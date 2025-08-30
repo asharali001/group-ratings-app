@@ -11,6 +11,7 @@ class GroupController extends GetxController {
   final AuthService _authService = Get.find<AuthService>();
 
   final RxList<Group> userGroups = <Group>[].obs;
+  final RxList<RatingItem> groupRatingItems = <RatingItem>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isCreatingGroup = false.obs;
   final RxBool isJoiningGroup = false.obs;
@@ -36,6 +37,13 @@ class GroupController extends GetxController {
         userGroups.value = groups;
       });
     }
+  }
+
+  void loadGroupRatingItems(String groupId) {
+    final ratingService = Get.put(RatingService());
+    ratingService.getGroupRatingItems(groupId).listen((ratings) {
+      groupRatingItems.value = ratings;
+    });
   }
 
   /// Create a new group

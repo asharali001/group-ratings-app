@@ -32,15 +32,6 @@ class RatingService {
           await ref.putFile(imageFile);
           imageUrl = await ref.getDownloadURL();
         } catch (e) {
-          if (e.toString().contains('permission-denied')) {
-            print('Firebase Storage permission denied');
-          } else if (e.toString().contains('unauthenticated')) {
-            print('User not authenticated for Firebase Storage');
-          } else if (e.toString().contains('storage/unauthorized')) {
-            print('Firebase Storage unauthorized');
-          } else if (e.toString().contains('storage/quota-exceeded')) {
-            print('Firebase Storage quota exceeded');
-          }
           imageUrl = null;
         }
       }
@@ -193,7 +184,7 @@ class RatingService {
 
   Stream<List<RatingItem>> getUserRatingItems(String userId) {
     return _ratingsCollection
-        .where('createdBy', isEqualTo: userId)
+        .where('ratedBy', arrayContains: userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map(
@@ -203,7 +194,6 @@ class RatingService {
         );
   }
 
-  /// Add a user rating to a rating item
   Future<bool> addUserRating({
     required String ratingItemId,
     required String userId,
@@ -219,6 +209,7 @@ class RatingService {
 
       await _ratingsCollection.doc(ratingItemId).update({
         'ratings': FieldValue.arrayUnion([userRating.toMap()]),
+        'ratedBy': FieldValue.arrayUnion([userId]),
         'updatedAt': Timestamp.now(),
       });
 
@@ -280,6 +271,7 @@ class RatingService {
 
       await _ratingsCollection.doc(ratingItemId).update({
         'ratings': updatedRatings.map((r) => r.toMap()).toList(),
+        'ratedBy': FieldValue.arrayRemove([userId]),
         'updatedAt': Timestamp.now(),
       });
 

@@ -1,7 +1,7 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '/core/__core.dart';
 import '/styles/__styles.dart';
@@ -25,105 +25,58 @@ class GroupCard extends StatefulWidget {
 }
 
 class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
-  late AnimationController _scaleController;
-  late AnimationController _fadeController;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _fadeAnimation;
-  bool _isHovered = false;
+  final GroupController controller = Get.put(GroupController());
 
   @override
   void initState() {
     super.initState();
-    _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
-      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
-    );
-
-    _fadeController.forward();
-  }
-
-  @override
-  void dispose() {
-    _scaleController.dispose();
-    _fadeController.dispose();
-    super.dispose();
+    controller.loadGroupRatingItems(widget.group.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimationConfiguration.staggeredList(
-      position: widget.index,
-      duration: const Duration(milliseconds: 600),
-      child: SlideAnimation(
-        verticalOffset: 50.0,
-        child: FadeInAnimation(
-          child: MouseRegion(
-            onEnter: (_) {
-              setState(() => _isHovered = true);
-              _scaleController.forward();
-            },
-            onExit: (_) {
-              setState(() => _isHovered = false);
-              _scaleController.reverse();
-            },
-            child: AnimatedBuilder(
-              animation: _scaleAnimation,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _scaleAnimation.value,
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: context.colors.outline.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(AppBorderRadius.xl),
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: context.colors.outline.withValues(alpha: 0.3),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(AppBorderRadius.xl),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppBorderRadius.xl),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    widget.group.description!,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: context.colors.onSurface,
+                      height: 1.5,
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-                      child: Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildHeader(),
-                                const SizedBox(height: AppSpacing.lg),
-                                _buildDescription(),
-                                const SizedBox(height: AppSpacing.lg),
-                                _buildFooter(),
-                              ],
-                            ),
-                          ),
-
-                          // Action buttons overlay
-                          Positioned(
-                            top: AppSpacing.md,
-                            right: AppSpacing.md,
-                            child: _buildActionButtons(),
-                          ),
-                        ],
-                      ),
-                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                );
-              },
+                  const SizedBox(height: AppSpacing.lg),
+                  _buildFooter(),
+                ],
+              ),
             ),
-          ),
+
+            // Action buttons overlay
+            Positioned(
+              top: AppSpacing.md,
+              right: AppSpacing.md,
+              child: _buildActionButtons(),
+            ),
+          ],
         ),
       ),
     );
@@ -138,11 +91,11 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
           height: 80,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppBorderRadius.round),
+              borderRadius: BorderRadius.circular(AppBorderRadius.md),
               color: context.colors.surfaceContainerHighest,
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppBorderRadius.round),
+              borderRadius: BorderRadius.circular(AppBorderRadius.md),
               child: widget.group.imageUrl != null
                   ? Image.network(
                       widget.group.imageUrl!,
@@ -238,65 +191,40 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
         ),
 
         // Group code chip
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            color: context.colors.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(AppBorderRadius.round),
-            border: Border.all(color: context.colors.outline, width: 1),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.code_rounded,
-                size: 14,
-                color: context.colors.onSurface,
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              Text(
-                widget.group.groupCode,
-                style: AppTypography.bodySmall.copyWith(
+        GestureDetector(
+          onTap: () => _copyGroupCodeToClipboard(widget.group.groupCode),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              color: context.colors.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(AppBorderRadius.round),
+              border: Border.all(color: context.colors.outline, width: 1),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.code_rounded,
+                  size: 14,
                   color: context.colors.onSurface,
-                  fontWeight: AppTypography.medium,
-                  fontFamily: 'monospace',
                 ),
-              ),
-            ],
+                const SizedBox(width: AppSpacing.xs),
+                Text(
+                  widget.group.groupCode,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: context.colors.onSurface,
+                    fontWeight: AppTypography.medium,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildDescription() {
-    if (widget.group.description == null || widget.group.description!.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      width: double.maxFinite,
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(AppBorderRadius.md),
-        border: Border.all(
-          color: context.colors.outline.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Text(
-        widget.group.description!,
-        style: AppTypography.bodyMedium.copyWith(
-          color: context.colors.onSurface,
-          height: 1.5,
-        ),
-        maxLines: 3,
-        overflow: TextOverflow.ellipsis,
-      ),
     );
   }
 
@@ -320,11 +248,13 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
             color: AppColors.blue,
           ),
           const SizedBox(width: AppSpacing.lg),
-          _buildFooterItem(
-            icon: Icons.star_rounded,
-            label: '0 ratings', // TODO: Get actual ratings count
-            color: AppColors.yellow,
-          ),
+          Obx(() {
+            return _buildFooterItem(
+              icon: Icons.star_rounded,
+              label: '${controller.groupRatingItems.length} ratings',
+              color: AppColors.yellow,
+            );
+          }),
           const Spacer(),
           _buildFooterItem(
             icon: Icons.schedule_rounded,
@@ -488,6 +418,13 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
           ),
         ],
       ),
+    );
+  }
+
+  void _copyGroupCodeToClipboard(String groupCode) {
+    Clipboard.setData(ClipboardData(text: groupCode));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Group code copied to clipboard')),
     );
   }
 

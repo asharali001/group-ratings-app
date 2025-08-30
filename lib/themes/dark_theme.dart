@@ -35,7 +35,7 @@ class DarkAppTheme {
     tertiary: AppColors.tertiary,
   );
 
-  static final _textTheme = GoogleFonts.kanitTextTheme().apply(
+  static final _textTheme = GoogleFonts.outfitTextTheme().apply(
     bodyColor: _colorScheme.onSurface,
     displayColor: _colorScheme.onSurface,
   );
@@ -151,9 +151,7 @@ class DarkAppTheme {
       }
     }),
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    shape: const RoundedRectangleBorder(
-      borderRadius: AppBorderRadius.xsRadius,
-    ),
+    shape: const RoundedRectangleBorder(borderRadius: AppBorderRadius.xsRadius),
   );
 
   static final _inputDecorationTheme = InputDecorationTheme(
@@ -167,9 +165,7 @@ class DarkAppTheme {
     hintStyle: AppTypography.labelLarge.copyWith(
       color: _colorScheme.onSurfaceVariant,
     ),
-    errorStyle: AppTypography.labelSmall.copyWith(
-      color: _colorScheme.error,
-    ),
+    errorStyle: AppTypography.labelSmall.copyWith(color: _colorScheme.error),
     helperStyle: AppTypography.labelSmall,
     counterStyle: AppTypography.labelSmall,
     border: const OutlineInputBorder(
@@ -216,9 +212,7 @@ class DarkAppTheme {
   static final _outlinedButtonTheme = OutlinedButtonThemeData(
     style: AppStyleUtils.outlinedButtonStyle.copyWith(
       foregroundColor: WidgetStateProperty.all(_colorScheme.primary),
-      side: WidgetStateProperty.all(
-        BorderSide(color: _colorScheme.primary),
-      ),
+      side: WidgetStateProperty.all(BorderSide(color: _colorScheme.primary)),
     ),
   );
 

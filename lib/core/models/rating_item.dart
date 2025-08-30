@@ -10,6 +10,7 @@ class RatingItem {
   final String? imageUrl;
   final String? location;
   final int ratingScale;
+  final List<String> ratedBy;
   final List<UserRating> ratings;
   final String groupId;
   final String createdBy;
@@ -23,6 +24,7 @@ class RatingItem {
     this.imageUrl,
     this.location,
     required this.ratingScale,
+    required this.ratedBy,
     required this.ratings,
     required this.groupId,
     required this.createdBy,
@@ -46,6 +48,7 @@ class RatingItem {
       imageUrl: imageUrl ?? '',
       location: location ?? '',
       ratingScale: ratingScale,
+      ratedBy: [],
       ratings: [],
       groupId: groupId,
       createdBy: createdBy,
@@ -61,6 +64,7 @@ class RatingItem {
     String? imageUrl,
     String? location,
     int? ratingScale,
+    List<String>? ratedBy,
     List<UserRating>? ratings,
     String? groupId,
     String? createdBy,
@@ -74,6 +78,7 @@ class RatingItem {
       imageUrl: imageUrl ?? this.imageUrl,
       location: location ?? this.location,
       ratingScale: ratingScale ?? this.ratingScale,
+      ratedBy: ratedBy ?? this.ratedBy,
       ratings: ratings ?? this.ratings,
       groupId: groupId ?? this.groupId,
       createdBy: createdBy ?? this.createdBy,
@@ -90,6 +95,7 @@ class RatingItem {
       imageUrl: map['imageUrl'] ?? '',
       location: map['location'] ?? '',
       ratingScale: map['ratingScale'],
+      ratedBy: List<String>.from(map['ratedBy'] ?? []),
       ratings: List<UserRating>.from(
         (map['ratings'] ?? []).map((e) => UserRating.fromMap(e)),
       ),
@@ -108,6 +114,7 @@ class RatingItem {
       'imageUrl': imageUrl ?? '',
       'location': location ?? '',
       'ratingScale': ratingScale,
+      'ratedBy': ratedBy,
       'ratings': ratings,
       'groupId': groupId,
       'createdBy': createdBy,
@@ -118,7 +125,7 @@ class RatingItem {
 
   @override
   String toString() {
-    return 'RatingItem(id: $id, name: $name, description: $description, imageUrl: $imageUrl, location: $location, ratingScale: $ratingScale, ratings: $ratings, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'RatingItem(id: $id, name: $name, description: $description, imageUrl: $imageUrl, location: $location, ratingScale: $ratingScale, ratedBy: $ratedBy, ratings: $ratings, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -131,6 +138,7 @@ class RatingItem {
         other.imageUrl == imageUrl &&
         other.location == location &&
         other.ratingScale == ratingScale &&
+        other.ratedBy == ratedBy &&
         other.ratings == ratings &&
         other.groupId == groupId &&
         other.createdBy == createdBy &&
@@ -146,6 +154,7 @@ class RatingItem {
         imageUrl.hashCode ^
         location.hashCode ^
         ratingScale.hashCode ^
+        ratedBy.hashCode ^
         ratings.hashCode ^
         groupId.hashCode ^
         createdBy.hashCode ^

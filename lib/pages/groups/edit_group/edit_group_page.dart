@@ -23,45 +23,15 @@ class _EditGroupPageState extends State<EditGroupPage>
   final _descriptionController = TextEditingController();
   final _groupController = Get.put(EditGroupController());
 
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeOut));
-
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-        );
-
-    // Initialize form with existing group data
     _nameController.text = widget.group.name;
     _descriptionController.text = widget.group.description ?? '';
-
-    _fadeController.forward();
-    _slideController.forward();
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
-    _slideController.dispose();
     _nameController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -119,7 +89,7 @@ class _EditGroupPageState extends State<EditGroupPage>
           style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         elevation: 0,
-        foregroundColor: AppColors.text,
+        foregroundColor: context.colors.onSurface,
         centerTitle: true,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
@@ -127,141 +97,86 @@ class _EditGroupPageState extends State<EditGroupPage>
           ),
         ),
       ),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Section
-                  _buildHeader(),
-                  const SizedBox(height: AppSpacing.xl),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Group Image Section
+              _buildImageSection(),
+              const SizedBox(height: AppSpacing.xl),
 
-                  // Group Image Section
-                  _buildImageSection(),
-                  const SizedBox(height: AppSpacing.xl),
-
-                  // Image Upload Progress
-                  Obx(
-                    () => _groupController.isUploadingImage.value
-                        ? Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            decoration: BoxDecoration(
-                              color: context.colors.primary.withValues(
-                                alpha: 0.1,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppBorderRadius.lg,
-                              ),
-                              border: Border.all(
-                                color: context.colors.primary.withValues(
-                                  alpha: 0.3,
-                                ),
-                                width: 1,
-                              ),
+              // Image Upload Progress
+              Obx(
+                () => _groupController.isUploadingImage.value
+                    ? Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        decoration: BoxDecoration(
+                          color: context.colors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(
+                            AppBorderRadius.lg,
+                          ),
+                          border: Border.all(
+                            color: context.colors.primary.withValues(
+                              alpha: 0.3,
                             ),
-                            child: Column(
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              context.colors.primary,
-                                            ),
-                                      ),
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      context.colors.primary,
                                     ),
-                                    const SizedBox(width: AppSpacing.md),
-                                    Expanded(
-                                      child: Text(
-                                        'Processing and uploading image...',
-                                        style: AppTypography.bodyMedium
-                                            .copyWith(
-                                              color: context.colors.primary,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: AppSpacing.sm),
-                                Text(
-                                  'This may take a few moments depending on your internet connection.',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: context.colors.onSurfaceVariant,
                                   ),
-                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(width: AppSpacing.md),
+                                Expanded(
+                                  child: Text(
+                                    'Processing and uploading image...',
+                                    style: AppTypography.bodyMedium.copyWith(
+                                      color: context.colors.primary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                  if (_groupController.isUploadingImage.value)
-                    const SizedBox(height: AppSpacing.lg),
-
-                  // Form Section
-                  _buildFormSection(),
-                  const SizedBox(height: AppSpacing.xl),
-
-                  // Update Button
-                  _buildUpdateButton(),
-                ],
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              'This may take a few moments depending on your internet connection.',
+                              style: AppTypography.bodySmall.copyWith(
+                                color: context.colors.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+              if (_groupController.isUploadingImage.value)
+                const SizedBox(height: AppSpacing.lg),
 
-  Widget _buildHeader() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            context.colors.primary.withValues(alpha: 0.3),
-            context.colors.primary.withValues(alpha: 0.1),
-          ],
+              // Form Section
+              _buildFormSection(),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Update Button
+              _buildUpdateButton(),
+            ],
+          ),
         ),
-        borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-        border: Border.all(color: context.colors.outline, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.edit_rounded, size: 32, color: context.colors.primary),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'Update Your Group',
-            style: AppTypography.headlineSmall.copyWith(
-              color: context.colors.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Modify your group details to keep it fresh and engaging for your members.',
-            style: AppTypography.bodyMedium.copyWith(
-              color: context.colors.onSurfaceVariant,
-              height: 1.5,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -276,6 +191,7 @@ class _EditGroupPageState extends State<EditGroupPage>
         border: Border.all(color: context.colors.outline, width: 1),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Group Photo',
@@ -284,7 +200,6 @@ class _EditGroupPageState extends State<EditGroupPage>
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
           Text(
             'Update the photo to keep your group looking fresh',
             style: AppTypography.bodySmall.copyWith(
@@ -293,136 +208,85 @@ class _EditGroupPageState extends State<EditGroupPage>
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.lg),
-
-          // Current Image Display
-          if (widget.group.imageUrl != null) ...[
-            Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-                boxShadow: [
-                  BoxShadow(
-                    color: context.colors.outline.withValues(alpha: 0.2),
-                    blurRadius: 15,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-                child: Image.network(
-                  widget.group.imageUrl!,
-                  fit: BoxFit.cover,
-                  width: 140,
-                  height: 140,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: 140,
-                      height: 140,
-                      decoration: BoxDecoration(
-                        color: context.colors.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-                      ),
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        size: 48,
-                        color: AppColors.gray,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-          ],
-
-          GestureDetector(
-            onTap: _pickImage,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                color: _groupController.hasSelectedImage
-                    ? AppColors.transparent
-                    : context.colors.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-                border: Border.all(
-                  color: _groupController.hasSelectedImage
-                      ? context.colors.primary.withValues(alpha: 0.3)
-                      : context.colors.outline.withValues(alpha: 0.3),
-                  width: 2,
-                ),
-                boxShadow: _groupController.hasSelectedImage
-                    ? [
-                        BoxShadow(
-                          color: context.colors.primary.withValues(alpha: 0.2),
-                          blurRadius: 15,
-                          offset: const Offset(0, 6),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: _groupController.hasSelectedImage
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-                      child: Stack(
-                        children: [
-                          Image.file(
-                            _groupController.selectedImage!,
-                            fit: BoxFit.cover,
-                            width: 140,
-                            height: 140,
-                          ),
-                          Positioned(
-                            top: AppSpacing.sm,
-                            right: AppSpacing.sm,
-                            child: Container(
-                              padding: const EdgeInsets.all(AppSpacing.xs),
+          Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppBorderRadius.xl),
+              child: Stack(
+                children: [
+                  // Image
+                  _groupController.hasSelectedImage
+                      ? Image.file(
+                          _groupController.selectedImage!,
+                          fit: BoxFit.cover,
+                        )
+                      : widget.group.imageUrl != null
+                      ? Image.network(
+                          widget.group.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
                               decoration: BoxDecoration(
-                                color: context.colors.primary,
-                                shape: BoxShape.circle,
+                                color: context.colors.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(
+                                  AppBorderRadius.xl,
+                                ),
                               ),
-                              child: Icon(
-                                Icons.check,
-                                size: 16,
-                                color: context.colors.onPrimary,
+                              child: const Icon(
+                                Icons.image_not_supported,
+                                size: 48,
+                                color: AppColors.gray,
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.md),
+                            );
+                          },
+                        )
+                      : Container(
                           decoration: BoxDecoration(
-                            color: context.colors.primary.withValues(
-                              alpha: 0.1,
+                            color: context.colors.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(
+                              AppBorderRadius.xl,
                             ),
-                            shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.add_a_photo_rounded,
-                            size: 32,
-                            color: context.colors.primary,
+                            size: 48,
+                            color: context.colors.onSurfaceVariant,
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          'Change Photo',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: context.colors.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
+
+                  // Edit Icon Overlay
+                  Positioned(
+                    top: AppSpacing.sm,
+                    right: AppSpacing.sm,
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        padding: const EdgeInsets.all(AppSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: context.colors.primary,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: context.colors.primary.withValues(
+                                alpha: 0.3,
+                              ),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
+                        child: Icon(
+                          Icons.edit,
+                          size: 20,
+                          color: context.colors.onPrimary,
+                        ),
+                      ),
                     ),
+                  ),
+                ],
+              ),
             ),
           ),
+
           if (_groupController.hasSelectedImage) ...[
             const SizedBox(height: AppSpacing.md),
             Obx(

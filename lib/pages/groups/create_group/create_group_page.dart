@@ -135,11 +135,6 @@ class _CreateGroupPageState extends State<CreateGroupPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header Section
-                  _buildHeader(),
-                  const SizedBox(height: AppSpacing.xl),
-
-                  // Group Image Section
                   _buildImageSection(),
                   const SizedBox(height: AppSpacing.xl),
 
@@ -218,51 +213,6 @@ class _CreateGroupPageState extends State<CreateGroupPage>
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            context.colors.primary.withValues(alpha: 0.3),
-            context.colors.primary.withValues(alpha: 0.1),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-        border: Border.all(color: context.colors.outline, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.group_add_rounded,
-            size: 32,
-            color: context.colors.primary,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'Start Building Your Community',
-            style: AppTypography.headlineSmall.copyWith(
-              color: context.colors.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Create a group to connect with like-minded people and share experiences.',
-            style: AppTypography.bodyMedium.copyWith(
-              color: context.colors.onSurfaceVariant,
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildImageSection() {
     return Container(
       width: double.infinity,
@@ -273,6 +223,7 @@ class _CreateGroupPageState extends State<CreateGroupPage>
         border: Border.all(color: context.colors.outline, width: 1),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Group Photo',
