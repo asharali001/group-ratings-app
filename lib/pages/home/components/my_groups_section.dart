@@ -23,7 +23,7 @@ class MyGroupsSection extends GetView<HomeController> {
             Text(
               'My Groups',
               style: AppTypography.titleLarge.copyWith(
-                color: context.colors.onSurface,
+                color: AppColors.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -31,9 +31,7 @@ class MyGroupsSection extends GetView<HomeController> {
               onPressed: controller.navigateToGroupsPage,
               icon: const Icon(Icons.arrow_forward),
               label: const Text('View All'),
-              style: TextButton.styleFrom(
-                foregroundColor: context.colors.primary,
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ],
         ),
@@ -49,7 +47,7 @@ class MyGroupsSection extends GetView<HomeController> {
               description:
                   'Create or join a group to get started with rating items together',
               icon: Icons.group_outlined,
-              iconColor: context.colors.onSurface,
+              iconColor: AppColors.onSurface,
               actions: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

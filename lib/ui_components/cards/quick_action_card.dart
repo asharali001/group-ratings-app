@@ -9,7 +9,6 @@ class QuickActionCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final VoidCallback onTap;
-  final bool isGradient;
 
   const QuickActionCard({
     super.key,
@@ -18,7 +17,6 @@ class QuickActionCard extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     required this.onTap,
-    this.isGradient = false,
   });
 
   @override
@@ -28,17 +26,10 @@ class QuickActionCard extends StatelessWidget {
       child: Container(
         height: 120,
         decoration: BoxDecoration(
-          gradient: isGradient
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    context.colors.primary,
-                    context.colors.primary.withValues(alpha: 0.8),
-                  ],
-                )
-              : null,
-          color: isGradient ? null : context.colors.surfaceContainer,
+          color: AppColors.cardBackground,
+          border: Border.all(
+            color: context.colors.outline.withValues(alpha: 0.3),
+          ),
           borderRadius: BorderRadius.circular(AppBorderRadius.lg),
         ),
         child: Padding(
@@ -48,16 +39,10 @@ class QuickActionCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: isGradient
-                      ? context.colors.onPrimary.withValues(alpha: 0.2)
-                      : iconColor.withValues(alpha: 0.1),
+                  color: iconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppBorderRadius.md),
                 ),
-                child: Icon(
-                  icon,
-                  color: isGradient ? context.colors.onPrimary : iconColor,
-                  size: 28,
-                ),
+                child: Icon(icon, color: iconColor, size: 28),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
@@ -68,9 +53,7 @@ class QuickActionCard extends StatelessWidget {
                     Text(
                       title,
                       style: AppTypography.titleMedium.copyWith(
-                        color: isGradient
-                            ? context.colors.onPrimary
-                            : context.colors.onSurface,
+                        color: context.colors.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -78,9 +61,7 @@ class QuickActionCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: AppTypography.bodyMedium.copyWith(
-                        color: isGradient
-                            ? context.colors.onPrimary.withValues(alpha: 0.9)
-                            : context.colors.onSurface,
+                        color: context.colors.onSurface,
                       ),
                     ),
                   ],
@@ -88,9 +69,7 @@ class QuickActionCard extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_forward_ios,
-                color: isGradient
-                    ? context.colors.onPrimary.withValues(alpha: 0.7)
-                    : context.colors.onSurface,
+                color: context.colors.onSurface,
                 size: 16,
               ),
             ],

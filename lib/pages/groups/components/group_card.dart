@@ -5,10 +5,12 @@ import 'package:get/get.dart';
 
 import '/core/__core.dart';
 import '/styles/__styles.dart';
+import '/ui_components/__ui_components.dart';
+import '/constants/enums.dart';
 
 import '../group_controller.dart';
 
-class GroupCard extends StatefulWidget {
+class GroupCard extends StatelessWidget {
   final Group group;
   final bool isCreator;
   final int index;
@@ -21,142 +23,58 @@ class GroupCard extends StatefulWidget {
   });
 
   @override
-  State<GroupCard> createState() => _GroupCardState();
-}
-
-class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
-  final GroupController controller = Get.put(GroupController());
-
-  @override
-  void initState() {
-    super.initState();
-    controller.loadGroupRatingItems(widget.group.id);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: context.colors.outline.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        color: AppColors.cardBackground,
+        border: Border.all(color: AppColors.outline),
         borderRadius: BorderRadius.circular(AppBorderRadius.xl),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    widget.group.description!,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: context.colors.onSurface,
-                      height: 1.5,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _buildFooter(),
-                ],
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            group.description!,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.onSurface,
+              height: 1.5,
             ),
-
-            // Action buttons overlay
-            Positioned(
-              top: AppSpacing.md,
-              right: AppSpacing.md,
-              child: _buildActionButtons(),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _buildFooter(),
+        ],
       ),
     );
   }
 
   Widget _buildHeader() {
-    return Row(
+    return Column(
       children: [
-        // Modern avatar with gradient border
-        SizedBox(
-          width: 80,
-          height: 80,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppBorderRadius.md),
-              color: context.colors.surfaceContainerHighest,
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppBorderRadius.md),
-              child: widget.group.imageUrl != null
-                  ? Image.network(
-                      widget.group.imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                context.colors.primary.withValues(alpha: 0.1),
-                                context.colors.primary.withValues(alpha: 0.1),
-                              ],
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.group_rounded,
-                            color: context.colors.primary,
-                            size: 28,
-                          ),
-                        );
-                      },
-                    )
-                  : Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppColors.primary.withValues(alpha: 0.1),
-                            AppColors.purple.withValues(alpha: 0.1),
-                          ],
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.group_rounded,
-                        color: context.colors.primary,
-                        size: 28,
-                      ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    group.name,
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: AppColors.onSurface,
+                      fontWeight: AppTypography.semiBold,
                     ),
-            ),
-          ),
-        ),
-
-        const SizedBox(width: AppSpacing.sm),
-
-        // Group info
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.group.name,
-                style: AppTypography.bodyLarge.copyWith(
-                  color: context.colors.onSurface,
-                  fontWeight: AppTypography.semiBold,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  _buildStatusChips(),
+                ],
               ),
-              const SizedBox(height: AppSpacing.sm),
-              _buildStatusChips(),
-            ],
-          ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            _buildActionButtons(),
+          ],
         ),
       ],
     );
@@ -174,48 +92,43 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
             vertical: AppSpacing.sm,
           ),
           decoration: BoxDecoration(
-            color: widget.isCreator
-                ? context.colors.primary
-                : context.colors.secondary,
+            color: isCreator ? AppColors.primary : AppColors.secondary,
             borderRadius: BorderRadius.circular(AppBorderRadius.round),
           ),
           child: Text(
-            widget.isCreator ? 'Creator' : 'Member',
+            isCreator ? 'Creator' : 'Member',
             style: AppTypography.bodySmall.copyWith(
-              color: widget.isCreator
-                  ? context.colors.onPrimary
-                  : context.colors.onSurface,
+              color: AppColors.white,
               fontWeight: AppTypography.semiBold,
             ),
           ),
         ),
-
         // Group code chip
         GestureDetector(
-          onTap: () => _copyGroupCodeToClipboard(widget.group.groupCode),
+          onTap: () => _copyGroupCodeToClipboard(group.groupCode),
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
               vertical: AppSpacing.sm,
             ),
             decoration: BoxDecoration(
-              color: context.colors.surfaceContainerHighest,
+              color: AppColors.cardBackgroundHighest,
               borderRadius: BorderRadius.circular(AppBorderRadius.round),
-              border: Border.all(color: context.colors.outline, width: 1),
+              border: Border.all(color: AppColors.outline),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.code_rounded,
-                  size: 14,
-                  color: context.colors.onSurface,
+                  size: 12,
+                  color: AppColors.onSurface,
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
-                  widget.group.groupCode,
+                  group.groupCode,
                   style: AppTypography.bodySmall.copyWith(
-                    color: context.colors.onSurface,
+                    color: AppColors.onSurface,
                     fontWeight: AppTypography.medium,
                     fontFamily: 'monospace',
                   ),
@@ -224,46 +137,155 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
             ),
           ),
         ),
+        // Category chip
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.blue.withValues(alpha: 0.02),
+            borderRadius: BorderRadius.circular(AppBorderRadius.round),
+            border: Border.all(color: AppColors.blue.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(group.category.emoji, style: const TextStyle(fontSize: 12)),
+              const SizedBox(width: AppSpacing.xs),
+              Text(
+                group.category.displayName,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.blue,
+                  fontWeight: AppTypography.medium,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildFooter() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: context.colors.surface,
-        borderRadius: BorderRadius.circular(AppBorderRadius.md),
-        border: Border.all(
-          color: context.colors.outline.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          _buildFooterItem(
-            icon: Icons.people_rounded,
-            label:
-                '${widget.group.members.length} member${widget.group.members.length == 1 ? '' : 's'}',
-            color: AppColors.blue,
-          ),
-          const SizedBox(width: AppSpacing.lg),
-          Obx(() {
-            return _buildFooterItem(
+    return Column(
+      children: [
+        Row(
+          children: [
+            _buildFooterItem(
+              icon: Icons.people_rounded,
+              label:
+                  '${group.memberIds.length} member${group.memberIds.length == 1 ? '' : 's'}',
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: AppSpacing.lg),
+            _buildFooterItem(
               icon: Icons.star_rounded,
-              label: '${controller.groupRatingItems.length} ratings',
+              label: '${group.ratingItemsCount} ratings',
               color: AppColors.yellow,
-            );
-          }),
-          const Spacer(),
-          _buildFooterItem(
-            icon: Icons.schedule_rounded,
-            label: _formatDate(widget.group.createdAt),
-            color: context.colors.onSurface,
-            isDate: true,
+            ),
+            const Spacer(),
+            _buildFooterItem(
+              icon: Icons.schedule_rounded,
+              label: _formatDate(group.createdAt),
+              color: AppColors.onSurface,
+              isDate: true,
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _buildMembersPreview(),
+      ],
+    );
+  }
+
+  Widget _buildMembersPreview() {
+    final displayMembers = group.members.take(3).toList();
+    final remainingCount = group.members.length - 3;
+
+    return Row(
+      children: [
+        const Icon(
+          Icons.people_outline_rounded,
+          size: 16,
+          color: AppColors.textLight,
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Text(
+          'Members: ',
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textLight,
+            fontWeight: AppTypography.medium,
           ),
-        ],
-      ),
+        ),
+        Expanded(
+          child: Row(
+            children: [
+              ...displayMembers.map(
+                (member) => Container(
+                  margin: const EdgeInsets.only(right: AppSpacing.xs),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: member.role == GroupMemberRole.admin
+                        ? AppColors.primary.withValues(alpha: 0.1)
+                        : AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppBorderRadius.sm),
+                    border: Border.all(
+                      color: member.role == GroupMemberRole.admin
+                          ? AppColors.primary.withValues(alpha: 0.3)
+                          : AppColors.outline,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (member.role == GroupMemberRole.admin)
+                        const Icon(
+                          Icons.admin_panel_settings_rounded,
+                          size: 12,
+                          color: AppColors.primary,
+                        ),
+                      if (member.role == GroupMemberRole.admin)
+                        const SizedBox(width: AppSpacing.xs),
+                      Text(
+                        member.name,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: member.role == GroupMemberRole.admin
+                              ? AppColors.primary
+                              : AppColors.text,
+                          fontWeight: AppTypography.medium,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (remainingCount > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppBorderRadius.sm),
+                    border: Border.all(color: AppColors.outline),
+                  ),
+                  child: Text(
+                    '+$remainingCount more',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textLight,
+                      fontWeight: AppTypography.medium,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -276,19 +298,12 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.xs),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppBorderRadius.sm),
-          ),
-          child: Icon(icon, size: 16, color: color),
-        ),
+        Icon(icon, size: 16, color: color),
         const SizedBox(width: AppSpacing.xs),
         Text(
           label,
           style: AppTypography.bodySmall.copyWith(
-            color: context.colors.onSurface,
+            color: AppColors.onSurface,
             fontWeight: AppTypography.medium,
           ),
         ),
@@ -301,7 +316,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Edit button for creator
-        if (widget.isCreator) ...[
+        if (isCreator) ...[
           _buildActionButton(
             icon: EvaIcons.editOutline,
             onTap: _navigateToEditGroup,
@@ -313,14 +328,10 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
 
         // Leave/Delete button
         _buildActionButton(
-          icon: widget.isCreator
-              ? EvaIcons.trash2Outline
-              : EvaIcons.logOutOutline,
-          onTap: () => _showLeaveGroupDialog(context),
-          color: widget.isCreator
-              ? context.colors.error
-              : context.colors.onSurface,
-          tooltip: widget.isCreator ? 'Delete Group' : 'Leave Group',
+          icon: isCreator ? EvaIcons.trash2Outline : EvaIcons.logOutOutline,
+          onTap: () => _showLeaveGroupDialog(Get.context!),
+          color: isCreator ? AppColors.error : AppColors.onSurface,
+          tooltip: isCreator ? 'Delete Group' : 'Leave Group',
         ),
       ],
     );
@@ -332,23 +343,20 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
     required Color color,
     required String tooltip,
   }) {
-    return Tooltip(
-      message: tooltip,
-      child: Container(
-        decoration: BoxDecoration(
-          color: context.colors.surface.withValues(alpha: 0.9),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppBorderRadius.round),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(AppBorderRadius.round),
-          border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(AppBorderRadius.round),
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              child: Icon(icon, size: 20, color: color),
-            ),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            child: Icon(icon, size: 20, color: color),
           ),
         ),
       ),
@@ -356,10 +364,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
   }
 
   void _navigateToEditGroup() {
-    Get.toNamed(
-      RouteNames.groups.editGroupPage,
-      arguments: {'group': widget.group},
-    );
+    Get.toNamed(RouteNames.groups.editGroupPage, arguments: {'group': group});
   }
 
   void _showLeaveGroupDialog(BuildContext context) {
@@ -377,9 +382,9 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
           ),
         ),
         content: Text(
-          widget.isCreator
-              ? 'Are you sure you want to leave "${widget.group.name}"? Since you are the creator, this will delete the group for all members.'
-              : 'Are you sure you want to leave "${widget.group.name}"?',
+          isCreator
+              ? 'Are you sure you want to leave "${group.name}"? Since you are the creator, this will delete the group for all members.'
+              : 'Are you sure you want to leave "${group.name}"?',
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.textLight,
             height: 1.5,
@@ -406,7 +411,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
             onPressed: () {
               Navigator.of(context).pop();
               final groupController = Get.find<GroupController>();
-              groupController.leaveGroup(widget.group.id);
+              groupController.leaveGroup(group.id);
             },
             child: Text(
               'Leave',
@@ -423,9 +428,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
 
   void _copyGroupCodeToClipboard(String groupCode) {
     Clipboard.setData(ClipboardData(text: groupCode));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Group code copied to clipboard')),
-    );
+    showCustomSnackBar(message: 'Group code copied to clipboard');
   }
 
   String _formatDate(DateTime date) {

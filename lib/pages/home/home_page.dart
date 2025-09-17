@@ -11,30 +11,27 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            const CustomAppbar(),
+            CustomAppbar(),
             Expanded(
-              child: RefreshIndicator(
-                onRefresh: controller.refreshData,
-                child: const SingleChildScrollView(
-                  padding: EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      StatsSection(),
-                      SizedBox(height: AppSpacing.xl),
-                      MyGroupsSection(),
-                      SizedBox(height: AppSpacing.xl),
-                      QuickActionsSection(),
-                      // SizedBox(height: AppSpacing.xl),
-                      // FeaturesSection(),
-                      // SizedBox(height: AppSpacing.xl),
-                      // RecentActivitySection(),
-                    ],
-                  ),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    StatsSection(),
+                    SizedBox(height: AppSpacing.xl),
+                    MyGroupsSection(),
+                    SizedBox(height: AppSpacing.xl),
+                    QuickActionsSection(),
+                    // SizedBox(height: AppSpacing.xl),
+                    // FeaturesSection(),
+                    // SizedBox(height: AppSpacing.xl),
+                    // RecentActivitySection(),
+                  ],
                 ),
               ),
             ),

@@ -24,9 +24,11 @@ class EmptyStateCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: context.colors.surfaceContainer,
+        color: AppColors.cardBackground,
+        border: Border.all(
+          color: context.colors.outline.withValues(alpha: 0.3),
+        ),
         borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-        border: Border.all(color: context.colors.outline, width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

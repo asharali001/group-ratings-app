@@ -10,6 +10,8 @@ class Group {
   final String? description;
   final String? imageUrl;
   final String groupCode;
+  final int ratingItemsCount;
+  final GroupCategory category;
   final List<String> memberIds;
   final List<GroupMember> members;
   final DateTime createdAt;
@@ -21,6 +23,8 @@ class Group {
     required this.name,
     this.description,
     this.imageUrl,
+    required this.ratingItemsCount,
+    required this.category,
     required this.memberIds,
     required this.members,
     required this.createdAt,
@@ -32,6 +36,7 @@ class Group {
     required String name,
     String? description,
     String? imageUrl,
+    required GroupCategory category,
     required UserModel user,
   }) {
     final now = DateTime.now();
@@ -41,6 +46,8 @@ class Group {
       name: name,
       description: description,
       imageUrl: imageUrl,
+      ratingItemsCount: 0,
+      category: category,
       memberIds: [user.uid],
       members: [
         GroupMember(
@@ -62,6 +69,11 @@ class Group {
       name: map['name'] ?? '',
       description: map['description'],
       imageUrl: map['imageUrl'],
+      ratingItemsCount: map['ratingItemsCount'] ?? 0,
+      category: GroupCategory.values.firstWhere(
+        (e) => e.name == map['category'],
+        orElse: () => GroupCategory.other,
+      ),
       memberIds: List<String>.from(map['memberIds'] ?? []),
       members: List<GroupMember>.from(
         (map['members'] ?? []).map((e) => GroupMember.fromMap(e)),
@@ -78,6 +90,8 @@ class Group {
       'name': name,
       'description': description,
       'imageUrl': imageUrl,
+      'ratingItemsCount': ratingItemsCount,
+      'category': category.name,
       'memberIds': memberIds,
       'members': members.map((e) => e.toMap()).toList(),
       'createdAt': Timestamp.fromDate(createdAt),
@@ -91,6 +105,8 @@ class Group {
     String? name,
     String? description,
     String? imageUrl,
+    int? ratingItemsCount,
+    GroupCategory? category,
     List<String>? memberIds,
     List<GroupMember>? members,
     DateTime? createdAt,
@@ -102,6 +118,8 @@ class Group {
       name: name ?? this.name,
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
+      ratingItemsCount: ratingItemsCount ?? this.ratingItemsCount,
+      category: category ?? this.category,
       memberIds: memberIds ?? this.memberIds,
       members: members ?? this.members,
       createdAt: createdAt ?? this.createdAt,

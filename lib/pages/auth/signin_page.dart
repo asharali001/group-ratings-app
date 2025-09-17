@@ -133,22 +133,25 @@ class SignInPage extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         
         // Password Field
-        CustomTextField(
-          controller: controller.passwordController,
-          labelText: 'Password',
-          prefixIcon: Icons.lock,
-          obscureText: !controller.isPasswordVisible,
-          suffixIcon: IconButton(
-            icon: Icon(
-              controller.isPasswordVisible 
-                ? Icons.visibility_off 
-                : Icons.visibility,
-              color: AppColors.textLight,
-            ),
-            onPressed: controller.togglePasswordVisibility,
-          ),
-          textInputAction: TextInputAction.done,
-          onSubmitted: () => controller.signInWithEmailAndPassword(),
+        Obx(() {
+            return CustomTextField(
+              controller: controller.passwordController,
+              labelText: 'Password',
+              prefixIcon: Icons.lock,
+              obscureText: !controller.isPasswordVisible,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  controller.isPasswordVisible 
+                    ? Icons.visibility_off 
+                    : Icons.visibility,
+                  color: AppColors.textLight,
+                ),
+                onPressed: controller.togglePasswordVisibility,
+              ),
+              textInputAction: TextInputAction.done,
+              onSubmitted: () => controller.signInWithEmailAndPassword(),
+            );
+          }
         ),
         
         const SizedBox(height: AppSpacing.md),
@@ -187,14 +190,17 @@ class SignInPage extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         
         // Submit Button
-        CustomButton(
-          onPressed: controller.isLoading 
-            ? null 
-            : controller.signInWithEmailAndPassword,
-          text: controller.isLoading 
-            ? 'Please wait...'
-            : 'Sign In',
-          isLoading: controller.isLoading,
+        Obx(() {
+            return CustomButton(
+              onPressed: controller.isLoading 
+                ? null 
+                : controller.signInWithEmailAndPassword,
+              text: controller.isLoading 
+                ? 'Please wait...'
+                : 'Sign In',
+              isLoading: controller.isLoading,
+            );
+          }
         ),
         
         const SizedBox(height: AppSpacing.md),

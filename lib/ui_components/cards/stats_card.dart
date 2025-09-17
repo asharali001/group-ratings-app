@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '/core/__core.dart';
 import '/styles/__styles.dart';
 
 class StatsCard extends StatelessWidget {
@@ -8,7 +7,6 @@ class StatsCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color iconColor;
-  final Color backgroundColor;
 
   const StatsCard({
     super.key,
@@ -16,7 +14,6 @@ class StatsCard extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.iconColor,
-    required this.backgroundColor,
   });
 
   @override
@@ -24,31 +21,26 @@ class StatsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: AppColors.cardBackground,
+        border: Border.all(color: AppColors.outline),
         borderRadius: BorderRadius.circular(AppBorderRadius.lg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppBorderRadius.sm),
-                ),
-                child: Icon(icon, color: iconColor, size: 20),
-              ),
-              const Spacer(),
-              const Icon(Icons.trending_up, color: AppColors.green, size: 16),
-            ],
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppBorderRadius.sm),
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
             value,
             style: AppTypography.headlineSmall.copyWith(
-              color: context.colors.onSurface,
+              color: AppColors.onSurface,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -56,7 +48,7 @@ class StatsCard extends StatelessWidget {
           Text(
             title,
             style: AppTypography.bodyMedium.copyWith(
-              color: context.colors.onSurface,
+              color: AppColors.onSurface,
             ),
           ),
         ],

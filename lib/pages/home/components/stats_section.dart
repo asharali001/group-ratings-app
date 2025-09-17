@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import '/core/__core.dart';
 import '/styles/__styles.dart';
 import '/ui_components/__ui_components.dart';
 
@@ -18,7 +17,7 @@ class StatsSection extends GetView<HomeController> {
         Text(
           'Overview',
           style: AppTypography.titleLarge.copyWith(
-            color: context.colors.onSurface,
+            color: AppColors.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -31,8 +30,7 @@ class StatsSection extends GetView<HomeController> {
                   title: 'Active Groups',
                   value: '${controller.activeGroupsCount}',
                   icon: Icons.group,
-                  iconColor: context.colors.primary,
-                  backgroundColor: context.colors.surfaceContainer,
+                  iconColor: AppColors.primary,
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -42,7 +40,6 @@ class StatsSection extends GetView<HomeController> {
                   value: '${controller.totalRatings}',
                   icon: Icons.star,
                   iconColor: AppColors.yellow,
-                  backgroundColor: context.colors.surfaceContainer,
                 ),
               ),
             ],

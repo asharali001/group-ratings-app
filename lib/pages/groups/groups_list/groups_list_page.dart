@@ -15,9 +15,11 @@ class GroupsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final groupController = Get.find<GroupsListController>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Groups'),
+    return Obx(() {
+      return PageLayout(
+        title: 'My Groups',
+        isLoading: groupController.isLoading.value,
+        isEmpty: groupController.userGroups.isEmpty,
         actions: [
           IconButton(
             onPressed: () => Get.toNamed(RouteNames.groups.createGroupPage),
@@ -25,62 +27,25 @@ class GroupsPage extends StatelessWidget {
             tooltip: 'Create Group',
           ),
         ],
-      ),
-      body: Obx(() {
-        if (groupController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (groupController.userGroups.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.group_outlined,
-                  size: 64,
-                  color: AppColors.gray,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  'No groups yet',
-                  style: AppTypography.titleMedium.copyWith(
-                    color: AppColors.textLight,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Create or join a group to get started',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textLight,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CustomButton(
-                      onPressed: () =>
-                          Get.toNamed(RouteNames.groups.createGroupPage),
-                      text: 'Create Group',
-                      backgroundColor: AppColors.primary,
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    CustomButton(
-                      onPressed: () =>
-                          Get.toNamed(RouteNames.groups.joinGroupPage),
-                      text: 'Join Group',
-                      backgroundColor: AppColors.blue,
-                    ),
-                  ],
-                ),
-              ],
+        emptyStateWidget: EmptyStateWidget(
+          icon: Icons.group_outlined,
+          title: 'No groups yet',
+          description: 'Create or join a group to get started',
+          actions: [
+            CustomButton(
+              onPressed: () => Get.toNamed(RouteNames.groups.createGroupPage),
+              text: 'Create Group',
+              backgroundColor: AppColors.primary,
             ),
-          );
-        }
-
-        return ListView.builder(
+            const SizedBox(width: AppSpacing.md),
+            CustomButton(
+              onPressed: () => Get.toNamed(RouteNames.groups.joinGroupPage),
+              text: 'Join Group',
+              backgroundColor: AppColors.secondary,
+            ),
+          ],
+        ),
+        child: ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           itemCount: groupController.userGroups.length,
           itemBuilder: (context, index) {
@@ -97,8 +62,8 @@ class GroupsPage extends StatelessWidget {
               ),
             );
           },
-        );
-      }),
-    );
+        ),
+      );
+    });
   }
 }

@@ -47,22 +47,12 @@ class _CustomAppbarState extends State<CustomAppbar> {
           child: Material(
             elevation: 8,
             borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-            color: context.colors.surfaceContainer,
+            color: AppColors.cardBackground,
             child: Container(
               decoration: BoxDecoration(
-                color: context.colors.surfaceContainer,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                border: Border.all(
-                  color: context.colors.outline.withValues(alpha: 0.1),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: context.colors.onSurface.withValues(alpha: 0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+                border: Border.all(color: AppColors.outline),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -72,7 +62,7 @@ class _CustomAppbarState extends State<CustomAppbar> {
                     label: 'Profile',
                     onTap: () {
                       _removeOverlay();
-                      // TODO: Navigate to profile
+                      Get.toNamed(RouteNames.mainApp.profilePage);
                     },
                   ),
                   _buildMenuItem(
@@ -80,7 +70,7 @@ class _CustomAppbarState extends State<CustomAppbar> {
                     label: 'Settings',
                     onTap: () {
                       _removeOverlay();
-                      // TODO: Navigate to settings
+                      Get.toNamed(RouteNames.mainApp.settingsPage);
                     },
                   ),
                   const Divider(
@@ -162,12 +152,12 @@ class _CustomAppbarState extends State<CustomAppbar> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: context.colors.primaryContainer,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(AppBorderRadius.md),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.rate_review,
-              color: context.colors.primary,
+              color: AppColors.primary,
               size: 24,
             ),
           ),
@@ -179,14 +169,14 @@ class _CustomAppbarState extends State<CustomAppbar> {
                 Text(
                   'Group Ratings',
                   style: AppTypography.titleLarge.copyWith(
-                    color: context.colors.onPrimaryContainer,
+                    color: AppColors.onCardBackground,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
                   'Rate and review together',
                   style: AppTypography.bodySmall.copyWith(
-                    color: context.colors.onPrimaryContainer,
+                    color: AppColors.onCardBackground,
                   ),
                 ),
               ],
@@ -202,23 +192,19 @@ class _CustomAppbarState extends State<CustomAppbar> {
                   child: Container(
                     padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
-                      color: context.colors.surfaceContainer,
+                      color: AppColors.cardBackground,
                       borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                      border: Border.all(
-                        color: context.colors.outline.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor: context.colors.primary,
+                          backgroundColor: AppColors.primary,
                           child: Text(
                             authService.userDisplayName[0].toUpperCase(),
-                            style: TextStyle(
-                              color: context.colors.onPrimary,
+                            style: const TextStyle(
+                              color: AppColors.onPrimary,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
@@ -241,39 +227,4 @@ class _CustomAppbarState extends State<CustomAppbar> {
       ),
     );
   }
-}
-
-// Custom painter for the dropdown arrow
-class ArrowPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.surface
-      ..style = PaintingStyle.fill;
-
-    final path = Path()
-      ..moveTo(8, 0)
-      ..lineTo(0, 8)
-      ..lineTo(16, 8)
-      ..close();
-
-    canvas.drawPath(path, paint);
-
-    // Draw border for the arrow
-    final borderPaint = Paint()
-      ..color = AppColors.outline
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    final borderPath = Path()
-      ..moveTo(8, 0)
-      ..lineTo(0, 8)
-      ..lineTo(16, 8)
-      ..close();
-
-    canvas.drawPath(borderPath, borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

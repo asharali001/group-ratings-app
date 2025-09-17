@@ -24,20 +24,10 @@ class RatingsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          group.name,
-          style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w600),
-        ),
-        elevation: 0,
-        centerTitle: true,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(AppBorderRadius.lg),
-          ),
-        ),
+        title: Text(group.name),
         actions: [
           IconButton(
-            onPressed: () => _showAddRatingDialog(context, ratingController),
+            onPressed: () => _navigateToAddRating(context, ratingController),
             icon: const Icon(Icons.add),
             tooltip: 'Add Rating',
           ),
@@ -49,29 +39,12 @@ class RatingsPage extends StatelessWidget {
 
   Widget _buildRatingsList(RatingItemController ratingController) {
     return Obx(() {
-      if (ratingController.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
-      }
-
       if (ratingController.groupRatings.isEmpty) {
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.xl),
-                decoration: BoxDecoration(
-                  color: Get.context!.colors.surfaceContainerHighest.withValues(
-                    alpha: 0.3,
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.star_outline,
-                  size: 64,
-                  color: Get.context!.colors.onSurfaceVariant,
-                ),
-              ),
+              const Icon(Icons.star, size: 64, color: AppColors.yellow),
               const SizedBox(height: AppSpacing.lg),
               Text(
                 'No ratings yet',
@@ -92,10 +65,10 @@ class RatingsPage extends StatelessWidget {
               if (ratingController.canCreateRating())
                 CustomButton(
                   onPressed: () =>
-                      _showAddRatingDialog(Get.context!, ratingController),
+                      _navigateToAddRating(Get.context!, ratingController),
                   text: 'Add First Rating',
-                  backgroundColor: Get.context!.colors.primary,
-                  textColor: Get.context!.colors.onPrimary,
+                  backgroundColor: AppColors.primary,
+                  textColor: AppColors.white,
                 ),
             ],
           ),
@@ -108,13 +81,13 @@ class RatingsPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final rating = ratingController.groupRatings[index];
           return Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             child: RatingItemCard(
               rating: rating,
               canEdit: ratingController.canEditRating(rating),
               controller: ratingController,
               onEdit: () =>
-                  _showEditRatingDialog(context, ratingController, rating),
+                  _navigateToEditRating(context, ratingController, rating),
               onDelete: () =>
                   _showDeleteRatingDialog(context, ratingController, rating),
             ),
@@ -124,52 +97,24 @@ class RatingsPage extends StatelessWidget {
     });
   }
 
-  void _showAddRatingDialog(
+  void _navigateToAddRating(
     BuildContext context,
     RatingItemController ratingController,
   ) {
-    showDialog(
-      context: context,
-      builder: (context) => AddRatingDialog(
-        groupId: group.id,
-        onRatingCreated: () {
-          // The rating will be automatically added to the list via the stream
-          Get.snackbar(
-            'Success',
-            'Rating added successfully!',
-            backgroundColor: AppColors.green,
-            colorText: AppColors.white,
-            snackPosition: SnackPosition.BOTTOM,
-            borderRadius: AppBorderRadius.md,
-            margin: const EdgeInsets.all(AppSpacing.md),
-          );
-        },
-      ),
+    Get.toNamed(
+      RouteNames.groups.addRatingPage,
+      arguments: {'groupId': group.id, 'groupName': group.name},
     );
   }
 
-  void _showEditRatingDialog(
+  void _navigateToEditRating(
     BuildContext context,
     RatingItemController ratingController,
     RatingItem rating,
   ) {
-    showDialog(
-      context: context,
-      builder: (context) => EditRatingDialog(
-        rating: rating,
-        onRatingUpdated: () {
-          // The rating will be automatically updated in the list via the stream
-          Get.snackbar(
-            'Success',
-            'Rating updated successfully!',
-            backgroundColor: AppColors.green,
-            colorText: AppColors.white,
-            snackPosition: SnackPosition.BOTTOM,
-            borderRadius: AppBorderRadius.md,
-            margin: const EdgeInsets.all(AppSpacing.md),
-          );
-        },
-      ),
+    Get.toNamed(
+      RouteNames.groups.editRatingPage,
+      arguments: {'rating': rating},
     );
   }
 

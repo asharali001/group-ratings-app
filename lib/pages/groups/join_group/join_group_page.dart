@@ -7,50 +7,8 @@ import '/ui_components/__ui_components.dart';
 
 import 'join_group_controller.dart';
 
-class JoinGroupPage extends StatefulWidget {
+class JoinGroupPage extends GetView<JoinGroupController> {
   const JoinGroupPage({super.key});
-
-  @override
-  State<JoinGroupPage> createState() => _JoinGroupPageState();
-}
-
-class _JoinGroupPageState extends State<JoinGroupPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _groupCodeController = TextEditingController();
-  final _groupController = Get.put(JoinGroupController());
-
-  @override
-  void dispose() {
-    _groupCodeController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _joinGroup() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final success = await _groupController.joinGroup(
-      _groupCodeController.text.trim().toUpperCase(),
-    );
-
-    if (success) {
-      Get.back();
-      Get.snackbar(
-        'Success',
-        _groupController.successMessage.value,
-        backgroundColor: AppColors.green,
-        colorText: AppColors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } else {
-      Get.snackbar(
-        'Error',
-        _groupController.errorMessage.value,
-        backgroundColor: AppColors.red,
-        colorText: AppColors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,96 +17,39 @@ class _JoinGroupPageState extends State<JoinGroupPage> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Form(
-          key: _formKey,
+          key: controller.formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Section
-              Center(
-                child: Column(
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: context.colors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                      ),
-                      child: Icon(
-                        Icons.group_add,
-                        size: 60,
-                        color: context.colors.primary,
-                      ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Join a Group',
+                    style: AppTypography.headlineMedium.copyWith(
+                      color: context.colors.onSurface,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      'Join a Group',
-                      style: AppTypography.headlineMedium.copyWith(
-                        color: context.colors.onSurface,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+                  Text(
+                    'Enter the group code to join an existing group',
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: context.colors.onSurface,
                     ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      'Enter the group code to join an existing group',
-                      style: AppTypography.bodyLarge.copyWith(
-                        color: context.colors.onSurface,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
 
-              const SizedBox(height: AppSpacing.xl),
-
-              // Group Code Field
-              Text(
-                'Group Code *',
-                style: AppTypography.titleMedium.copyWith(
-                  color: context.colors.onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _groupCodeController,
-                decoration: InputDecoration(
-                  labelText: 'Enter 6-digit group code',
-                  prefixIcon: const Icon(Icons.vpn_key),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                    borderSide: BorderSide(
-                      color: context.colors.onSurface.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                    borderSide: BorderSide(
-                      color: AppColors.gray.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                    borderSide: const BorderSide(color: AppColors.primary),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                    borderSide: const BorderSide(color: AppColors.red),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                    borderSide: const BorderSide(color: AppColors.red),
-                  ),
-                  filled: true,
-                  fillColor: context.colors.surfaceContainer,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.md,
-                  ),
-                ),
+              const SizedBox(height: AppSpacing.md),
+              CustomFormField(
+                controller: controller.groupCodeController,
+                label: 'Group Code',
+                hint: 'Enter 6-digit group code',
+                icon: Icons.vpn_key,
+                isRequired: true,
                 textInputAction: TextInputAction.done,
-                onFieldSubmitted: (_) => _joinGroup(),
+                onFieldSubmitted: (_) => controller.joinGroup(),
                 textCapitalization: TextCapitalization.characters,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -198,18 +99,19 @@ class _JoinGroupPageState extends State<JoinGroupPage> {
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.md),
 
               // Join Button
               Obx(
                 () => CustomButton(
-                  onPressed: _groupController.isJoiningGroup.value
+                  width: double.infinity,
+                  onPressed: controller.isJoiningGroup.value
                       ? null
-                      : _joinGroup,
+                      : controller.joinGroup,
                   text: 'Join Group',
-                  backgroundColor: context.colors.primary,
+                  backgroundColor: AppColors.primary,
                   textColor: context.colors.onPrimary,
-                  isLoading: _groupController.isJoiningGroup.value,
+                  isLoading: controller.isJoiningGroup.value,
                 ),
               ),
             ],

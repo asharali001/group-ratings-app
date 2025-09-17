@@ -1,53 +1,63 @@
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
 import '/core/__core.dart';
+import '/ui_components/__ui_components.dart';
 
 class JoinGroupController extends GetxController {
   final AuthService _authService = Get.find<AuthService>();
 
   final RxBool isJoiningGroup = false.obs;
-  final RxString errorMessage = ''.obs;
-  final RxString successMessage = ''.obs;
 
-  /// Join a group using a group code
-  Future<bool> joinGroup(String groupCode) async {
+  // Form state
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController groupCodeController = TextEditingController();
+
+  Future<bool> joinGroup() async {
+    if (!formKey.currentState!.validate()) return false;
     try {
+      final groupCode = groupCodeController.text.trim().toUpperCase();
       isJoiningGroup.value = true;
-      errorMessage.value = '';
 
       final userId = _authService.currentUser?.uid;
       if (userId == null) {
-        errorMessage.value = 'User not authenticated';
+        showCustomSnackBar(message: 'User not authenticated', isError: true);
         return false;
       }
 
       final group = await GroupService.joinGroup(
         groupCode: groupCode,
+        userName: _authService.currentUser?.displayName ?? '',
         userId: userId,
       );
 
       if (group != null) {
-        successMessage.value = 'Successfully joined "${group.name}"!';
+        showCustomSnackBar(
+          message: 'Successfully joined "${group.name}"!',
+          isSuccess: true,
+        );
         return true;
       } else {
-        errorMessage.value = 'Group not found or invalid code';
+        showCustomSnackBar(
+          message: 'Group not found or invalid code',
+          isError: true,
+        );
         return false;
       }
     } catch (e) {
-      errorMessage.value = 'Failed to join group: ${e.toString()}';
+      showCustomSnackBar(
+        message: 'Failed to join group: ${e.toString()}',
+        isError: true,
+      );
       return false;
     } finally {
       isJoiningGroup.value = false;
     }
   }
 
-  /// Clear error message
-  void clearError() {
-    errorMessage.value = '';
-  }
-
-  /// Clear success message
-  void clearSuccess() {
-    successMessage.value = '';
+  @override
+  void onClose() {
+    groupCodeController.dispose();
+    super.onClose();
   }
 }

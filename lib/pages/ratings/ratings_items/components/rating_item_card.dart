@@ -26,13 +26,12 @@ class RatingItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       decoration: BoxDecoration(
-        color: context.colors.surface,
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.cardBackground,
         border: Border.all(
           color: context.colors.outline.withValues(alpha: 0.3),
         ),
+        borderRadius: BorderRadius.circular(AppBorderRadius.xl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,28 +45,20 @@ class RatingItemCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with Title and Actions
                 _buildHeader(context),
-
-                const SizedBox(height: 16),
-
-                // Description
+                const SizedBox(height: AppSpacing.md),
                 if (rating.description?.isNotEmpty == true) ...[
                   Text(
                     rating.description!,
                     style: AppTypography.bodyMedium.copyWith(
-                      color: context.colors.onSurfaceVariant,
+                      color: context.colors.onSurface,
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.md),
                 ],
-
-                // User Ratings Section
                 _buildUserRatingsSection(),
-
-                // Footer
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSpacing.md),
                 _buildFooter(context),
               ],
             ),
@@ -79,7 +70,7 @@ class RatingItemCard extends StatelessWidget {
 
   Widget _buildHeroImage(BuildContext context) {
     return Container(
-      height: 280,
+      height: 250,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
@@ -141,27 +132,21 @@ class RatingItemCard extends StatelessWidget {
               // Title
               Text(
                 rating.name,
-                style: AppTypography.headlineSmall.copyWith(
+                style: AppTypography.bodyLarge.copyWith(
                   color: context.colors.onSurface,
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
+                  fontWeight: AppTypography.semiBold,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
-
-              const SizedBox(height: 8),
-
-              // Location
+              const SizedBox(height: AppSpacing.xs),
               if (rating.location?.isNotEmpty == true)
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.location_on_outlined,
+                      color: AppColors.primary,
                       size: 16,
-                      color: context.colors.primary,
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       rating.location!,
                       style: AppTypography.bodyMedium.copyWith(
@@ -175,25 +160,26 @@ class RatingItemCard extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(width: 16),
+        const SizedBox(width: AppSpacing.sm),
 
-        // Action Buttons
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (canEdit)
               _buildActionButton(
-                context,
+                context: context,
                 icon: EvaIcons.editOutline,
                 onTap: onEdit,
-                color: context.colors.primary,
+                color: AppColors.primary,
+                tooltip: 'Edit Rating',
               ),
             if (canEdit) const SizedBox(width: 12),
             _buildActionButton(
-              context,
+              context: context,
               icon: EvaIcons.trash2Outline,
               onTap: onDelete,
               color: context.colors.error,
+              tooltip: 'Delete Rating',
             ),
           ],
         ),
@@ -201,25 +187,30 @@ class RatingItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(
-    BuildContext context, {
+  Widget _buildActionButton({
+    required BuildContext context,
     required IconData icon,
     required VoidCallback? onTap,
     required Color color,
+    required String tooltip,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            child: Icon(icon, size: 20, color: color),
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.colors.surface.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(AppBorderRadius.round),
+          border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(AppBorderRadius.round),
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              child: Icon(icon, size: 20, color: color),
+            ),
           ),
         ),
       ),
@@ -231,106 +222,89 @@ class RatingItemCard extends StatelessWidget {
     final currentUserRating = controller?.getCurrentUserRating(rating.id);
     final canRate = controller != null && controller!.canCreateRating();
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Get.context!.colors.surfaceContainerHighest.withValues(
-          alpha: 0.5,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Get.context!.colors.outline.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section Header
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Get.context!.colors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.star_rounded,
-                  size: 18,
-                  color: Get.context!.colors.primary,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section Header
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'User Ratings',
-                      style: AppTypography.titleMedium.copyWith(
-                        color: Get.context!.colors.onSurface,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      '${rating.ratings.length} rating${rating.ratings.length == 1 ? '' : 's'}',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: Get.context!.colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
+              child: const Icon(
+                Icons.star_rounded,
+                color: AppColors.primary,
+                size: 18,
               ),
-              if (canRate) _buildRateButton(currentUserRating),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          // Ratings List
-          if (hasRatings) ...[
-            ...rating.ratings.map((userRating) => _buildRatingItem(userRating)),
-          ] else ...[
-            _buildEmptyState(),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ratings',
+                    style: AppTypography.titleMedium.copyWith(
+                      color: Get.context!.colors.onSurface,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    '${rating.ratings.length} rating${rating.ratings.length == 1 ? '' : 's'}',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: Get.context!.colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (canRate) _buildRateButton(currentUserRating),
           ],
+        ),
+
+        const SizedBox(height: 20),
+
+        // Ratings List
+        if (hasRatings) ...[
+          ...rating.ratings.map((userRating) => _buildRatingItem(userRating)),
+        ] else ...[
+          _buildEmptyState(),
         ],
-      ),
+      ],
     );
   }
 
   Widget _buildRateButton(UserRating? currentUserRating) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Get.context!.colors.primary,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _showRatingDialog,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  currentUserRating != null
-                      ? Icons.edit_rounded
-                      : Icons.add_rounded,
-                  size: 16,
+    return Material(
+      color: AppColors.primary,
+      borderRadius: BorderRadius.circular(AppBorderRadius.md),
+      child: InkWell(
+        onTap: _showRatingDialog,
+        borderRadius: BorderRadius.circular(AppBorderRadius.md),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                currentUserRating != null
+                    ? Icons.edit_rounded
+                    : Icons.add_rounded,
+                size: 16,
+                color: Get.context!.colors.onPrimary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                currentUserRating != null ? 'Edit' : 'Rate',
+                style: AppTypography.bodySmall.copyWith(
                   color: Get.context!.colors.onPrimary,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  currentUserRating != null ? 'Edit' : 'Rate',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: Get.context!.colors.onPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -338,40 +312,16 @@ class RatingItemCard extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Get.context!.colors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Get.context!.colors.outline.withValues(alpha: 0.1),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        child: Text(
+          'No ratings yet. Be the first to rate this item!',
+          style: AppTypography.bodyMedium.copyWith(
+            color: Get.context!.colors.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Get.context!.colors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.star_outline_rounded,
-              size: 16,
-              color: Get.context!.colors.primary,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'No ratings yet. Be the first to rate this item!',
-              style: AppTypography.bodyMedium.copyWith(
-                color: Get.context!.colors.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -387,13 +337,13 @@ class RatingItemCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isCurrentUser
-            ? Get.context!.colors.primary.withValues(alpha: 0.08)
-            : Get.context!.colors.surface,
+            ? AppColors.primary.withValues(alpha: 0.08)
+            : AppColors.secondary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isCurrentUser
-              ? Get.context!.colors.primary.withValues(alpha: 0.2)
-              : Get.context!.colors.outline.withValues(alpha: 0.1),
+              ? AppColors.primary.withValues(alpha: 0.2)
+              : AppColors.secondary.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -403,9 +353,7 @@ class RatingItemCard extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: isCurrentUser
-                  ? Get.context!.colors.primary
-                  : Get.context!.colors.onSurfaceVariant,
+              color: isCurrentUser ? AppColors.primary : AppColors.secondary,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
@@ -414,7 +362,7 @@ class RatingItemCard extends StatelessWidget {
                     ? userRating.userName[0].toUpperCase()
                     : '?',
                 style: AppTypography.titleSmall.copyWith(
-                  color: Get.context!.colors.onPrimary,
+                  color: AppColors.white,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -445,13 +393,13 @@ class RatingItemCard extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Get.context!.colors.primary,
+                          color: AppColors.primary,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           'You',
                           style: AppTypography.bodySmall.copyWith(
-                            color: Get.context!.colors.onPrimary,
+                            color: AppColors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                           ),
@@ -463,10 +411,10 @@ class RatingItemCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.star_rounded,
                       size: 16,
-                      color: Get.context!.colors.primary,
+                      color: AppColors.yellow,
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -496,69 +444,33 @@ class RatingItemCard extends StatelessWidget {
   }
 
   Widget _buildFooter(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: context.colors.onSurfaceVariant.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.schedule_outlined,
-                size: 14,
-                color: context.colors.onSurfaceVariant,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                _formatDate(rating.createdAt),
-                style: AppTypography.bodySmall.copyWith(
-                  color: context.colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: context.colors.onSurfaceVariant.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppBorderRadius.round),
         ),
-        const Spacer(),
-        if (rating.ratings.isNotEmpty)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  context.colors.primary.withValues(alpha: 0.1),
-                  context.colors.primary.withValues(alpha: 0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: context.colors.primary.withValues(alpha: 0.2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.schedule_outlined,
+              size: 14,
+              color: context.colors.onSurfaceVariant,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              _formatDate(rating.createdAt),
+              style: AppTypography.bodySmall.copyWith(
+                color: context.colors.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.star_rounded,
-                  size: 14,
-                  color: context.colors.primary,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '${rating.ratings.length} rating${rating.ratings.length == 1 ? '' : 's'}',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: context.colors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
+          ],
+        ),
+      ),
     );
   }
 

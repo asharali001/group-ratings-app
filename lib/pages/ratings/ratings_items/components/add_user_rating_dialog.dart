@@ -91,7 +91,7 @@ class _AddUserRatingDialogState extends State<AddUserRatingDialog> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: context.colors.surfaceContainerHighest,
+                color: AppColors.cardBackgroundHighest,
                 borderRadius: BorderRadius.circular(AppBorderRadius.md),
                 border: Border.all(color: context.colors.outline),
               ),
@@ -185,7 +185,7 @@ class _AddUserRatingDialogState extends State<AddUserRatingDialog> {
                 Expanded(
                   child: CustomButton(
                     text: 'Cancel',
-                    backgroundColor: context.colors.surfaceContainerHighest,
+                    backgroundColor: AppColors.cardBackgroundHighest,
                     textColor: context.colors.onSurface,
                     onPressed: () => Get.back(),
                   ),

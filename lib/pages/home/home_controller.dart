@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
-import '../../core/__core.dart';
+
+import '/core/__core.dart';
+import '/ui_components/__ui_components.dart';
 
 class HomeController extends GetxController {
   final RxList<Group> _userGroups = <Group>[].obs;
@@ -31,7 +33,7 @@ class HomeController extends GetxController {
         });
       }
     } catch (e) {
-      print('Error loading user groups: $e');
+      showCustomSnackBar(message: 'Failed to load your groups', isError: true);
     } finally {
       _isLoading.value = false;
     }
@@ -49,15 +51,10 @@ class HomeController extends GetxController {
         });
       }
     } catch (e) {
-      print('Error loading ratings: $e');
+      showCustomSnackBar(message: 'Failed to load your ratings', isError: true);
     } finally {
       _isLoading.value = false;
     }
-  }
-
-  Future<void> refreshData() async {
-    await _loadUserGroups();
-    await _loadRatings();
   }
 
   void navigateToGroupRatings(Group group) {
@@ -73,6 +70,6 @@ class HomeController extends GetxController {
   }
 
   void navigateToGroupsPage() {
-    Get.toNamed(RouteNames.mainApp.groupsPage);
+    Get.toNamed(RouteNames.groups.groupsPage);
   }
 }

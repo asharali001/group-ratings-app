@@ -328,4 +328,34 @@ class RatingItemController extends GetxController {
   bool hasUserRated(String ratingItemId) {
     return getCurrentUserRating(ratingItemId) != null;
   }
+
+  // Rating expansion state management
+  final Map<String, bool> _ratingsExpanded = {};
+
+  /// Check if ratings are expanded for a specific rating item
+  bool isRatingsExpanded(String ratingItemId) {
+    return _ratingsExpanded[ratingItemId] ?? false;
+  }
+
+  /// Toggle ratings expansion for a specific rating item
+  void toggleRatingsExpansion(String ratingItemId) {
+    _ratingsExpanded[ratingItemId] = !isRatingsExpanded(ratingItemId);
+    update();
+  }
+
+  /// Get visible ratings for a specific rating item (with pagination)
+  List<UserRating> getVisibleRatings(String ratingItemId) {
+    final ratingItem = getRatingById(ratingItemId);
+    if (ratingItem == null) return [];
+
+    final isExpanded = isRatingsExpanded(ratingItemId);
+
+    if (isExpanded) {
+      // Show all ratings when expanded
+      return ratingItem.ratings;
+    } else {
+      // Show only first 2 ratings when collapsed
+      return ratingItem.ratings.take(2).toList();
+    }
+  }
 }
