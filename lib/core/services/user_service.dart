@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 import 'firebase_service.dart';
@@ -16,7 +17,7 @@ class UserService {
       await _firestore.collection(_usersCollection).doc(user.uid).set(userData);
     } catch (e) {
       // Log error but don't throw - we don't want to fail auth if Firestore fails
-      print('Error creating user document: $e');
+      log('Error creating user document: $e', name: 'UserService');
     }
   }
 
@@ -30,7 +31,7 @@ class UserService {
 
       await _firestore.collection(_usersCollection).doc(uid).update(updates);
     } catch (e) {
-      print('Error updating user document: $e');
+      log('Error updating user document: $e', name: 'UserService');
       rethrow;
     }
   }
@@ -45,7 +46,7 @@ class UserService {
       }
       return null;
     } catch (e) {
-      print('Error getting user document: $e');
+      log('Error getting user document: $e', name: 'UserService');
       return null;
     }
   }
@@ -62,7 +63,7 @@ class UserService {
 
       return doc.exists;
     } catch (e) {
-      print('Error checking user document: $e');
+      log('Error checking user document: $e', name: 'UserService');
       return false;
     }
   }
@@ -72,7 +73,7 @@ class UserService {
     try {
       await _firestore.collection(_usersCollection).doc(uid).delete();
     } catch (e) {
-      print('Error deleting user document: $e');
+      log('Error deleting user document: $e', name: 'UserService');
       rethrow;
     }
   }

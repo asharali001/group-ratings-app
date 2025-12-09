@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:get/get.dart';
 
 import '/core/__core.dart';
@@ -61,7 +62,7 @@ class AuthService extends GetxService {
       }
     } catch (e) {
       // Log error but don't throw
-      print('Error creating user document: $e');
+      log('Error creating user document: $e', name: 'AuthService');
     }
   }
 
@@ -120,6 +121,24 @@ class AuthService extends GetxService {
     try {
       _isLoading.value = true;
       final user = await AuthApi.signInWithGoogle();
+
+      // Create user document in Firestore if it doesn't exist
+      await _createUserDocumentIfNeeded(user);
+
+      _currentUser.value = user;
+      return user;
+    } catch (e) {
+      rethrow;
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  /// Sign in with Apple
+  Future<UserModel?> signInWithApple() async {
+    try {
+      _isLoading.value = true;
+      final user = await AuthApi.signInWithApple();
 
       // Create user document in Firestore if it doesn't exist
       await _createUserDocumentIfNeeded(user);

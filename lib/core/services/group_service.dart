@@ -1,14 +1,11 @@
-import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 import '/core/__core.dart';
 import '/constants/__constants.dart';
 
 class GroupService {
   static final FirebaseFirestore _firestore = FirebaseService.firestore;
-  static final FirebaseStorage _storage = FirebaseService.storage;
 
   static const String _groupsCollection = 'groups';
 

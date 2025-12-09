@@ -16,10 +16,6 @@ class AppRoutes {
       name: RouteNames.mainApp.profilePage,
       page: () => const ProfilePage(),
     ),
-    GetPage(
-      name: RouteNames.mainApp.settingsPage,
-      page: () => const SettingsPage(),
-    ),
 
     // Group routes
     GetPage(name: RouteNames.groups.groupsPage, page: () => const GroupsPage()),

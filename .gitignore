@@ -43,3 +43,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase
+.firebase/
+
+# Keystore scripts (potentially sensitive)
+android/app/create_keystore.sh
+
+# Launcher icon source files
+assets/launcher/
+
+# Marketing site (separate project)
+marketing_site/

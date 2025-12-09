@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '/styles/__styles.dart';
 import '/ui_components/__ui_components.dart';
 import 'components/google_sign_in_button.dart';
+import 'components/apple_sign_in_button.dart';
 
 import 'auth_controller.dart';
 
@@ -81,6 +82,11 @@ class SignInPage extends StatelessWidget {
                   
                   // Google Sign In Button
                   const GoogleSignInButton(),
+                  
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Apple Sign In Button
+                  const AppleSignInButton(),
                   
                   const SizedBox(height: AppSpacing.lg),
                   

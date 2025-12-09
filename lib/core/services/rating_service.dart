@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:developer';
 import 'dart:io';
 
 import '../models/__models.dart';
@@ -48,7 +49,7 @@ class RatingService {
       await _ratingsCollection.doc(ratingItem.id).set(ratingItem.toMap());
       return ratingItem;
     } catch (e) {
-      print('Error creating rating: $e');
+      log('Error creating rating: $e', name: 'RatingService');
       return null;
     }
   }
@@ -73,7 +74,7 @@ class RatingService {
       }
       return null;
     } catch (e) {
-      print('Error getting rating: $e');
+      log('Error getting rating: $e', name: 'RatingService');
       return null;
     }
   }
@@ -112,19 +113,19 @@ class RatingService {
           final imageUrl = await ref.getDownloadURL();
           updateData['imageUrl'] = imageUrl;
 
-          print('Image updated successfully: $imageUrl');
+          log('Image updated successfully: $imageUrl', name: 'RatingService');
         } catch (e) {
-          print('Error updating image: $e');
+          log('Error updating image: $e', name: 'RatingService');
 
           // Check for specific Firebase Storage errors
           if (e.toString().contains('permission-denied')) {
-            print('Firebase Storage permission denied');
+            log('Firebase Storage permission denied', name: 'RatingService');
           } else if (e.toString().contains('unauthenticated')) {
-            print('User not authenticated for Firebase Storage');
+            log('User not authenticated for Firebase Storage', name: 'RatingService');
           } else if (e.toString().contains('storage/unauthorized')) {
-            print('Firebase Storage unauthorized');
+            log('Firebase Storage unauthorized', name: 'RatingService');
           } else if (e.toString().contains('storage/quota-exceeded')) {
-            print('Firebase Storage quota exceeded');
+            log('Firebase Storage quota exceeded', name: 'RatingService');
           }
 
           // Continue without image if update fails
@@ -141,9 +142,9 @@ class RatingService {
           // Optionally delete the old image from storage
           try {
             await _storage.refFromURL(currentRating.imageUrl!).delete();
-            print('Old image deleted successfully');
+            log('Old image deleted successfully', name: 'RatingService');
           } catch (e) {
-            print('Error deleting old image: $e');
+            log('Error deleting old image: $e', name: 'RatingService');
             // Continue with update even if image deletion fails
           }
         }
@@ -152,7 +153,7 @@ class RatingService {
       await _ratingsCollection.doc(ratingId).update(updateData);
       return true;
     } catch (e) {
-      print('Error updating rating: $e');
+      log('Error updating rating: $e', name: 'RatingService');
       return false;
     }
   }
@@ -168,7 +169,7 @@ class RatingService {
         try {
           await _storage.refFromURL(rating.imageUrl!).delete();
         } catch (e) {
-          print('Error deleting image: $e');
+          log('Error deleting image: $e', name: 'RatingService');
           // Continue with rating deletion even if image deletion fails
         }
       }
@@ -177,7 +178,7 @@ class RatingService {
       await _ratingsCollection.doc(ratingId).delete();
       return true;
     } catch (e) {
-      print('Error deleting rating: $e');
+      log('Error deleting rating: $e', name: 'RatingService');
       return false;
     }
   }
@@ -215,7 +216,7 @@ class RatingService {
 
       return true;
     } catch (e) {
-      print('Error adding user rating: $e');
+      log('Error adding user rating: $e', name: 'RatingService');
       return false;
     }
   }
@@ -249,7 +250,7 @@ class RatingService {
 
       return true;
     } catch (e) {
-      print('Error updating user rating: $e');
+      log('Error updating user rating: $e', name: 'RatingService');
       return false;
     }
   }
@@ -277,7 +278,7 @@ class RatingService {
 
       return true;
     } catch (e) {
-      print('Error removing user rating: $e');
+      log('Error removing user rating: $e', name: 'RatingService');
       return false;
     }
   }

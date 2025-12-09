@@ -1,5 +1,11 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:math' hide log;
+
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../models/user_model.dart';
 
@@ -68,6 +74,61 @@ class AuthApi {
     } catch (e) {
       throw _handleAuthError(e);
     }
+  }
+
+  /// Sign in with Apple
+  static Future<UserModel> signInWithApple() async {
+    try {
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+
+      final AuthorizationCredentialAppleID appleCredential =
+          await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      final OAuthProvider oAuthProvider = OAuthProvider('apple.com');
+      final AuthCredential credential = oAuthProvider.credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+        rawNonce: rawNonce,
+      );
+
+      final UserCredential result = await _auth.signInWithCredential(
+        credential,
+      );
+
+      // Apple only returns name on first sign in, so we might want to update it
+      if (appleCredential.givenName != null) {
+        final displayName = '${appleCredential.givenName} ${appleCredential.familyName}';
+        await result.user!.updateDisplayName(displayName);
+      }
+      
+      return UserModel.fromFirebaseUser(result.user!);
+    } catch (e) {
+      log('Apple Sign In Error: $e', name: 'AuthApi');
+      throw _handleAuthError(e);
+    }
+  }
+
+  /// Generate a random nonce string
+  static String _generateNonce([int length = 32]) {
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
+        .join();
+  }
+
+  /// Returns the sha256 hash of [input] in string format.
+  static String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
   }
 
   /// Sign out

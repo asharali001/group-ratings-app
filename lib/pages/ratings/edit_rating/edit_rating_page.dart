@@ -296,7 +296,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                                   ),
                                 ],
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.close_rounded,
                                 size: 18,
                                 color: AppColors.white,
@@ -337,7 +337,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.edit_rounded,
                                       size: 16,
                                       color: AppColors.white,
@@ -380,7 +380,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                                     AppBorderRadius.lg,
                                   ),
                                 ),
-                                child: Center(
+                                child: const Center(
                                   child: Icon(
                                     Icons.image_rounded,
                                     color: AppColors.primary,
@@ -432,7 +432,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                                   ),
                                 ],
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.delete_rounded,
                                 size: 18,
                                 color: AppColors.white,
@@ -473,7 +473,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.edit_rounded,
                                       size: 16,
                                       color: AppColors.white,
@@ -503,7 +503,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                             color: AppColors.primary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.add_photo_alternate_rounded,
                             size: 32,
                             color: AppColors.primary,
@@ -513,7 +513,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                         if (controller.isUpdatingImage.value)
                           Column(
                             children: [
-                              CircularProgressIndicator(
+                              const CircularProgressIndicator(
                                 strokeWidth: 3,
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   AppColors.primary,

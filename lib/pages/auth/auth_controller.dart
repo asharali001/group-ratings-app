@@ -147,6 +147,25 @@ class AuthController extends GetxController {
     }
   }
 
+  /// Sign in with Apple
+  Future<void> signInWithApple() async {
+    try {
+      _isLoading.value = true;
+      _clearError();
+
+      await _authService.signInWithApple();
+      Get.offAllNamed('/home');
+    } catch (e) {
+      // Don't show error if user cancelled
+      if (e.toString().contains('canceled') || e.toString().contains('cancelled')) {
+        return;
+      }
+      _errorMessage.value = e.toString();
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
   /// Sign in with Google
   Future<void> signInWithGoogle() async {
     try {

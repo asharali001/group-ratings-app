@@ -52,16 +52,20 @@ class MyGroupsSection extends GetView<HomeController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CustomButton(
-                      onPressed: controller.navigateToCreateGroup,
-                      text: 'Create Group',
-                      backgroundColor: AppColors.primary,
+                    Expanded(
+                      child: CustomButton(
+                        onPressed: controller.navigateToCreateGroup,
+                        text: 'Create Group',
+                        backgroundColor: AppColors.primary,
+                      ),
                     ),
                     const SizedBox(width: AppSpacing.md),
-                    CustomButton(
-                      onPressed: controller.navigateToJoinGroup,
-                      text: 'Join Group',
-                      backgroundColor: AppColors.indigo,
+                    Expanded(
+                      child: CustomButton(
+                        onPressed: controller.navigateToJoinGroup,
+                        text: 'Join Group',
+                        backgroundColor: AppColors.indigo,
+                      ),
                     ),
                   ],
                 ),
