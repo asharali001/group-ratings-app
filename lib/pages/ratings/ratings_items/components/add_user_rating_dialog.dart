@@ -3,12 +3,12 @@ import 'package:get/get.dart';
 
 import '/core/__core.dart';
 import '/styles/__styles.dart';
-import '/ui_components/buttons/custom_button.dart';
+import '/ui_components/__ui_components.dart';
 
 class AddUserRatingDialog extends StatefulWidget {
   final RatingItem ratingItem;
   final UserRating? existingRating;
-  final Function(double) onRatingSubmitted;
+  final Function(double, String?) onRatingSubmitted;
 
   const AddUserRatingDialog({
     super.key,
@@ -23,17 +23,15 @@ class AddUserRatingDialog extends StatefulWidget {
 
 class _AddUserRatingDialogState extends State<AddUserRatingDialog> {
   late double _ratingValue;
-  final TextEditingController _commentController = TextEditingController();
+  late TextEditingController _commentController;
   bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
-    _ratingValue = widget.existingRating?.ratingValue ?? 1.0;
-    if (widget.existingRating != null) {
-      // You could add a comment field to UserRating model if needed
-      // _commentController.text = widget.existingRating!.comment ?? '';
-    }
+    _ratingValue = widget.existingRating?.ratingValue ?? 
+        (widget.ratingItem.ratingScale / 2).ceilToDouble();
+    _commentController = TextEditingController(text: widget.existingRating?.comment);
   }
 
   @override
@@ -44,193 +42,174 @@ class _AddUserRatingDialogState extends State<AddUserRatingDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isEditing = widget.existingRating != null;
-    final title = isEditing ? 'Edit Your Rating' : 'Rate This Item';
 
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(AppBorderRadius.xl),
+          topRight: Radius.circular(AppBorderRadius.xl),
+        ),
       ),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              children: [
-                Icon(
-                  isEditing ? Icons.edit : Icons.star,
-                  color: context.colors.primary,
-                  size: 24,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.xl,
+            AppSpacing.lg,
+            AppSpacing.xl,
+            AppSpacing.xl,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag Handle
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.outlineVariant,
+                  borderRadius: AppBorderRadius.fullRadius,
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: AppTypography.titleLarge.copyWith(
-                      color: context.colors.onSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(Icons.close),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: AppSpacing.md),
-
-            // Item Info
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: AppColors.cardBackgroundHighest,
-                borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                border: Border.all(color: context.colors.outline),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.ratingItem.name,
-                    style: AppTypography.titleMedium.copyWith(
-                      color: context.colors.onSurface,
-                      fontWeight: FontWeight.w600,
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // Title
+              Text(
+                isEditing 
+                    ? 'Rate ${widget.ratingItem.name}'
+                    : 'Rate ${widget.ratingItem.name}',
+                style: AppTypography.titleLarge.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // Rating Display
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.sm,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: AppBorderRadius.fullRadius,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.star_rounded,
+                      color: colorScheme.primary,
+                      size: 20,
                     ),
-                  ),
-                  if (widget.ratingItem.description != null &&
-                      widget.ratingItem.description!.isNotEmpty) ...[
-                    const SizedBox(height: AppSpacing.xs),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
-                      widget.ratingItem.description!,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: context.colors.onSurfaceVariant,
+                      '${_ratingValue.toInt()}',
+                      style: AppTypography.titleLarge.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      ' / ${widget.ratingItem.ratingScale}',
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
-                ],
+                ),
               ),
-            ),
 
-            const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.xl),
 
-            // Rating Scale Display
-            Text(
-              'Rating Scale: 1-${widget.ratingItem.ratingScale}',
-              style: AppTypography.bodyMedium.copyWith(
-                color: context.colors.onSurfaceVariant,
+              // Slider
+              AppSlider(
+                value: _ratingValue,
+                min: 1.0,
+                max: widget.ratingItem.ratingScale.toDouble(),
+                divisions: widget.ratingItem.ratingScale - 1,
+                onChanged: (value) {
+                  setState(() {
+                    _ratingValue = value;
+                  });
+                },
               ),
-            ),
 
-            const SizedBox(height: AppSpacing.md),
-
-            // Rating Input
-            Center(
-              child: Column(
-                children: [
-                  Text(
-                    'Your Rating: ${_ratingValue.toInt()}',
-                    style: AppTypography.titleMedium.copyWith(
-                      color: context.colors.primary,
-                      fontWeight: FontWeight.w600,
+              // Scale Labels
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '1',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Slider(
-                    value: _ratingValue,
-                    min: 1.0,
-                    max: widget.ratingItem.ratingScale.toDouble(),
-                    divisions: widget.ratingItem.ratingScale - 1,
-                    activeColor: context.colors.primary,
-                    inactiveColor: context.colors.outline,
-                    onChanged: (value) {
-                      setState(() {
-                        _ratingValue = value;
-                      });
-                    },
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '1',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
+                    Text(
+                      '${widget.ratingItem.ratingScale}',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
                       ),
-                      Text(
-                        '${widget.ratingItem.ratingScale}',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.lg),
 
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: CustomButton(
-                    text: 'Cancel',
-                    backgroundColor: AppColors.cardBackgroundHighest,
-                    textColor: context.colors.onSurface,
-                    onPressed: () => Get.back(),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: CustomButton(
-                    text: isEditing ? 'Update' : 'Submit',
-                    onPressed: _isSubmitting ? null : _submitRating,
-                    isLoading: _isSubmitting,
-                    backgroundColor: context.colors.primary,
-                    textColor: context.colors.onPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ],
+              // Comment Field
+              AppTextField(
+                controller: _commentController,
+                label: 'Comment (optional)',
+                hintText: 'Share your thoughts...',
+                maxLines: 3,
+                textInputAction: TextInputAction.done,
+              ),
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // Submit Button
+              AppButton(
+                text: isEditing ? 'Update Rating' : 'Submit Rating',
+                onPressed: _isSubmitting ? null : _submitRating,
+                isLoading: _isSubmitting,
+                isFullWidth: true,
+              ),
+
+              const SizedBox(height: AppSpacing.sm),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Future<void> _submitRating() async {
-    if (_ratingValue < 1) {
-      Get.snackbar(
-        'Invalid Rating',
-        'Please select a rating between 1 and ${widget.ratingItem.ratingScale}',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.error,
-        colorText: AppColors.white,
-      );
-      return;
-    }
-
     setState(() {
       _isSubmitting = true;
     });
 
     try {
-      widget.onRatingSubmitted(_ratingValue);
+      widget.onRatingSubmitted(_ratingValue, _commentController.text.trim().isEmpty ? null : _commentController.text.trim());
       Get.back();
     } finally {
-      setState(() {
-        _isSubmitting = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
   }
 }

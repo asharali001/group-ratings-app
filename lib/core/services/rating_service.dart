@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import '../models/__models.dart';
+import 'user_service.dart';
 
 class RatingService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -20,6 +21,8 @@ class RatingService {
     required int ratingScale,
     File? imageFile,
     required String createdBy,
+    double? initialRating,
+    String? initialComment,
   }) async {
     try {
       String? imageUrl;
@@ -37,6 +40,9 @@ class RatingService {
         }
       }
 
+      // Get creator's display name
+      final creatorName = await UserService.getUserDisplayName(createdBy);
+
       final ratingItem = RatingItem.create(
         groupId: groupId,
         name: itemName,
@@ -46,6 +52,22 @@ class RatingService {
         imageUrl: imageUrl ?? '',
         createdBy: createdBy,
       );
+
+      // Add initial rating if provided
+      if (initialRating != null) {
+        final userRating = UserRating.create(
+          userId: createdBy,
+          userName: creatorName,
+          ratingValue: initialRating,
+          ratingScale: ratingScale,
+          comment: initialComment,
+        );
+
+        // Update the rating item with the initial rating
+        ratingItem.ratings.add(userRating);
+        ratingItem.ratedBy.add(createdBy);
+      }
+
       await _ratingsCollection.doc(ratingItem.id).set(ratingItem.toMap());
       return ratingItem;
     } catch (e) {
@@ -200,12 +222,16 @@ class RatingService {
     required String userId,
     required String userName,
     required double ratingValue,
+    required int ratingScale,
+    String? comment,
   }) async {
     try {
       final userRating = UserRating.create(
         userId: userId,
         userName: userName,
         ratingValue: ratingValue,
+        ratingScale: ratingScale,
+        comment: comment,
       );
 
       await _ratingsCollection.doc(ratingItemId).update({
@@ -226,6 +252,8 @@ class RatingService {
     required String ratingItemId,
     required String userId,
     required double ratingValue,
+    required int ratingScale,
+    String? comment,
   }) async {
     try {
       // Get the current rating item
@@ -237,6 +265,8 @@ class RatingService {
         if (rating.userId == userId) {
           return rating.copyWith(
             ratingValue: ratingValue,
+            normalizedValue: ratingValue / ratingScale,
+            comment: comment,
             updatedAt: DateTime.now(),
           );
         }

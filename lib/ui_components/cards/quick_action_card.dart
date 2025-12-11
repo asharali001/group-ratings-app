@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '/core/__core.dart';
 import '/styles/__styles.dart';
+import 'app_card.dart';
 
 class QuickActionCard extends StatelessWidget {
   final String title;
@@ -21,60 +21,54 @@ class QuickActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return AppCard(
+      variant: AppCardVariant.flat,
       onTap: onTap,
-      child: Container(
-        height: 120,
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          border: Border.all(
-            color: context.colors.outline.withValues(alpha: 0.3),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      height:
+          120, // Keep height consistency if needed, though flexible is often better. I'll keep it for now.
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              borderRadius: AppBorderRadius.mdRadius,
+            ),
+            child: Icon(icon, color: iconColor, size: 28),
           ),
-          borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppBorderRadius.md),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: AppTypography.titleMedium.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                child: Icon(icon, color: iconColor, size: 28),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      style: AppTypography.titleMedium.copyWith(
-                        color: context.colors.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      subtitle,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: context.colors.onSurface,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  subtitle,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: colorScheme.onSurfaceVariant, // Better for subtitle
+                  ),
                 ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: context.colors.onSurface,
-                size: 16,
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          Icon(
+            Icons.arrow_forward_ios,
+            color: colorScheme.onSurface.withValues(alpha: 0.5),
+            size: 16,
+          ),
+        ],
       ),
     );
   }

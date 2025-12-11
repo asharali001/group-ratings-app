@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -10,10 +11,15 @@ class RatingItemController extends GetxController {
 
   // Observable lists and variables
   final RxList<RatingItem> groupRatings = <RatingItem>[].obs;
+  final RxList<RatingItem> filteredRatings = <RatingItem>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isCreatingRating = false.obs;
   final RxBool isUpdatingRating = false.obs;
   final RxBool isDeletingRating = false.obs;
+
+  // Search and filter
+  final RxString searchQuery = ''.obs;
+  final RxString selectedFilter = 'All'.obs;
 
   // Messages
   final RxString errorMessage = ''.obs;
@@ -22,6 +28,32 @@ class RatingItemController extends GetxController {
   // Current group context
   final RxString currentGroupId = ''.obs;
   final Rx<Group?> currentGroup = Rx<Group?>(null);
+
+  StreamSubscription<List<RatingItem>>? _ratingsSubscription;
+  StreamSubscription<UserModel?>? _authStateSubscription;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Listen to auth state changes
+    _authStateSubscription = _authService.authStateChanges.listen((user) {
+      if (user == null) {
+        clearUserData();
+      }
+    });
+
+    // Listen to search and filter changes
+    ever(searchQuery, (_) => _applyFilters());
+    ever(selectedFilter, (_) => _applyFilters());
+    ever(groupRatings, (_) => _applyFilters());
+  }
+
+  @override
+  void onClose() {
+    _authStateSubscription?.cancel();
+    _ratingsSubscription?.cancel();
+    super.onClose();
+  }
 
   /// Set the current group context and load its ratings
   void setGroupContext(Group group) {
@@ -32,9 +64,88 @@ class RatingItemController extends GetxController {
 
   /// Load all ratings for a specific group
   void loadGroupRatingItems(String groupId) {
-    _ratingService.getGroupRatingItems(groupId).listen((ratings) {
+    // Cancel existing subscription
+    _ratingsSubscription?.cancel();
+
+    _ratingsSubscription = _ratingService.getGroupRatingItems(groupId).listen((
+      ratings,
+    ) {
       groupRatings.value = ratings;
     });
+  }
+
+  /// Clear all user-specific data
+  void clearUserData() {
+    _authStateSubscription?.cancel();
+    _ratingsSubscription?.cancel();
+    _authStateSubscription = null;
+    _ratingsSubscription = null;
+    groupRatings.clear();
+    filteredRatings.clear();
+    currentGroupId.value = '';
+    currentGroup.value = null;
+    searchQuery.value = '';
+    selectedFilter.value = 'All';
+    errorMessage.value = '';
+    successMessage.value = '';
+    isLoading.value = false;
+    isCreatingRating.value = false;
+    isUpdatingRating.value = false;
+    isDeletingRating.value = false;
+    _ratingsExpanded.clear();
+  }
+
+  /// Apply search and filter
+  void _applyFilters() {
+    var results = groupRatings.toList();
+
+    // Apply search
+    if (searchQuery.value.isNotEmpty) {
+      results = results.where((item) {
+        final query = searchQuery.value.toLowerCase();
+        return item.name.toLowerCase().contains(query) ||
+            (item.description?.toLowerCase().contains(query) ?? false) ||
+            (item.location?.toLowerCase().contains(query) ?? false);
+      }).toList();
+    }
+
+    // Apply filter
+    switch (selectedFilter.value) {
+      case 'My Ratings':
+        final currentUserId = _authService.currentUserId;
+        results = results
+            .where((item) => item.ratedBy.contains(currentUserId))
+            .toList();
+        break;
+      case 'Highest Rated':
+        results.sort((a, b) {
+          final avgA = _calculateAverage(a.ratings);
+          final avgB = _calculateAverage(b.ratings);
+          return avgB.compareTo(avgA);
+        });
+        break;
+      case 'Newest':
+        results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      default: // 'All'
+        break;
+    }
+
+    filteredRatings.value = results;
+  }
+
+  double _calculateAverage(List<UserRating> ratings) {
+    if (ratings.isEmpty) return 0.0;
+    final sum = ratings.fold<double>(0.0, (sum, r) => sum + r.ratingValue);
+    return sum / ratings.length;
+  }
+
+  void updateSearchQuery(String query) {
+    searchQuery.value = query;
+  }
+
+  void updateFilter(String filter) {
+    selectedFilter.value = filter;
   }
 
   Future<String> getUserDisplayName(String uid) async {
@@ -48,6 +159,8 @@ class RatingItemController extends GetxController {
     String? location,
     required int ratingScale,
     File? imageFile,
+    double? initialRating,
+    String? initialComment,
   }) async {
     try {
       isCreatingRating.value = true;
@@ -66,6 +179,8 @@ class RatingItemController extends GetxController {
         ratingScale: ratingScale,
         imageFile: imageFile,
         createdBy: userId,
+        initialRating: initialRating,
+        initialComment: initialComment,
       );
 
       if (rating != null) {
@@ -218,11 +333,19 @@ class RatingItemController extends GetxController {
   Future<bool> addUserRating({
     required String ratingItemId,
     required double ratingValue,
+    String? comment,
   }) async {
     try {
       final userId = _authService.currentUser?.uid;
       if (userId == null) {
         errorMessage.value = 'User not authenticated';
+        return false;
+      }
+
+      // Get the rating item to access ratingScale
+      final ratingItem = getRatingById(ratingItemId);
+      if (ratingItem == null) {
+        errorMessage.value = 'Rating item not found';
         return false;
       }
 
@@ -236,6 +359,8 @@ class RatingItemController extends GetxController {
         userId: userId,
         userName: userName,
         ratingValue: ratingValue,
+        ratingScale: ratingItem.ratingScale,
+        comment: comment,
       );
 
       if (success) {
@@ -255,6 +380,7 @@ class RatingItemController extends GetxController {
   Future<bool> updateUserRating({
     required String ratingItemId,
     required double ratingValue,
+    String? comment,
   }) async {
     try {
       final userId = _authService.currentUser?.uid;
@@ -263,10 +389,19 @@ class RatingItemController extends GetxController {
         return false;
       }
 
+      // Get the rating item to access ratingScale
+      final ratingItem = getRatingById(ratingItemId);
+      if (ratingItem == null) {
+        errorMessage.value = 'Rating item not found';
+        return false;
+      }
+
       final success = await _ratingService.updateUserRating(
         ratingItemId: ratingItemId,
         userId: userId,
         ratingValue: ratingValue,
+        ratingScale: ratingItem.ratingScale,
+        comment: comment,
       );
 
       if (success) {

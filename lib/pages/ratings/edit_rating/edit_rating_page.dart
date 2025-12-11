@@ -20,9 +20,6 @@ class EditRatingPage extends GetView<EditRatingController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Rating'),
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.text,
-        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -32,17 +29,17 @@ class EditRatingPage extends GetView<EditRatingController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header Section
-              _buildHeaderSection(),
+              _buildHeaderSection(context),
 
               const SizedBox(height: AppSpacing.lg),
 
               // Image Section
-              _buildImageSection(),
+              _buildImageSection(context),
 
               const SizedBox(height: AppSpacing.lg),
 
               // Form Section
-              _buildFormSection(),
+              _buildFormSection(context),
 
               const SizedBox(height: AppSpacing.lg),
 
@@ -55,37 +52,38 @@ class EditRatingPage extends GetView<EditRatingController> {
     );
   }
 
-  Widget _buildHeaderSection() {
+  Widget _buildHeaderSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Edit Rating',
           style: AppTypography.titleLarge.copyWith(
-            color: AppColors.text,
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Update your rating for "${rating.name}"',
-          style: AppTypography.bodyMedium.copyWith(color: AppColors.textLight),
+          style: AppTypography.bodyMedium.copyWith(color: colorScheme.onSurfaceVariant),
         ),
       ],
     );
   }
 
-  Widget _buildFormSection() {
+  Widget _buildFormSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Item Name Field
-        CustomFormField(
+        AppTextField(
           label: 'Item Name',
-          hint: 'What are you rating?',
           controller: controller.itemNameController,
-          icon: Icons.label_rounded,
-          isRequired: true,
+          prefixIcon: Icons.label_rounded,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Item name is required';
@@ -103,63 +101,32 @@ class EditRatingPage extends GetView<EditRatingController> {
         const SizedBox(height: AppSpacing.md),
 
         // Rating Scale Selection
-        CustomDropdown<int>(
-          items: EditRatingController.availableRatingScales,
+        AppDropdown<int>(
+          label: 'Rating Scale',
           value: controller.ratingScale.value,
           onChanged: (value) {
             if (value != null) {
               controller.setRatingScale(value);
             }
           },
-          label: 'Rating Scale',
-          hintText: 'Select rating scale',
-          isRequired: true,
-          itemBuilder: (context, item, isSelected) => Row(
-            children: [
-              Icon(
-                Icons.circle_rounded,
-                color: isSelected ? AppColors.primary : AppColors.textLight,
-                size: 20,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Text(
-                '$item Points',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: isSelected ? AppColors.primary : AppColors.text,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
-              ),
-            ],
-          ),
-          displayBuilder: (value) => Row(
-            children: [
-              const Icon(
-                Icons.circle_rounded,
-                color: AppColors.primary,
-                size: 20,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Text(
-                '$value Points',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.text,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          emptyIcon: Icons.star_rounded,
+          prefixIcon: Icons.star_outline_rounded,
+          items: EditRatingController.availableRatingScales.map((scale) {
+            return DropdownMenuItem<int>(
+              value: scale,
+              child: Text('$scale Points'),
+            );
+          }).toList(),
+          validator: (value) => value == null ? 'Selection required' : null,
         ),
 
         const SizedBox(height: AppSpacing.md),
 
         // Description Field
-        CustomFormField(
+        AppTextField(
           label: 'Description',
-          hint: 'Tell us more about your experience (optional)',
+          hintText: 'Tell us more about your experience (optional)',
           controller: controller.descriptionController,
-          icon: Icons.description_rounded,
-          isRequired: false,
+          prefixIcon: Icons.description_rounded,
           maxLines: 3,
           validator: (value) {
             if (value != null &&
@@ -174,12 +141,12 @@ class EditRatingPage extends GetView<EditRatingController> {
         const SizedBox(height: AppSpacing.md),
 
         // Location Field
-        CustomFormField(
+        AppTextField(
           label: 'Location',
-          hint: 'Where is this item located? (optional)',
+          hintText: 'Where is this item located? (optional)',
           controller: controller.locationController,
-          icon: Icons.location_on_rounded,
-          isRequired: false,
+          prefixIcon: Icons.location_on_rounded,
+          textInputAction: TextInputAction.next,
           validator: (value) {
             if (value != null &&
                 value.trim().isNotEmpty &&
@@ -193,21 +160,24 @@ class EditRatingPage extends GetView<EditRatingController> {
     );
   }
 
-  Widget _buildImageSection() {
+  Widget _buildImageSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Item Photo',
           style: AppTypography.titleMedium.copyWith(
-            color: AppColors.text,
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Update the photo for your rating (optional)',
-          style: AppTypography.bodySmall.copyWith(color: AppColors.textLight),
+          style: AppTypography.bodySmall.copyWith(color: colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: AppSpacing.md),
 
@@ -226,17 +196,17 @@ class EditRatingPage extends GetView<EditRatingController> {
                         (rating.imageUrl != null &&
                             rating.imageUrl!.isNotEmpty &&
                             controller.keepExistingImage.value)
-                    ? AppColors.transparent
-                    : AppColors.surfaceVariant.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+                    ? Colors.transparent
+                    : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                borderRadius: AppBorderRadius.lgRadius,
                 border: Border.all(
                   color:
                       controller.selectedImage.value != null ||
                           (rating.imageUrl != null &&
                               rating.imageUrl!.isNotEmpty &&
                               controller.keepExistingImage.value)
-                      ? AppColors.primary.withValues(alpha: 0.2)
-                      : AppColors.outline.withValues(alpha: 0.3),
+                      ? colorScheme.primary.withValues(alpha: 0.2)
+                      : colorScheme.outline.withValues(alpha: 0.3),
                   width: 2,
                   style: BorderStyle.solid,
                 ),
@@ -245,9 +215,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                   ? Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            AppBorderRadius.lg,
-                          ),
+                          borderRadius: AppBorderRadius.lgRadius,
                           child: Image.file(
                             controller.selectedImage.value!,
                             fit: BoxFit.cover,
@@ -259,17 +227,15 @@ class EditRatingPage extends GetView<EditRatingController> {
                         Positioned.fill(
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                AppBorderRadius.lg,
-                              ),
+                              borderRadius: AppBorderRadius.lgRadius,
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  AppColors.black.withValues(alpha: 0.3),
-                                  AppColors.transparent,
-                                  AppColors.transparent,
-                                  AppColors.black.withValues(alpha: 0.3),
+                                  Colors.black.withValues(alpha: 0.3),
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.black.withValues(alpha: 0.3),
                                 ],
                               ),
                             ),
@@ -284,11 +250,11 @@ class EditRatingPage extends GetView<EditRatingController> {
                             child: Container(
                               padding: const EdgeInsets.all(AppSpacing.sm),
                               decoration: BoxDecoration(
-                                color: AppColors.black.withValues(alpha: 0.6),
+                                color: Colors.black.withValues(alpha: 0.6),
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.black.withValues(
+                                    color: Colors.black.withValues(
                                       alpha: 0.2,
                                     ),
                                     blurRadius: 8,
@@ -299,7 +265,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                               child: const Icon(
                                 Icons.close_rounded,
                                 size: 18,
-                                color: AppColors.white,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -320,13 +286,11 @@ class EditRatingPage extends GetView<EditRatingController> {
                                   vertical: AppSpacing.sm,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.black.withValues(alpha: 0.6),
-                                  borderRadius: BorderRadius.circular(
-                                    AppBorderRadius.md,
-                                  ),
+                                  color: Colors.black.withValues(alpha: 0.6),
+                                  borderRadius: AppBorderRadius.mdRadius,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.black.withValues(
+                                      color: Colors.black.withValues(
                                         alpha: 0.2,
                                       ),
                                       blurRadius: 8,
@@ -340,13 +304,13 @@ class EditRatingPage extends GetView<EditRatingController> {
                                     const Icon(
                                       Icons.edit_rounded,
                                       size: 16,
-                                      color: AppColors.white,
+                                      color: Colors.white,
                                     ),
                                     const SizedBox(width: AppSpacing.xs),
                                     Text(
                                       'Change Photo',
                                       style: AppTypography.bodySmall.copyWith(
-                                        color: AppColors.white,
+                                        color: Colors.white,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -364,9 +328,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                   ? Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            AppBorderRadius.lg,
-                          ),
+                          borderRadius: AppBorderRadius.lgRadius,
                           child: Image.network(
                             rating.imageUrl!,
                             fit: BoxFit.cover,
@@ -375,15 +337,13 @@ class EditRatingPage extends GetView<EditRatingController> {
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
                                 decoration: BoxDecoration(
-                                  color: AppColors.surfaceVariant,
-                                  borderRadius: BorderRadius.circular(
-                                    AppBorderRadius.lg,
-                                  ),
+                                  color: colorScheme.surfaceContainerHighest,
+                                  borderRadius: AppBorderRadius.lgRadius,
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: Icon(
                                     Icons.image_rounded,
-                                    color: AppColors.primary,
+                                    color: colorScheme.primary,
                                     size: 48,
                                   ),
                                 ),
@@ -395,17 +355,15 @@ class EditRatingPage extends GetView<EditRatingController> {
                         Positioned.fill(
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                AppBorderRadius.lg,
-                              ),
+                              borderRadius: AppBorderRadius.lgRadius,
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  AppColors.black.withValues(alpha: 0.3),
-                                  AppColors.transparent,
-                                  AppColors.transparent,
-                                  AppColors.black.withValues(alpha: 0.3),
+                                  Colors.black.withValues(alpha: 0.3),
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.black.withValues(alpha: 0.3),
                                 ],
                               ),
                             ),
@@ -420,11 +378,11 @@ class EditRatingPage extends GetView<EditRatingController> {
                             child: Container(
                               padding: const EdgeInsets.all(AppSpacing.sm),
                               decoration: BoxDecoration(
-                                color: AppColors.black.withValues(alpha: 0.6),
+                                color: Colors.black.withValues(alpha: 0.6),
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.black.withValues(
+                                    color: Colors.black.withValues(
                                       alpha: 0.2,
                                     ),
                                     blurRadius: 8,
@@ -435,7 +393,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                               child: const Icon(
                                 Icons.delete_rounded,
                                 size: 18,
-                                color: AppColors.white,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -456,13 +414,11 @@ class EditRatingPage extends GetView<EditRatingController> {
                                   vertical: AppSpacing.sm,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.black.withValues(alpha: 0.6),
-                                  borderRadius: BorderRadius.circular(
-                                    AppBorderRadius.md,
-                                  ),
+                                  color: Colors.black.withValues(alpha: 0.6),
+                                  borderRadius: AppBorderRadius.mdRadius,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.black.withValues(
+                                      color: Colors.black.withValues(
                                         alpha: 0.2,
                                       ),
                                       blurRadius: 8,
@@ -476,13 +432,13 @@ class EditRatingPage extends GetView<EditRatingController> {
                                     const Icon(
                                       Icons.edit_rounded,
                                       size: 16,
-                                      color: AppColors.white,
+                                      color: Colors.white,
                                     ),
                                     const SizedBox(width: AppSpacing.xs),
                                     Text(
                                       'Change Photo',
                                       style: AppTypography.bodySmall.copyWith(
-                                        color: AppColors.white,
+                                        color: Colors.white,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -500,30 +456,30 @@ class EditRatingPage extends GetView<EditRatingController> {
                         Container(
                           padding: const EdgeInsets.all(AppSpacing.lg),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
+                            color: colorScheme.primaryContainer.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.add_photo_alternate_rounded,
                             size: 32,
-                            color: AppColors.primary,
+                            color: colorScheme.primary,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         if (controller.isUpdatingImage.value)
                           Column(
                             children: [
-                              const CircularProgressIndicator(
+                              CircularProgressIndicator(
                                 strokeWidth: 3,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppColors.primary,
+                                  colorScheme.primary,
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.sm),
                               Text(
                                 'Uploading...',
                                 style: AppTypography.bodyMedium.copyWith(
-                                  color: AppColors.primary,
+                                  color: colorScheme.primary,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -535,7 +491,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                               Text(
                                 'Tap to add photo',
                                 style: AppTypography.titleMedium.copyWith(
-                                  color: AppColors.primary,
+                                  color: colorScheme.primary,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -543,7 +499,7 @@ class EditRatingPage extends GetView<EditRatingController> {
                               Text(
                                 'JPEG, PNG up to 10MB',
                                 style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textLight,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -559,8 +515,8 @@ class EditRatingPage extends GetView<EditRatingController> {
 
   Widget _buildSubmitButton() {
     return Obx(
-      () => CustomButton(
-        width: double.infinity,
+      () => AppButton(
+        isFullWidth: true,
         onPressed: controller.isUpdatingImage.value
             ? null
             : () async {
@@ -573,8 +529,6 @@ class EditRatingPage extends GetView<EditRatingController> {
             ? 'Uploading...'
             : 'Update Rating',
         isLoading: controller.isUpdatingImage.value,
-        backgroundColor: AppColors.primary,
-        textColor: AppColors.white,
       ),
     );
   }

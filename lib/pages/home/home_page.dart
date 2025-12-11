@@ -24,13 +24,7 @@ class HomePage extends GetView<HomeController> {
                   children: [
                     StatsSection(),
                     SizedBox(height: AppSpacing.xl),
-                    MyGroupsSection(),
-                    SizedBox(height: AppSpacing.xl),
                     QuickActionsSection(),
-                    // SizedBox(height: AppSpacing.xl),
-                    // FeaturesSection(),
-                    // SizedBox(height: AppSpacing.xl),
-                    // RecentActivitySection(),
                   ],
                 ),
               ),

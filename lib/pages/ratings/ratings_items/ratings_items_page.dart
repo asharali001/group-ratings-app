@@ -6,6 +6,7 @@ import '/styles/__styles.dart';
 import '/ui_components/__ui_components.dart';
 
 import 'rating_items_controller.dart';
+import 'rating_item_details_page.dart';
 import 'components/__components.dart';
 
 class RatingsPage extends StatelessWidget {
@@ -16,6 +17,8 @@ class RatingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ratingController = Get.put(RatingItemController());
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     // Set the group context when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -33,68 +36,187 @@ class RatingsPage extends StatelessWidget {
           ),
         ],
       ),
-      body: _buildRatingsList(ratingController),
+      body: Obx(() {
+        final itemCount = ratingController.filteredRatings.length;
+        final totalCount = ratingController.groupRatings.length;
+
+        if (itemCount == 0 &&
+            ratingController.searchQuery.value.isEmpty &&
+            ratingController.selectedFilter.value == 'All') {
+          return Column(
+            children: [
+              GroupHeaderSection(group: group, itemCount: 0),
+              GroupMembersSection(group: group),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        size: 64,
+                        color: AppColors.yellow,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(
+                        'No items yet',
+                        style: AppTypography.titleLarge.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Be the first to add an item to this group!',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      if (ratingController.canCreateRating())
+                        AppButton(
+                          onPressed: () =>
+                              _navigateToAddRating(context, ratingController),
+                          text: 'Add First Item',
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        return CustomScrollView(
+          slivers: [
+            // Group Header
+            SliverToBoxAdapter(
+              child: GroupHeaderSection(group: group, itemCount: itemCount),
+            ),
+
+            // Members Section
+            SliverToBoxAdapter(child: GroupMembersSection(group: group)),
+
+            // Search Bar
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                ),
+                child: AppTextField(
+                  label: 'Search',
+                  hintText: 'Search items...',
+                  prefixIcon: Icons.search_rounded,
+                  onChanged: (value) {
+                    ratingController.updateSearchQuery(value);
+                  },
+                ),
+              ),
+            ),
+
+            // Filter Chips
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Obx(
+                    () => Row(
+                      children: [
+                        _buildFilterChip(
+                          'All',
+                          isSelected:
+                              ratingController.selectedFilter.value == 'All',
+                          onTap: () => ratingController.updateFilter('All'),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        _buildFilterChip(
+                          'My Ratings',
+                          isSelected:
+                              ratingController.selectedFilter.value ==
+                              'My Ratings',
+                          onTap: () =>
+                              ratingController.updateFilter('My Ratings'),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        _buildFilterChip(
+                          'Highest Rated',
+                          isSelected:
+                              ratingController.selectedFilter.value ==
+                              'Highest Rated',
+                          onTap: () =>
+                              ratingController.updateFilter('Highest Rated'),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        _buildFilterChip(
+                          'Newest',
+                          isSelected:
+                              ratingController.selectedFilter.value == 'Newest',
+                          onTap: () => ratingController.updateFilter('Newest'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Section Header
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                  AppSpacing.md,
+                ),
+                child: Text(
+                  itemCount == totalCount
+                      ? 'Items ($itemCount)'
+                      : 'Items ($itemCount of $totalCount)',
+                  style: AppTypography.titleMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+
+            // Compact Rating Items List
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final rating = ratingController.filteredRatings[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: CompactRatingItemCard(
+                      item: rating,
+                      onTap: () => _navigateToRatingDetails(rating),
+                    ),
+                  );
+                }, childCount: itemCount),
+              ),
+            ),
+
+            // Bottom padding
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+          ],
+        );
+      }),
     );
   }
 
-  Widget _buildRatingsList(RatingItemController ratingController) {
-    return Obx(() {
-      if (ratingController.groupRatings.isEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.star, size: 64, color: AppColors.yellow),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                'No ratings yet',
-                style: AppTypography.titleLarge.copyWith(
-                  color: Get.context!.colors.onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Be the first to add a rating to this group!',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: Get.context!.colors.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              if (ratingController.canCreateRating())
-                CustomButton(
-                  onPressed: () =>
-                      _navigateToAddRating(Get.context!, ratingController),
-                  text: 'Add First Rating',
-                  backgroundColor: AppColors.primary,
-                  textColor: AppColors.white,
-                ),
-            ],
-          ),
-        );
-      }
-
-      return ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        itemCount: ratingController.groupRatings.length,
-        itemBuilder: (context, index) {
-          final rating = ratingController.groupRatings[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            child: RatingItemCard(
-              rating: rating,
-              canEdit: ratingController.canEditRating(rating),
-              controller: ratingController,
-              onEdit: () =>
-                  _navigateToEditRating(context, ratingController, rating),
-              onDelete: () =>
-                  _showDeleteRatingDialog(context, ratingController, rating),
-            ),
-          );
-        },
-      );
-    });
+  Widget _buildFilterChip(
+    String label, {
+    bool isSelected = false,
+    VoidCallback? onTap,
+  }) {
+    return AppChip(label: label, isSelected: isSelected, onTap: onTap);
   }
 
   void _navigateToAddRating(
@@ -107,44 +229,10 @@ class RatingsPage extends StatelessWidget {
     );
   }
 
-  void _navigateToEditRating(
-    BuildContext context,
-    RatingItemController ratingController,
-    RatingItem rating,
-  ) {
-    Get.toNamed(
-      RouteNames.groups.editRatingPage,
-      arguments: {'rating': rating},
-    );
-  }
-
-  void _showDeleteRatingDialog(
-    BuildContext context,
-    RatingItemController ratingController,
-    RatingItem rating,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Rating'),
-        content: Text(
-          'Are you sure you want to delete your rating for "${rating.name}"? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ratingController.deleteRatingItem(rating.id);
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+  void _navigateToRatingDetails(RatingItem item) {
+    Get.to(
+      () => RatingItemDetailsPage(ratingItem: item),
+      transition: Transition.cupertino,
     );
   }
 }

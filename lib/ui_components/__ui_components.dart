@@ -5,3 +5,5 @@ export 'popups/__popups.dart';
 export 'headers/__headers.dart';
 export 'inputs/__inputs.dart';
 export 'layouts/__layouts.dart';
+export 'modals/__modals.dart';
+export 'data_display/__data_display.dart';

@@ -1,76 +1,103 @@
 import 'dart:ui';
 
 class AppColors {
-  static const primary = Color(0xFF0BA5EC);
-  static const onPrimary = Color(0xFFFFFFFF);
-  static const secondary = Color(0xFF6366F1);
-  static const tertiary = Color(0xFFB0BEC5);
+  // ===========================================================================
+  // Core Palette (Primitive Values)
+  // Internal use only. Use Semantic Aliases for UI.
+  // ===========================================================================
 
-  static const surface = Color(0xFFFFFFFF);
-  static const onSurface = Color(0xFF272D2F);
-  static const surfaceVariant = Color(0xFFF1F5F9);
-  static const surfaceContainer = Color(0xFFF8FAFC);
-  static const outline = Color(0xAAA1A1A1);
-  static const outlineVariant = Color(0xFFCBD5E1);
+  // Brand Colors
+  static const _shiebleBlue = Color(0xFF0BA5EC);
+  static const _shiebleIndigo = Color(0xFF6366F1);
 
-  static const cardBackground = Color.fromARGB(255, 227, 239, 252);
-  static const onCardBackground = Color(0xFF272D2F);
-  static const cardBackgroundHighest = Color.fromARGB(255, 230, 230, 255);
+  // Neutrals (Slate/Gray Scale)
+  static const _neutral50 = Color(0xFFF8FAFC);
+  static const _neutral100 = Color(0xFFF1F5F9);
+  static const _neutral200 = Color(0xFFE2E8F0);
+  static const _neutral300 = Color(0xFFCBD5E1);
+  static const _neutral400 = Color(0xFF94A3B8);
+  static const _neutral500 = Color(0xFF64748B);
+  static const _neutral600 = Color(0xFF475569);
+  static const _neutral700 = Color(0xFF334155);
+  static const _neutral800 = Color(0xFF1E293B);
+  static const _neutral900 = Color(0xFF0F172A);
 
-  static const success = green;
-  static const successContainer = greenLight;
-  static const warning = yellow;
-  static const warningContainer = yellowLight;
-  static const error = red;
-  static const errorContainer = redLight;
-  static const info = blue;
-  static const infoContainer = blueLight;
+  // Functional Colors
+  static const _green500 = Color(0xFF22C55E);
+  static const _green50 = Color(0xFFF0FDF4); // Success Background
+  
+  static const _red500 = Color(0xFFEF4444);
+  static const _red50 = Color(0xFFFEF2F2);   // Error Background
 
-  static const text = Color(0xFF272D2F);
-  static const textLight = Color(0xFF6A727D);
+  static const _orange500 = Color(0xFFF97316);
+  static const _orange50 = Color(0xFFFFF7ED); // Warning Background
 
-  static const black = Color(0xFF000000);
+  static const _blue500 = Color(0xFF3B82F6);
+  static const _blue50 = Color(0xFFEFF6FF);   // Info Background
+
   static const white = Color(0xFFFFFFFF);
-
-  static const gray = Color(0xFF8E8E93);
-  static const silver = Color(0xFFA1A1A1);
-  static const darkGray = Color(0xFF1C1C1E);
-
+  static const black = Color(0xFF000000);
   static const transparent = Color(0x00000000);
 
-  static const blue = Color(0xFF007AFF);
-  static const blueLight = Color(0xFF5AC8FA);
-  static const blueDark = Color(0xFF0056CC);
+  // ===========================================================================
+  // Semantic Aliases (Usage based)
+  // ===========================================================================
 
-  static const green = Color(0xFF34C759);
-  static const greenLight = Color(0xFF30D158);
-  static const greenDark = Color(0xFF28A745);
+  // Primary
+  static const primary = _shiebleBlue;
+  static const onPrimary = white;
+  static const primaryContainer = Color(0xFFE0F2FE); // Light Blue
+  static const onPrimaryContainer = Color(0xFF0369A1); // Dark Blue
 
-  static const red = Color(0xFFFF3B30);
-  static const redLight = Color(0xFFFF453A);
-  static const redDark = Color(0xFFDC3545);
+  // Secondary
+  static const secondary = _shiebleIndigo;
+  static const onSecondary = white;
 
-  static const yellow = Color(0xFFFFCC00);
-  static const yellowLight = Color(0xFFFFD60A);
-  static const yellowDark = Color(0xFFE6B800);
+  // Backgrounds
+  static const background = _neutral50;
+  static const surface = white;
+  static const onSurface = textPrimary;
+  static const surfaceVariant = _neutral100;
+  static const onSurfaceVariant = textSecondary; // Also useful
+  
+  // Text
+  static const textPrimary = _neutral900;
+  
+  // Semantic Aliases for common colors
+  static const green = _green500;
+  static const red = _red500;
+  static const blue = _blue500;
+  static const yellow = _orange500; // Mapping yellow to orange/warning color or add actual yellow
+  static const purple = _shiebleIndigo; // Mapping purple to indigo
+  static const textSecondary = _neutral500;
+  static const textTertiary = _neutral400;
+  
+  // Borders
+  static const border = _neutral200;
+  static const borderFocus = _shiebleBlue;
 
-  static const darkOrange = Color(0xFFFF9500);
-  static const orange = Color(0xFFFF6B35);
-  static const orangeLight = Color(0xFFFF8A65);
+  // Feedback (Toast / functional)
+  static const success = _green500;
+  static const successContainer = _green50;
+  
+  static const error = _red500;
+  static const errorContainer = _red50;
+  
+  static const warning = _orange500;
+  static const warningContainer = _orange50;
+  
+  static const info = _blue500;
+  static const infoContainer = _blue50;
 
-  static const purple = Color(0xFF8B5CF6);
-  static const purpleLight = Color(0xFFA78BFA);
-  static const purpleDark = Color(0xFF7C3AED);
-
-  static const pink = Color(0xFFEC4899);
-  static const pinkLight = Color(0xFFF472B6);
-  static const pinkDark = Color(0xFFDB2777);
-
-  static const teal = Color(0xFF14B8A6);
-  static const tealLight = Color(0xFF2DD4BF);
-  static const tealDark = Color(0xFF0D9488);
-
-  static const indigo = Color(0xFF6366F1);
-  static const indigoLight = Color(0xFF818CF8);
-  static const indigoDark = Color(0xFF4F46E5);
+  // Legacy mappings for backward compatibility during refactor
+  // TODO: Remove these once migration is complete
+  static const gray = _neutral400;
+  static const darkGray = _neutral800;
+  static const silver = _neutral300;
+  static const outline = _neutral300;
+  static const outlineVariant = _neutral200;
+  static const text = textPrimary;
+  static const textLight = textSecondary;
+  static const cardBackground = surface;
+  static const onCardBackground = textPrimary;
 }

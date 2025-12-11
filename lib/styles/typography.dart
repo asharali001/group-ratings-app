@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTypography {
-  
   // Font weights
   static const FontWeight light = FontWeight.w300;
   static const FontWeight regular = FontWeight.w400;
@@ -11,111 +10,118 @@ class AppTypography {
   static const FontWeight bold = FontWeight.w700;
   static const FontWeight extraBold = FontWeight.w800;
 
-  // Base text theme using Google Fonts
+  // Base text theme using Google Fonts - used for ThemeData
   static TextTheme get textTheme => GoogleFonts.kanitTextTheme();
-  
+
   // Custom text styles with consistent sizing and weights
-  static const TextStyle displayLarge = TextStyle(
+  // Using GoogleFonts.kanit directly to ensure font family is always applied
+  
+  // Display
+  static TextStyle get displayLarge => GoogleFonts.kanit(
     fontSize: 57,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: -0.25,
     height: 1.12,
   );
 
-  static const TextStyle displayMedium = TextStyle(
+  static TextStyle get displayMedium => GoogleFonts.kanit(
     fontSize: 45,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: 0,
     height: 1.16,
   );
 
-  static const TextStyle displaySmall = TextStyle(
+  static TextStyle get displaySmall => GoogleFonts.kanit(
     fontSize: 36,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: 0,
     height: 1.22,
   );
 
-  static const TextStyle headlineLarge = TextStyle(
+  // Headline
+  static TextStyle get headlineLarge => GoogleFonts.kanit(
     fontSize: 32,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: 0,
     height: 1.25,
   );
 
-  static const TextStyle headlineMedium = TextStyle(
+  static TextStyle get headlineMedium => GoogleFonts.kanit(
     fontSize: 28,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: 0,
     height: 1.29,
   );
 
-  static const TextStyle headlineSmall = TextStyle(
+  static TextStyle get headlineSmall => GoogleFonts.kanit(
     fontSize: 24,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: 0,
     height: 1.33,
   );
 
-  static const TextStyle titleLarge = TextStyle(
+  // Title
+  static TextStyle get titleLarge => GoogleFonts.kanit(
     fontSize: 22,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: 0,
     height: 1.27,
   );
 
-  static const TextStyle titleMedium = TextStyle(
+  static TextStyle get titleMedium => GoogleFonts.kanit(
     fontSize: 16,
-    fontWeight: FontWeight.w500,
+    fontWeight: medium,
     letterSpacing: 0.15,
     height: 1.5,
   );
 
-  static const TextStyle titleSmall = TextStyle(
+  static TextStyle get titleSmall => GoogleFonts.kanit(
     fontSize: 14,
-    fontWeight: FontWeight.w500,
+    fontWeight: medium,
     letterSpacing: 0.1,
     height: 1.43,
   );
 
-  static const TextStyle bodyLarge = TextStyle(
+  // Body
+  static TextStyle get bodyLarge => GoogleFonts.kanit(
     fontSize: 16,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: 0.5,
     height: 1.5,
   );
 
-  static const TextStyle bodyMedium = TextStyle(
+  static TextStyle get bodyMedium => GoogleFonts.kanit(
     fontSize: 14,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: 0.25,
     height: 1.43,
   );
 
-  static const TextStyle bodySmall = TextStyle(
+  static TextStyle get bodySmall => GoogleFonts.kanit(
     fontSize: 12,
-    fontWeight: FontWeight.w400,
+    fontWeight: regular,
     letterSpacing: 0.4,
     height: 1.33,
   );
 
-  static const TextStyle labelLarge = TextStyle(
+  // Label
+  static TextStyle get labelLarge => GoogleFonts.kanit(
     fontSize: 14,
-    fontWeight: FontWeight.w500,
+    fontWeight: medium,
     letterSpacing: 0.1,
     height: 1.43,
   );
 
-  static const TextStyle labelMedium = TextStyle(
+  static TextStyle get labelMedium => GoogleFonts.kanit(
     fontSize: 12,
-    fontWeight: FontWeight.w500,
+    fontWeight: medium,
     letterSpacing: 0.5,
     height: 1.33,
   );
 
-  static const TextStyle labelSmall = TextStyle(
+  static TextStyle get labelSmall => GoogleFonts.kanit(
     fontSize: 11,
-    fontWeight: FontWeight.w500,
+    fontWeight: medium,
     letterSpacing: 0.5,
     height: 1.45,
   );

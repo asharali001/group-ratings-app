@@ -11,25 +11,25 @@ class AppStyleUtils {
   // Common decoration patterns
   static BoxDecoration get cardDecoration => const BoxDecoration(
     color: AppColors.white,
-    borderRadius: AppBorderRadius.cardRadiusObj,
+    borderRadius: AppBorderRadius.lgRadius,
     boxShadow: AppShadows.cardShadow,
   );
 
   static BoxDecoration get buttonDecoration => const BoxDecoration(
     color: AppColors.primary,
-    borderRadius: AppBorderRadius.buttonRadiusObj,
+    borderRadius: AppBorderRadius.mdRadius,
     boxShadow: AppShadows.buttonShadow,
   );
 
   static BoxDecoration get inputDecoration => BoxDecoration(
     color: AppColors.white,
-    borderRadius: AppBorderRadius.textFieldRadiusObj,
+    borderRadius: AppBorderRadius.mdRadius,
     border: Border.all(color: AppColors.gray),
   );
 
   static BoxDecoration get chipDecoration => BoxDecoration(
     color: AppColors.gray.withValues(alpha: 0.1),
-    borderRadius: AppBorderRadius.chipRadiusObj,
+    borderRadius: AppBorderRadius.fullRadius,
     border: Border.all(color: AppColors.gray.withValues(alpha: 0.3)),
   );
 
@@ -58,7 +58,7 @@ class AppStyleUtils {
   );
 
   static TextStyle get linkText => AppTypography.bodyMedium.copyWith(
-    color: AppColors.blue,
+    color: AppColors.info,
     decoration: TextDecoration.underline,
   );
 
@@ -68,24 +68,24 @@ class AppStyleUtils {
     fillColor: AppColors.white,
     contentPadding: AppSpacing.inputPadding,
     border: OutlineInputBorder(
-      borderRadius: AppBorderRadius.textFieldRadiusObj,
+      borderRadius: AppBorderRadius.mdRadius,
       borderSide: BorderSide(color: AppColors.gray),
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: AppBorderRadius.textFieldRadiusObj,
+      borderRadius: AppBorderRadius.mdRadius,
       borderSide: BorderSide(color: AppColors.gray),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: AppBorderRadius.textFieldRadiusObj,
+      borderRadius: AppBorderRadius.mdRadius,
       borderSide: BorderSide(color: AppColors.primary, width: 2),
     ),
     errorBorder: OutlineInputBorder(
-      borderRadius: AppBorderRadius.textFieldRadiusObj,
-      borderSide: BorderSide(color: AppColors.red),
+      borderRadius: AppBorderRadius.mdRadius,
+      borderSide: BorderSide(color: AppColors.error),
     ),
     focusedErrorBorder: OutlineInputBorder(
-      borderRadius: AppBorderRadius.textFieldRadiusObj,
-      borderSide: BorderSide(color: AppColors.red, width: 2),
+      borderRadius: AppBorderRadius.mdRadius,
+      borderSide: BorderSide(color: AppColors.error, width: 2),
     ),
   );
 
@@ -95,7 +95,7 @@ class AppStyleUtils {
     foregroundColor: AppColors.white,
     padding: AppSpacing.buttonPadding,
     shape: const RoundedRectangleBorder(
-      borderRadius: AppBorderRadius.buttonRadiusObj,
+      borderRadius: AppBorderRadius.mdRadius,
     ),
     elevation: AppShadows.level1,
     minimumSize: const Size(AppSizes.buttonMinWidth, AppSizes.buttonHeight),
@@ -106,7 +106,7 @@ class AppStyleUtils {
     foregroundColor: AppColors.primary,
     padding: AppSpacing.buttonPadding,
     shape: const RoundedRectangleBorder(
-      borderRadius: AppBorderRadius.buttonRadiusObj,
+      borderRadius: AppBorderRadius.mdRadius,
       side: BorderSide(color: AppColors.primary),
     ),
     elevation: 0,
@@ -117,7 +117,7 @@ class AppStyleUtils {
     foregroundColor: AppColors.primary,
     padding: AppSpacing.buttonPadding,
     shape: const RoundedRectangleBorder(
-      borderRadius: AppBorderRadius.buttonRadiusObj,
+      borderRadius: AppBorderRadius.mdRadius,
     ),
     minimumSize: const Size(AppSizes.buttonMinWidth, AppSizes.buttonHeight),
   );
@@ -127,7 +127,7 @@ class AppStyleUtils {
     side: const BorderSide(color: AppColors.primary),
     padding: AppSpacing.buttonPadding,
     shape: const RoundedRectangleBorder(
-      borderRadius: AppBorderRadius.buttonRadiusObj,
+      borderRadius: AppBorderRadius.mdRadius,
     ),
     minimumSize: const Size(AppSizes.buttonMinWidth, AppSizes.buttonHeight),
   );
@@ -136,7 +136,7 @@ class AppStyleUtils {
   static Card get standardCard => const Card(
     elevation: AppShadows.level1,
     shape: RoundedRectangleBorder(
-      borderRadius: AppBorderRadius.cardRadiusObj,
+      borderRadius: AppBorderRadius.lgRadius,
     ),
     margin: EdgeInsets.all(AppSizes.cardMargin),
     child: Padding(
@@ -152,7 +152,7 @@ class AppStyleUtils {
     minLeadingWidth: AppSizes.listTileLeadingWidth,
     minVerticalPadding: AppSizes.listTileMinVerticalPadding,
     shape: RoundedRectangleBorder(
-      borderRadius: AppBorderRadius.listTileRadiusObj,
+      borderRadius: AppBorderRadius.mdRadius,
     ),
   );
 
@@ -184,7 +184,7 @@ class AppStyleUtils {
     foregroundColor: AppColors.white,
     elevation: AppShadows.level3,
     shape: RoundedRectangleBorder(
-      borderRadius: AppBorderRadius.fabRadiusObj,
+      borderRadius: AppBorderRadius.fullRadius,
     ),
   );
 
@@ -193,7 +193,7 @@ class AppStyleUtils {
     backgroundColor: AppColors.white,
     elevation: AppShadows.level5,
     shape: const RoundedRectangleBorder(
-      borderRadius: AppBorderRadius.dialogRadiusObj,
+      borderRadius: AppBorderRadius.xlRadius,
     ),
     titleTextStyle: headingText,
     contentTextStyle: bodyText,
@@ -205,8 +205,8 @@ class AppStyleUtils {
     elevation: AppShadows.level4,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(AppBorderRadius.dialogRadius),
-        topRight: Radius.circular(AppBorderRadius.dialogRadius),
+        topLeft: Radius.circular(AppBorderRadius.xl),
+        topRight: Radius.circular(AppBorderRadius.xl),
       ),
     ),
   );
@@ -220,7 +220,7 @@ class AppStyleUtils {
   }) {
     return BoxDecoration(
       color: color ?? AppColors.white,
-      borderRadius: borderRadius ?? AppBorderRadius.noneRadius,
+      borderRadius: borderRadius ?? BorderRadius.zero,
       boxShadow: boxShadow ?? AppShadows.none,
       border: border,
     );
@@ -257,24 +257,24 @@ class AppStyleUtils {
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,
       border: OutlineInputBorder(
-        borderRadius: AppBorderRadius.textFieldRadiusObj,
+        borderRadius: AppBorderRadius.mdRadius,
         borderSide: BorderSide(color: borderColor ?? AppColors.gray),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: AppBorderRadius.textFieldRadiusObj,
+        borderRadius: AppBorderRadius.mdRadius,
         borderSide: BorderSide(color: borderColor ?? AppColors.gray),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: AppBorderRadius.textFieldRadiusObj,
+        borderRadius: AppBorderRadius.mdRadius,
         borderSide: BorderSide(color: focusedBorderColor ?? AppColors.primary, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: AppBorderRadius.textFieldRadiusObj,
-        borderSide: BorderSide(color: errorBorderColor ?? AppColors.red),
+        borderRadius: AppBorderRadius.mdRadius,
+        borderSide: BorderSide(color: errorBorderColor ?? AppColors.error),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: AppBorderRadius.textFieldRadiusObj,
-        borderSide: BorderSide(color: errorBorderColor ?? AppColors.red, width: 2),
+        borderRadius: AppBorderRadius.mdRadius,
+        borderSide: BorderSide(color: errorBorderColor ?? AppColors.error, width: 2),
       ),
     );
   }

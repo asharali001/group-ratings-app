@@ -22,9 +22,6 @@ class AddRatingPage extends GetView<AddRatingController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add New Rating'),
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.text,
-        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -40,8 +37,8 @@ class AddRatingPage extends GetView<AddRatingController> {
               const FormSection(),
               const SizedBox(height: AppSpacing.lg),
               Obx(
-                () => CustomButton(
-                  width: double.infinity,
+                () => AppButton(
+                  isFullWidth: true,
                   onPressed: controller.isUpdatingImage.value
                       ? null
                       : () async {
@@ -56,8 +53,6 @@ class AddRatingPage extends GetView<AddRatingController> {
                       ? 'Uploading...'
                       : 'Add Rating',
                   isLoading: controller.isUpdatingImage.value,
-                  backgroundColor: AppColors.primary,
-                  textColor: AppColors.white,
                 ),
               ),
             ],

@@ -146,6 +146,12 @@ class RatingItem {
         other.updatedAt == updatedAt;
   }
 
+  double get averageRating {
+    if (ratings.isEmpty) return 0.0;
+    final sum = ratings.fold(0.0, (prev, curr) => prev + curr.ratingValue);
+    return sum / ratings.length;
+  }
+
   @override
   int get hashCode {
     return id.hashCode ^

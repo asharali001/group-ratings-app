@@ -117,8 +117,9 @@ class AuthController extends GetxController {
         password: passwordController.text,
       );
 
-      Get.offAllNamed('/home');
+      Get.offAllNamed(RouteNames.mainApp.mainLayout);
     } catch (e) {
+      debugPrint('Auth Error: $e');
       _errorMessage.value = e.toString();
     } finally {
       _isLoading.value = false;
@@ -139,7 +140,7 @@ class AuthController extends GetxController {
         displayName: displayNameController.text.trim(),
       );
 
-      Get.offAllNamed('/home');
+      Get.offAllNamed(RouteNames.mainApp.mainLayout);
     } catch (e) {
       _errorMessage.value = e.toString();
     } finally {
@@ -154,10 +155,11 @@ class AuthController extends GetxController {
       _clearError();
 
       await _authService.signInWithApple();
-      Get.offAllNamed('/home');
+      Get.offAllNamed(RouteNames.mainApp.mainLayout);
     } catch (e) {
       // Don't show error if user cancelled
-      if (e.toString().contains('canceled') || e.toString().contains('cancelled')) {
+      if (e.toString().contains('canceled') ||
+          e.toString().contains('cancelled')) {
         return;
       }
       _errorMessage.value = e.toString();
@@ -173,7 +175,7 @@ class AuthController extends GetxController {
       _clearError();
 
       await _authService.signInWithGoogle();
-      Get.offAllNamed('/home');
+      Get.offAllNamed(RouteNames.mainApp.mainLayout);
     } catch (e) {
       _errorMessage.value = e.toString();
     } finally {

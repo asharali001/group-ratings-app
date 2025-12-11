@@ -11,7 +11,9 @@ import '../models/user_model.dart';
 
 class AuthApi {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final GoogleSignIn _googleSignIn = GoogleSignIn();
+  static final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
 
   /// Sign in with email and password
   static Future<UserModel> signInWithEmailAndPassword({
@@ -62,6 +64,11 @@ class AuthApi {
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+      
+      if (googleAuth.idToken == null) {
+        throw Exception('Failed to get Google authentication token');
+      }
+
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -70,6 +77,11 @@ class AuthApi {
       final UserCredential result = await _auth.signInWithCredential(
         credential,
       );
+      
+      if (result.user == null) {
+        throw Exception('Failed to sign in to Firebase');
+      }
+
       return UserModel.fromFirebaseUser(result.user!);
     } catch (e) {
       throw _handleAuthError(e);
@@ -180,25 +192,28 @@ class AuthApi {
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'user-not-found':
-          return 'No user found with this email.';
         case 'wrong-password':
-          return 'Wrong password provided.';
+        case 'invalid-credential':
+          // Unified error for security to not reveal if email exists
+          return 'Invalid email or password. Please try again.';
         case 'email-already-in-use':
-          return 'An account already exists with this email.';
+          return 'An account already exists with this email address.';
         case 'weak-password':
-          return 'The password provided is too weak.';
+          return 'The password provided is too weak. Please use a stronger password.';
         case 'invalid-email':
-          return 'The email address is invalid.';
+          return 'The email address provided is attempting to be invalid. Please check and try again.';
         case 'user-disabled':
-          return 'This user account has been disabled.';
+          return 'This account has been disabled. Please contact support.';
         case 'too-many-requests':
-          return 'Too many attempts. Please try again later.';
+          return 'Too many sign-in attempts. Please try again later for your security.';
         case 'operation-not-allowed':
-          return 'This operation is not allowed.';
+          return 'This sign-in method is currently not enabled. Please contact support.';
+        case 'network-request-failed':
+          return 'Connection error. Please check your internet connection and try again.';
         default:
-          return error.message ?? 'An error occurred during authentication.';
+          return 'An unexpected authentication error occurred. Please try again.';
       }
     }
-    return error.toString();
+    return 'An unexpected error occurred. Please try again.';
   }
 }

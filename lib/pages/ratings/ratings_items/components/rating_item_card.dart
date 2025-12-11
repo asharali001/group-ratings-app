@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../rating_items_controller.dart';
 import '/core/__core.dart';
 import '/styles/__styles.dart';
+import '/ui_components/__ui_components.dart';
 import 'add_user_rating_dialog.dart';
 
 class RatingItemCard extends StatelessWidget {
@@ -25,14 +26,12 @@ class RatingItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        border: Border.all(
-          color: context.colors.outline.withValues(alpha: 0.3),
-        ),
-        borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-      ),
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return AppCard(
+      variant: AppCardVariant.outlined,
+      padding: EdgeInsets.zero, // Padding handled internally by sub-widgets
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -51,13 +50,13 @@ class RatingItemCard extends StatelessWidget {
                   Text(
                     rating.description!,
                     style: AppTypography.bodyMedium.copyWith(
-                      color: context.colors.onSurface,
+                      color: colorScheme.onSurface,
                       height: 1.5,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
                 ],
-                _buildUserRatingsSection(),
+                _buildUserRatingsSection(context),
                 const SizedBox(height: AppSpacing.md),
                 _buildFooter(context),
               ],
@@ -69,28 +68,31 @@ class RatingItemCard extends StatelessWidget {
   }
 
   Widget _buildHeroImage(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       height: 250,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topLeft: Radius.circular(AppBorderRadius.xl),
+          topRight: Radius.circular(AppBorderRadius.xl),
         ),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            context.colors.primary.withValues(alpha: 0.1),
-            context.colors.primary.withValues(alpha: 0.05),
+            colorScheme.primary.withValues(alpha: 0.1),
+            colorScheme.primary.withValues(alpha: 0.05),
           ],
         ),
       ),
       child: rating.imageUrl != null && rating.imageUrl!.isNotEmpty
           ? ClipRRect(
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+                topLeft: Radius.circular(AppBorderRadius.xl),
+                topRight: Radius.circular(AppBorderRadius.xl),
               ),
               child: Image.network(
                 rating.imageUrl!,
@@ -105,23 +107,25 @@ class RatingItemCard extends StatelessWidget {
   }
 
   Widget _buildPlaceholderIcon(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Center(
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: context.colors.primary.withValues(alpha: 0.1),
+          color: colorScheme.primary.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          Icons.image_outlined,
-          color: context.colors.primary,
-          size: 48,
-        ),
+        child: Icon(Icons.image_outlined, color: colorScheme.primary, size: 48),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -133,7 +137,7 @@ class RatingItemCard extends StatelessWidget {
               Text(
                 rating.name,
                 style: AppTypography.bodyLarge.copyWith(
-                  color: context.colors.onSurface,
+                  color: colorScheme.onSurface,
                   fontWeight: AppTypography.semiBold,
                 ),
               ),
@@ -141,16 +145,16 @@ class RatingItemCard extends StatelessWidget {
               if (rating.location?.isNotEmpty == true)
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.location_on_outlined,
-                      color: AppColors.primary,
+                      color: colorScheme.primary,
                       size: 16,
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       rating.location!,
                       style: AppTypography.bodyMedium.copyWith(
-                        color: context.colors.onSurfaceVariant,
+                        color: colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -170,7 +174,7 @@ class RatingItemCard extends StatelessWidget {
                 context: context,
                 icon: EvaIcons.editOutline,
                 onTap: onEdit,
-                color: AppColors.primary,
+                color: colorScheme.primary,
                 tooltip: 'Edit Rating',
               ),
             if (canEdit) const SizedBox(width: 12),
@@ -178,7 +182,7 @@ class RatingItemCard extends StatelessWidget {
               context: context,
               icon: EvaIcons.trash2Outline,
               onTap: onDelete,
-              color: context.colors.error,
+              color: colorScheme.error,
               tooltip: 'Delete Rating',
             ),
           ],
@@ -194,19 +198,22 @@ class RatingItemCard extends StatelessWidget {
     required Color color,
     required String tooltip,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Tooltip(
       message: tooltip,
       child: Container(
         decoration: BoxDecoration(
-          color: context.colors.surface.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(AppBorderRadius.round),
+          color: colorScheme.surface.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(AppBorderRadius.full),
           border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(AppBorderRadius.round),
+            borderRadius: BorderRadius.circular(AppBorderRadius.full),
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               child: Icon(icon, size: 20, color: color),
@@ -217,7 +224,9 @@ class RatingItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildUserRatingsSection() {
+  Widget _buildUserRatingsSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final hasRatings = rating.ratings.isNotEmpty;
     final currentUserRating = controller?.getCurrentUserRating(rating.id);
     final canRate = controller != null && controller!.canCreateRating();
@@ -231,12 +240,12 @@ class RatingItemCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.star_rounded,
-                color: AppColors.primary,
+                color: colorScheme.primary,
                 size: 18,
               ),
             ),
@@ -248,20 +257,20 @@ class RatingItemCard extends StatelessWidget {
                   Text(
                     'Ratings',
                     style: AppTypography.titleMedium.copyWith(
-                      color: Get.context!.colors.onSurface,
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
                     '${rating.ratings.length} rating${rating.ratings.length == 1 ? '' : 's'}',
                     style: AppTypography.bodySmall.copyWith(
-                      color: Get.context!.colors.onSurfaceVariant,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
             ),
-            if (canRate) _buildRateButton(currentUserRating),
+            if (canRate) _buildRateButton(context, currentUserRating),
           ],
         ),
 
@@ -269,21 +278,26 @@ class RatingItemCard extends StatelessWidget {
 
         // Ratings List
         if (hasRatings) ...[
-          ...rating.ratings.map((userRating) => _buildRatingItem(userRating)),
+          ...rating.ratings.map(
+            (userRating) => _buildRatingItem(context, userRating),
+          ),
         ] else ...[
-          _buildEmptyState(),
+          _buildEmptyState(context),
         ],
       ],
     );
   }
 
-  Widget _buildRateButton(UserRating? currentUserRating) {
+  Widget _buildRateButton(BuildContext context, UserRating? currentUserRating) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Material(
-      color: AppColors.primary,
-      borderRadius: BorderRadius.circular(AppBorderRadius.md),
+      color: colorScheme.primary,
+      borderRadius: AppBorderRadius.mdRadius,
       child: InkWell(
         onTap: _showRatingDialog,
-        borderRadius: BorderRadius.circular(AppBorderRadius.md),
+        borderRadius: AppBorderRadius.mdRadius,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
@@ -294,13 +308,13 @@ class RatingItemCard extends StatelessWidget {
                     ? Icons.edit_rounded
                     : Icons.add_rounded,
                 size: 16,
-                color: Get.context!.colors.onPrimary,
+                color: colorScheme.onPrimary,
               ),
               const SizedBox(width: 6),
               Text(
                 currentUserRating != null ? 'Edit' : 'Rate',
                 style: AppTypography.bodySmall.copyWith(
-                  color: Get.context!.colors.onPrimary,
+                  color: colorScheme.onPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -311,14 +325,17 @@ class RatingItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         child: Text(
           'No ratings yet. Be the first to rate this item!',
           style: AppTypography.bodyMedium.copyWith(
-            color: Get.context!.colors.onSurfaceVariant,
+            color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -326,7 +343,9 @@ class RatingItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildRatingItem(UserRating userRating) {
+  Widget _buildRatingItem(BuildContext context, UserRating userRating) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isCurrentUser =
         controller?.hasUserRated(rating.id) == true &&
         controller?.getCurrentUserRating(rating.id)?.userId ==
@@ -337,36 +356,29 @@ class RatingItemCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isCurrentUser
-            ? AppColors.primary.withValues(alpha: 0.08)
-            : AppColors.secondary.withValues(alpha: 0.08),
+            ? colorScheme.primary.withValues(alpha: 0.08)
+            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isCurrentUser
-              ? AppColors.primary.withValues(alpha: 0.2)
-              : AppColors.secondary.withValues(alpha: 0.2),
+              ? colorScheme.primary.withValues(alpha: 0.2)
+              : colorScheme.outlineVariant,
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // User Avatar
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: isCurrentUser ? AppColors.primary : AppColors.secondary,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                userRating.userName.isNotEmpty
-                    ? userRating.userName[0].toUpperCase()
-                    : '?',
-                style: AppTypography.titleSmall.copyWith(
-                  color: AppColors.white,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
+          AppAvatar(
+            url: null, // Use user image if available
+            initials: userRating.userName.isNotEmpty
+                ? userRating.userName[0].toUpperCase()
+                : '?',
+            size: 40,
+            backgroundColor: isCurrentUser
+                ? colorScheme.primary
+                : colorScheme.secondary,
+            foregroundColor: colorScheme.onPrimary,
           ),
 
           const SizedBox(width: 16),
@@ -381,7 +393,7 @@ class RatingItemCard extends StatelessWidget {
                     Text(
                       userRating.userName,
                       style: AppTypography.bodyMedium.copyWith(
-                        color: Get.context!.colors.onSurface,
+                        color: colorScheme.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -393,13 +405,13 @@ class RatingItemCard extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: colorScheme.primary,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           'You',
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.white,
+                            color: colorScheme.onPrimary,
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                           ),
@@ -414,18 +426,31 @@ class RatingItemCard extends StatelessWidget {
                     const Icon(
                       Icons.star_rounded,
                       size: 16,
-                      color: AppColors.yellow,
+                      color: Colors.amber,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${userRating.ratingValue.toInt()}/${rating.ratingScale}',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: Get.context!.colors.onSurfaceVariant,
+                        color: colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
+                if (userRating.comment != null &&
+                    userRating.comment!.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    userRating.comment!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontStyle: FontStyle.italic,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
             ),
           ),
@@ -434,7 +459,7 @@ class RatingItemCard extends StatelessWidget {
           Text(
             _formatDate(userRating.createdAt),
             style: AppTypography.bodySmall.copyWith(
-              color: Get.context!.colors.onSurfaceVariant,
+              color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -444,13 +469,15 @@ class RatingItemCard extends StatelessWidget {
   }
 
   Widget _buildFooter(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Align(
       alignment: Alignment.centerRight,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: context.colors.onSurfaceVariant.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppBorderRadius.round),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppBorderRadius.full),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -458,13 +485,13 @@ class RatingItemCard extends StatelessWidget {
             Icon(
               Icons.schedule_outlined,
               size: 14,
-              color: context.colors.onSurfaceVariant,
+              color: colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 6),
             Text(
               _formatDate(rating.createdAt),
               style: AppTypography.bodySmall.copyWith(
-                color: context.colors.onSurfaceVariant,
+                color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -479,24 +506,28 @@ class RatingItemCard extends StatelessWidget {
 
     final currentUserRating = controller!.getCurrentUserRating(rating.id);
 
-    Get.dialog(
+    Get.bottomSheet(
       AddUserRatingDialog(
         ratingItem: rating,
         existingRating: currentUserRating,
-        onRatingSubmitted: (ratingValue) async {
+        onRatingSubmitted: (ratingValue, comment) async {
           if (currentUserRating != null) {
             await controller!.updateUserRating(
               ratingItemId: rating.id,
               ratingValue: ratingValue,
+              comment: comment,
             );
           } else {
             await controller!.addUserRating(
               ratingItemId: rating.id,
               ratingValue: ratingValue,
+              comment: comment,
             );
           }
         },
       ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
   }
 

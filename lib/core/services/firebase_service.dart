@@ -13,17 +13,25 @@ class FirebaseService {
   /// Initialize Firebase for the app
   static Future<void> initialize() async {
     try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-      if (kDebugMode) {
-        debugPrint('Firebase initialized successfully');
+      // Check if Firebase is already initialized (e.g., from AppDelegate on iOS)
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        if (kDebugMode) {
+          debugPrint('Firebase initialized successfully');
+        }
+      } else {
+        if (kDebugMode) {
+          debugPrint('Firebase already initialized');
+        }
       }
     } catch (e) {
       if (kDebugMode) {
         debugPrint('Error initializing Firebase: $e');
       }
-      rethrow;
+      // Don't rethrow - allow app to continue even if Firebase init fails
+      // The app will handle missing Firebase gracefully
     }
   }
 

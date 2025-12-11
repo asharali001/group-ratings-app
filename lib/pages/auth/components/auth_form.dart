@@ -11,72 +11,79 @@ class AuthForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<AuthController>(
-      builder: (controller) {
-        return Column(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final controller = Get.find<AuthController>();
+
+    // Use Obx to listen to changes
+    return Obx(() => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Display Name Field (only for sign up)
             if (controller.isSignUp) ...[
-              CustomTextField(
+              AppTextField(
                 controller: controller.displayNameController,
-                labelText: 'Display Name',
-                prefixIcon: Icons.person,
+                label: 'Display Name',
+                prefixIcon: Icons.person_rounded,
                 textInputAction: TextInputAction.next,
+                enabled: !controller.isLoading,
               ),
               const SizedBox(height: AppSpacing.md),
             ],
-            
+
             // Email Field
-            CustomTextField(
+            AppTextField(
               controller: controller.emailController,
-              labelText: 'Email',
-              prefixIcon: Icons.email,
+              label: 'Email',
+              prefixIcon: Icons.email_rounded,
               keyboardType: TextInputType.emailAddress,
-              textInputAction: controller.isSignUp 
-                ? TextInputAction.next 
-                : TextInputAction.done,
+              textInputAction: controller.isSignUp
+                  ? TextInputAction.next
+                  : TextInputAction.done,
+              enabled: !controller.isLoading,
             ),
-            
+
             const SizedBox(height: AppSpacing.md),
-            
+
             // Password Field
-            CustomTextField(
+            AppTextField(
               controller: controller.passwordController,
-              labelText: 'Password',
-              prefixIcon: Icons.lock,
+              label: 'Password',
+              prefixIcon: Icons.lock_rounded,
               obscureText: !controller.isPasswordVisible,
+              enabled: !controller.isLoading,
               suffixIcon: IconButton(
                 icon: Icon(
-                  controller.isPasswordVisible 
-                    ? Icons.visibility_off 
-                    : Icons.visibility,
-                  color: AppColors.textLight,
+                  controller.isPasswordVisible
+                      ? Icons.visibility_off_rounded
+                      : Icons.visibility_rounded,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 onPressed: controller.togglePasswordVisibility,
               ),
               textInputAction: TextInputAction.done,
-              onSubmitted: () => _handleSubmit(controller),
+              onFieldSubmitted: (_) => _handleSubmit(controller),
             ),
-            
+
             const SizedBox(height: AppSpacing.md),
-            
+
             // Error Message
             if (controller.errorMessage.isNotEmpty)
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: AppColors.red.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppBorderRadius.sm),
+                  color: colorScheme.error.withValues(alpha: 0.1),
+                  borderRadius: AppBorderRadius.smRadius,
                   border: Border.all(
-                    color: AppColors.red.withValues(alpha: 0.3),
+                    color: colorScheme.error.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.error_outline,
-                      color: AppColors.red,
+                    Icon(
+                      Icons.error_outline_rounded,
+                      color: colorScheme.error,
                       size: 20,
                     ),
                     const SizedBox(width: AppSpacing.sm),
@@ -84,46 +91,48 @@ class AuthForm extends StatelessWidget {
                       child: Text(
                         controller.errorMessage,
                         style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.red,
+                          color: colorScheme.error,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-            
+
             const SizedBox(height: AppSpacing.lg),
-            
+
             // Submit Button
-            CustomButton(
-              onPressed: controller.isLoading 
-                ? null 
-                : () => _handleSubmit(controller),
-              text: controller.isLoading 
-                ? 'Please wait...'
-                : (controller.isSignUp ? 'Sign Up' : 'Sign In'),
+            AppButton(
+              onPressed: controller.isLoading
+                  ? null
+                  : () => _handleSubmit(controller),
+              text: controller.isLoading
+                  ? 'Please wait...'
+                  : (controller.isSignUp ? 'Sign Up' : 'Sign In'),
               isLoading: controller.isLoading,
+              isFullWidth: true,
             ),
-            
+
             const SizedBox(height: AppSpacing.md),
-            
+
             // Forgot Password (only for sign in)
             if (!controller.isSignUp)
-              TextButton(
-                onPressed: controller.isLoading 
-                  ? null 
-                  : controller.resetPassword,
-                child: Text(
-                  'Forgot Password?',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.primary,
+              Center(
+                child: TextButton(
+                  onPressed: controller.isLoading
+                      ? null
+                      : controller.resetPassword,
+                  child: Text(
+                    'Forgot Password?',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
           ],
-        );
-      },
-    );
+        ));
   }
 
   void _handleSubmit(AuthController controller) {
@@ -134,4 +143,3 @@ class AuthForm extends StatelessWidget {
     }
   }
 }
-

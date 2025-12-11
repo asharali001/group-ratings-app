@@ -11,6 +11,7 @@ class AppRoutes {
     GetPage(name: RouteNames.auth.signUpPage, page: () => const SignUpPage()),
 
     // App routes
+    GetPage(name: RouteNames.mainApp.mainLayout, page: () => const MainLayout()),
     GetPage(name: RouteNames.mainApp.homePage, page: () => const HomePage()),
     GetPage(
       name: RouteNames.mainApp.profilePage,

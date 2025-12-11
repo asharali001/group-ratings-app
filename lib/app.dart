@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'core/__core.dart';
 import 'themes/__themes.dart';
@@ -9,6 +10,22 @@ import 'constants/__constants.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
+
+  String _getInitialRoute() {
+    try {
+      // Check if Firebase is initialized before accessing auth
+      if (Firebase.apps.isEmpty) {
+        return RouteNames.auth.signInPage;
+      }
+      final currentUser = FirebaseService.auth.currentUser;
+      return currentUser != null
+          ? RouteNames.mainApp.mainLayout
+          : RouteNames.auth.signInPage;
+    } catch (e) {
+      // If there's any error accessing Firebase, default to sign-in page
+      return RouteNames.auth.signInPage;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +37,7 @@ class App extends StatelessWidget {
       ),
       child: GetMaterialApp(
         title: AppStrings.appName,
-        initialRoute: FirebaseService.auth.currentUser != null
-            ? RouteNames.mainApp.homePage
-            : RouteNames.auth.signInPage,
+        initialRoute: _getInitialRoute(),
         getPages: AppRoutes.routes,
         initialBinding: InitialBinding(),
         defaultTransition: Transition.noTransition,

@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import '/core/__core.dart';
 import '/styles/__styles.dart';
 import '/ui_components/__ui_components.dart';
+import '/constants/enums.dart';
 
 import 'create_group_controller.dart';
 
@@ -12,6 +12,9 @@ class CreateGroupPage extends GetView<CreateGroupController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Create New Group')),
       body: SingleChildScrollView(
@@ -24,8 +27,8 @@ class CreateGroupPage extends GetView<CreateGroupController> {
               _buildFormSection(context, controller),
               const SizedBox(height: AppSpacing.md),
               Obx(
-                () => CustomButton(
-                  width: double.infinity,
+                () => AppButton(
+                  isFullWidth: true,
                   onPressed: controller.isCreatingGroup.value
                       ? null
                       : controller.createGroup,
@@ -44,25 +47,27 @@ class CreateGroupPage extends GetView<CreateGroupController> {
     BuildContext context,
     CreateGroupController controller,
   ) {
+    var theme = Theme.of(context);
+    var colorScheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Group Details',
           style: AppTypography.titleLarge.copyWith(
-            color: context.colors.onSurface,
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: AppSpacing.md),
 
         // Group Name Field
-        CustomFormField(
+        AppTextField(
           label: 'Group Name',
-          hint: 'Enter a memorable group name',
           controller: controller.nameController,
-          icon: Icons.group_rounded,
-          isRequired: true,
+          prefixIcon: Icons.group_rounded,
+          textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Group name is required';
@@ -81,22 +86,38 @@ class CreateGroupPage extends GetView<CreateGroupController> {
 
         // Category Field
         Obx(
-          () => CategoryDropdown(
+          () => AppDropdown<GroupCategory>(
+            label: 'Category',
             value: controller.selectedCategory,
             onChanged: controller.updateSelectedCategory,
+            prefixIcon: Icons.category_rounded,
+            items: GroupCategory.allCategories.map((category) {
+              return DropdownMenuItem(
+                value: category,
+                child: Row(
+                  children: [
+                    Text(category.emoji),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(category.displayName),
+                  ],
+                ),
+              );
+            }).toList(),
+            validator: (value) =>
+                value == null ? 'Please select a category' : null,
           ),
         ),
 
         const SizedBox(height: AppSpacing.md),
 
         // Group Description Field
-        CustomFormField(
+        AppTextField(
           label: 'Description',
-          hint: 'Tell people what your group is about (optional)',
+          hintText: 'Tell people what your group is about (optional)',
           controller: controller.descriptionController,
-          icon: Icons.description_rounded,
-          isRequired: false,
+          prefixIcon: Icons.description_rounded,
           maxLines: 4,
+          textInputAction: TextInputAction.done,
           validator: (value) {
             if (value != null &&
                 value.trim().isNotEmpty &&

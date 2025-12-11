@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 
 import '/styles/__styles.dart';
 import '/ui_components/__ui_components.dart';
-import 'components/google_sign_in_button.dart';
 import 'components/apple_sign_in_button.dart';
-
 import 'auth_controller.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -17,7 +15,7 @@ class SignUpPage extends StatelessWidget {
       init: AuthController()..setSignUpMode(),
       builder: (controller) {
         return Scaffold(
-          backgroundColor: AppColors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(AppSpacing.lg),
@@ -25,7 +23,7 @@ class SignUpPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: AppSpacing.xl),
-                  
+
                   // App Logo/Title
                   Column(
                     children: [
@@ -47,49 +45,63 @@ class SignUpPage extends StatelessWidget {
                       Text(
                         'Create your account to get started',
                         style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.textLight,
+                          color: AppColors.textSecondary,
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: AppSpacing.xl),
-                  
+
                   // Sign Up Form
                   _buildSignUpForm(controller),
-                  
+
                   const SizedBox(height: AppSpacing.lg),
-                  
+
                   // Divider
                   Row(
                     children: [
-                      Expanded(child: Divider(color: AppColors.gray.withValues(alpha: 0.3))),
+                      const Expanded(child: Divider(color: AppColors.border)),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
                         child: Text(
                           'OR',
                           style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textLight,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ),
-                      Expanded(child: Divider(color: AppColors.gray.withValues(alpha: 0.3))),
+                      const Expanded(child: Divider(color: AppColors.border)),
                     ],
                   ),
-                  
+
                   const SizedBox(height: AppSpacing.lg),
-                  
+
                   // Google Sign In Button
-                  const GoogleSignInButton(),
-                  
+                  AppButton(
+                    text: 'Continue with Google',
+                    variant: AppButtonVariant.outline,
+                    isFullWidth: true,
+                    iconWidget: Image.asset(
+                      'assets/images/google-logo.png',
+                      width: 24,
+                      height: 24,
+                    ),
+                    onPressed: controller.isLoading
+                        ? null
+                        : controller.signInWithGoogle,
+                  ),
+
                   const SizedBox(height: AppSpacing.md),
 
                   // Apple Sign In Button
                   const AppleSignInButton(),
-                  
+
                   const SizedBox(height: AppSpacing.lg),
-                  
+
                   // Link to Sign In
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -97,11 +109,11 @@ class SignUpPage extends StatelessWidget {
                       Text(
                         'Already have an account? ',
                         style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textLight,
+                          color: AppColors.textSecondary,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () => Get.toNamed('/signin'),
+                      GestureDetector(
+                        onTap: () => Get.toNamed('/signin'),
                         child: Text(
                           'Sign In',
                           style: AppTypography.bodyMedium.copyWith(
@@ -112,7 +124,7 @@ class SignUpPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: AppSpacing.xl),
                 ],
               ),
@@ -128,63 +140,64 @@ class SignUpPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Display Name Field
-        CustomTextField(
+        AppTextField(
           controller: controller.displayNameController,
-          labelText: 'Display Name',
+          label: 'Display Name',
           prefixIcon: Icons.person,
           textInputAction: TextInputAction.next,
         ),
-        
+
         const SizedBox(height: AppSpacing.md),
-        
+
         // Email Field
-        CustomTextField(
+        AppTextField(
           controller: controller.emailController,
-          labelText: 'Email',
+          label: 'Email',
           prefixIcon: Icons.email,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
         ),
-        
+
         const SizedBox(height: AppSpacing.md),
-        
+
         // Password Field
-        CustomTextField(
-          controller: controller.passwordController,
-          labelText: 'Password',
-          prefixIcon: Icons.lock,
-          obscureText: !controller.isPasswordVisible,
-          suffixIcon: IconButton(
-            icon: Icon(
-              controller.isPasswordVisible 
-                ? Icons.visibility_off 
-                : Icons.visibility,
-              color: AppColors.textLight,
+        Obx(() {
+          return AppTextField(
+            controller: controller.passwordController,
+            label: 'Password',
+            prefixIcon: Icons.lock,
+            obscureText: !controller.isPasswordVisible,
+            suffixIcon: IconButton(
+              icon: Icon(
+                controller.isPasswordVisible
+                    ? Icons.visibility_off
+                    : Icons.visibility,
+                color: AppColors.textTertiary,
+              ),
+              onPressed: controller.togglePasswordVisibility,
             ),
-            onPressed: controller.togglePasswordVisibility,
-          ),
-          textInputAction: TextInputAction.done,
-          onSubmitted: () => controller.signUpWithEmailAndPassword(),
-        ),
-        
+            textInputAction: TextInputAction.done,
+            onFieldSubmitted: (_) => controller.signUpWithEmailAndPassword(),
+          );
+        }),
+
         const SizedBox(height: AppSpacing.md),
-        
+
         // Error Message
-        if (controller.errorMessage.isNotEmpty)
-          Container(
+        Obx(() {
+          if (controller.errorMessage.isEmpty) return const SizedBox.shrink();
+          return Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: AppColors.red.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppBorderRadius.sm),
-              border: Border.all(
-                color: AppColors.red.withValues(alpha: 0.3),
-              ),
+              color: AppColors.error.withValues(alpha: 0.1),
+              borderRadius: AppBorderRadius.smRadius,
+              border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
                 const Icon(
                   Icons.error_outline,
-                  color: AppColors.red,
+                  color: AppColors.error,
                   size: 20,
                 ),
                 const SizedBox(width: AppSpacing.sm),
@@ -192,26 +205,28 @@ class SignUpPage extends StatelessWidget {
                   child: Text(
                     controller.errorMessage,
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.red,
+                      color: AppColors.error,
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-        
+          );
+        }),
+
         const SizedBox(height: AppSpacing.lg),
-        
+
         // Submit Button
-        CustomButton(
-          onPressed: controller.isLoading 
-            ? null 
-            : controller.signUpWithEmailAndPassword,
-          text: controller.isLoading 
-            ? 'Please wait...'
-            : 'Sign Up',
-          isLoading: controller.isLoading,
-        ),
+        Obx(() {
+          return AppButton(
+            onPressed: controller.isLoading
+                ? null
+                : controller.signUpWithEmailAndPassword,
+            text: 'Sign Up',
+            isLoading: controller.isLoading,
+            isFullWidth: true,
+          );
+        }),
       ],
     );
   }

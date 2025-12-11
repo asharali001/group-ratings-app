@@ -14,8 +14,10 @@ class AddRatingController extends GetxController {
   final TextEditingController itemNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
+  final TextEditingController commentController = TextEditingController();
 
   final RxInt ratingScale = 5.obs;
+  final RxDouble initialRating = 0.0.obs;
   final Rx<File?> selectedImage = Rx<File?>(null);
 
   final RatingItemController _ratingController =
@@ -28,6 +30,7 @@ class AddRatingController extends GetxController {
     itemNameController.dispose();
     descriptionController.dispose();
     locationController.dispose();
+    commentController.dispose();
     super.onClose();
   }
 
@@ -35,7 +38,9 @@ class AddRatingController extends GetxController {
     itemNameController.clear();
     descriptionController.clear();
     locationController.clear();
+    commentController.clear();
     ratingScale.value = 5;
+    initialRating.value = 0.0;
     selectedImage.value = null;
   }
 
@@ -111,6 +116,10 @@ class AddRatingController extends GetxController {
             : locationController.text.trim(),
         ratingScale: ratingScale.value,
         imageFile: selectedImage.value,
+        initialRating: initialRating.value > 0 ? initialRating.value : null,
+        initialComment: commentController.text.trim().isEmpty
+            ? null
+            : commentController.text.trim(),
       );
 
       if (success) {

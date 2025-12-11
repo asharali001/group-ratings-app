@@ -16,6 +16,8 @@ class EditGroupPage extends GetView<EditGroupController> {
   @override
   Widget build(BuildContext context) {
     controller.initializeForm(group);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Group')),
@@ -26,11 +28,11 @@ class EditGroupPage extends GetView<EditGroupController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildFormSection(),
+              _buildFormSection(context),
               const SizedBox(height: AppSpacing.md),
               Obx(
-                () => CustomButton(
-                  width: double.infinity,
+                () => AppButton(
+                  isFullWidth: true,
                   onPressed: controller.isUpdatingGroup.value
                       ? null
                       : () => controller.updateGroup(groupId: group.id),
@@ -45,24 +47,27 @@ class EditGroupPage extends GetView<EditGroupController> {
     );
   }
 
-  Widget _buildFormSection() {
+  Widget _buildFormSection(BuildContext context) {
+    var theme = Theme.of(context);
+    var colorScheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Group Details',
           style: AppTypography.titleLarge.copyWith(
-            color: Get.context!.colors.onSurface,
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-        CustomFormField(
+        
+        AppTextField(
           label: 'Group Name',
-          hint: 'Enter a memorable group name',
           controller: controller.nameController,
-          icon: Icons.group_rounded,
-          isRequired: true,
+          prefixIcon: Icons.group_rounded,
+          textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Group name is required';
@@ -78,24 +83,42 @@ class EditGroupPage extends GetView<EditGroupController> {
         ),
 
         const SizedBox(height: AppSpacing.md),
+        
         Obx(
-          () => CategoryDropdown(
-            value: controller.selectedCategory.value,
+          () => AppDropdown<GroupCategory>(
+            label: 'Category',
+            value: controller.selectedCategory.value, // value was .value
             onChanged: (GroupCategory? newValue) {
               if (newValue != null) {
                 controller.selectedCategory.value = newValue;
               }
             },
+            prefixIcon: Icons.category_rounded,
+            items: GroupCategory.allCategories.map((category) {
+              return DropdownMenuItem(
+                value: category,
+                child: Row(
+                  children: [
+                    Text(category.emoji),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(category.displayName),
+                  ],
+                ),
+              );
+            }).toList(),
+            validator: (value) => value == null ? 'Please select a category' : null,
           ),
         ),
+        
         const SizedBox(height: AppSpacing.md),
-        CustomFormField(
+        
+        AppTextField(
           label: 'Description',
-          hint: 'Tell people what your group is about (optional)',
+          hintText: 'Tell people what your group is about (optional)',
           controller: controller.descriptionController,
-          icon: Icons.description_rounded,
-          isRequired: false,
+          prefixIcon: Icons.description_rounded,
           maxLines: 4,
+          textInputAction: TextInputAction.done,
           validator: (value) {
             if (value != null &&
                 value.trim().isNotEmpty &&

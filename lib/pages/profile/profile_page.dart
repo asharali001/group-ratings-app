@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '/styles/__styles.dart';
+import '/ui_components/__ui_components.dart';
 import 'profile_controller.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
-
 
   void _showEditNameDialog(BuildContext context, ProfileController controller) {
     final TextEditingController nameController = TextEditingController(
@@ -14,69 +14,25 @@ class ProfilePage extends StatelessWidget {
     );
 
     Get.dialog(
-      AlertDialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Edit Display Name',
-          style: TextStyle(
-            color: AppColors.text,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      AppDialog(
+        title: 'Edit Display Name',
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Display Name',
-              style: TextStyle(
-                color: AppColors.textLight,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.outlineVariant),
-              ),
-              child: TextField(
-                controller: nameController,
-                style: const TextStyle(color: AppColors.text),
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.person_outline, color: AppColors.textLight),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  hintText: 'Enter your name',
-                  hintStyle: TextStyle(color: AppColors.textLight),
-                ),
-                textCapitalization: TextCapitalization.words,
-              ),
+            AppTextField(
+              label: 'Display Name',
+              controller: nameController,
+              hintText: 'Enter your name',
+              prefixIcon: Icons.person_outline_rounded,
+              textCapitalization: TextCapitalization.words,
             ),
           ],
         ),
-        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.textLight),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              elevation: 0,
-            ),
-            onPressed: () => controller.updateDisplayName(nameController.text),
-            child: const Text('Save'),
-          ),
-        ],
+        primaryActionText: 'Save',
+        onPrimaryAction: () =>
+            controller.updateDisplayName(nameController.text),
+        secondaryActionText: 'Cancel',
       ),
     );
   }
@@ -84,15 +40,24 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(ProfileController());
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.text,
+        title: Text(
+          'Profile',
+          style: AppTypography.headlineSmall.copyWith(
+            fontWeight: FontWeight.w700,
+            color: colorScheme.onSurface,
+          ),
+        ),
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
         elevation: 0,
+        centerTitle: false,
       ),
-      backgroundColor: AppColors.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -109,22 +74,16 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        backgroundImage: user?.photoURL != null 
-                            ? NetworkImage(user!.photoURL!) 
-                            : null,
-                        child: user?.photoURL == null
-                            ? Text(
-                                (user?.displayName ?? 'U').substring(0, 1).toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                ),
-                              )
-                            : null,
+                      AppAvatar(
+                        url: user?.photoURL,
+                        initials: (user?.displayName ?? 'U')
+                            .substring(0, 1)
+                            .toUpperCase(),
+                        size: 100,
+                        backgroundColor: colorScheme.primary.withValues(
+                          alpha: 0.1,
+                        ),
+                        foregroundColor: colorScheme.primary,
                       ),
                       Positioned(
                         bottom: 0,
@@ -134,14 +93,17 @@ class ProfilePage extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
+                              color: colorScheme.primary,
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.white, width: 2),
+                              border: Border.all(
+                                color: colorScheme.surface,
+                                width: 2,
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.edit,
+                            child: Icon(
+                              Icons.edit_rounded,
                               size: 16,
-                              color: AppColors.white,
+                              color: colorScheme.onPrimary,
                             ),
                           ),
                         ),
@@ -154,88 +116,113 @@ class ProfilePage extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          user?.displayName ?? 'User',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.text,
+                        Flexible(
+                          child: Text(
+                            user?.displayName ?? 'User',
+                            style: AppTypography.headlineSmall.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.onSurface,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.edit, size: 16, color: AppColors.textLight),
+                        Icon(
+                          Icons.edit_rounded,
+                          size: 16,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     user?.email ?? 'No email',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textLight,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: AppSpacing.xl),
 
             // Stats Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildStatItem('Groups', '${controller.groupsCount}'),
-                _buildStatItem('Joined', controller.memberSince),
-              ],
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildStatItem(
+                    context,
+                    'Groups',
+                    '${controller.groupsCount}',
+                  ),
+                  Container(
+                    height: 40,
+                    width: 1,
+                    color: colorScheme.outlineVariant,
+                  ),
+                  _buildStatItem(context, 'Joined', controller.memberSince),
+                ],
+              ),
             ),
-            
+
             const SizedBox(height: AppSpacing.xxl),
-            
+
             // Actions
-            const Text(
-              'Account Settings',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+            Padding(
+              padding: const EdgeInsets.only(left: AppSpacing.xs),
+              child: Text(
+                'Account Settings',
+                style: AppTypography.titleSmall.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
-            
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: AppColors.outline),
-              ),
+
+            AppCard(
+              padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                   _buildListTile(
-                    icon: Icons.logout,
+                  _buildListTile(
+                    context,
+                    icon: Icons.logout_rounded,
                     title: 'Sign Out',
                     onTap: () => controller.signOut(),
                   ),
-                  const Divider(height: 1),
+                  Divider(
+                    height: 1,
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  ),
                   _buildListTile(
-                    icon: Icons.delete_forever,
+                    context,
+                    icon: Icons.delete_forever_rounded,
                     title: 'Delete Account',
-                    textColor: AppColors.red,
-                    iconColor: AppColors.red,
+                    textColor: colorScheme.error,
+                    iconColor: colorScheme.error,
                     onTap: () => controller.handleDeleteAccount(context),
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: AppSpacing.xxl),
-            
+
             // Version Info
-            const Center(
-              child: Text('Version 1.0.0',
-                style: TextStyle(
-                  color: AppColors.textLight,
-                  fontSize: 12,
+            Center(
+              child: Text(
+                'Version 1.0.0',
+                style: AppTypography.bodySmall.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -246,48 +233,67 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
+  Widget _buildStatItem(BuildContext context, String label, String value) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Column(
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.text,
+          style: AppTypography.titleLarge.copyWith(
+            fontWeight: FontWeight.w700,
+            color: colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: AppColors.textLight,
+          style: AppTypography.bodySmall.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildListTile({
+  Widget _buildListTile(
+    BuildContext context, {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
     Color? textColor,
     Color? iconColor,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: iconColor ?? AppColors.text),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: textColor ?? AppColors.text,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: iconColor ?? colorScheme.onSurface, size: 24),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                title,
+                style: AppTypography.bodyLarge.copyWith(
+                  color: textColor ?? colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+          ],
         ),
       ),
-      trailing: const Icon(Icons.chevron_right, color: AppColors.textLight),
-      onTap: onTap,
     );
   }
 }

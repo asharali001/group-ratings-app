@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import '/core/__core.dart';
 import '/styles/__styles.dart';
 import '/ui_components/__ui_components.dart';
 
@@ -12,6 +11,9 @@ class JoinGroupPage extends GetView<JoinGroupController> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+    var colorScheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Join Group')),
       body: SingleChildScrollView(
@@ -27,27 +29,27 @@ class JoinGroupPage extends GetView<JoinGroupController> {
                   Text(
                     'Join a Group',
                     style: AppTypography.headlineMedium.copyWith(
-                      color: context.colors.onSurface,
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     'Enter the group code to join an existing group',
                     style: AppTypography.bodyLarge.copyWith(
-                      color: context.colors.onSurface,
+                      color: colorScheme.onSurfaceVariant,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
 
-              const SizedBox(height: AppSpacing.md),
-              CustomFormField(
+              const SizedBox(height: AppSpacing.xl),
+
+              AppTextField(
                 controller: controller.groupCodeController,
                 label: 'Group Code',
-                hint: 'Enter 6-digit group code',
-                icon: Icons.vpn_key,
-                isRequired: true,
+                hintText: 'Enter 6-digit group code',
+                prefixIcon: Icons.vpn_key_rounded,
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => controller.joinGroup(),
                 textCapitalization: TextCapitalization.characters,
@@ -73,17 +75,17 @@ class JoinGroupPage extends GetView<JoinGroupController> {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.blue.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppBorderRadius.md),
+                  color: AppColors.info.withValues(alpha: 0.1),
+                  borderRadius: AppBorderRadius.mdRadius,
                   border: Border.all(
-                    color: AppColors.blue.withValues(alpha: 0.3),
+                    color: AppColors.info.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
                   children: [
                     const Icon(
-                      Icons.info_outline,
-                      color: AppColors.blue,
+                      Icons.info_outline_rounded,
+                      color: AppColors.info,
                       size: 20,
                     ),
                     const SizedBox(width: AppSpacing.sm),
@@ -91,7 +93,7 @@ class JoinGroupPage extends GetView<JoinGroupController> {
                       child: Text(
                         'Group codes are 6 characters long and can contain letters and numbers. Ask the group creator for the code.',
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.blue,
+                          color: AppColors.info,
                         ),
                       ),
                     ),
@@ -99,18 +101,16 @@ class JoinGroupPage extends GetView<JoinGroupController> {
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.xl),
 
               // Join Button
               Obx(
-                () => CustomButton(
-                  width: double.infinity,
+                () => AppButton(
+                  isFullWidth: true,
                   onPressed: controller.isJoiningGroup.value
                       ? null
                       : controller.joinGroup,
                   text: 'Join Group',
-                  backgroundColor: AppColors.primary,
-                  textColor: context.colors.onPrimary,
                   isLoading: controller.isJoiningGroup.value,
                 ),
               ),
