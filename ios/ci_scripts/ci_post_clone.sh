@@ -22,7 +22,6 @@ flutter precache --ios
 
 echo "✨ flutter build ios --config-only (to generate xcconfig)"
 # This ensures Generated.xcconfig exists
-cd ..
 flutter build ios --config-only --no-codesign
 
 echo "🧱 Install CocoaPods"
