@@ -35,10 +35,7 @@ class RatingItemCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Hero Image Section
           _buildHeroImage(context),
-
-          // Content Section
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(

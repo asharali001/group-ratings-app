@@ -20,12 +20,13 @@ class _GroupMembersSectionState extends State<GroupMembersSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final members = widget.group.members;
     final colorScheme = theme.colorScheme;
-    final totalMembers = widget.group.members.length;
+    final totalMembers = members.length;
     final shouldShowExpandButton = totalMembers > _maxDisplayedMembers;
     final displayedMembers = _isExpanded
-        ? widget.group.members
-        : widget.group.members.take(_maxDisplayedMembers).toList();
+        ? members
+        : members.take(_maxDisplayedMembers).toList();
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -78,7 +79,9 @@ class _GroupMembersSectionState extends State<GroupMembersSection> {
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: [
-              ...displayedMembers.map((member) => _buildMemberChip(context, member)),
+              ...displayedMembers.map(
+                (member) => _buildMemberChip(context, member),
+              ),
               if (!_isExpanded && shouldShowExpandButton)
                 _buildMoreChip(context, totalMembers - _maxDisplayedMembers),
             ],
@@ -170,18 +173,12 @@ class _GroupMembersSectionState extends State<GroupMembersSection> {
         decoration: BoxDecoration(
           color: colorScheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppBorderRadius.full),
-          border: Border.all(
-            color: colorScheme.primary.withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.add_rounded,
-              size: 16,
-              color: colorScheme.primary,
-            ),
+            Icon(Icons.add_rounded, size: 16, color: colorScheme.primary),
             const SizedBox(width: 4),
             Text(
               '$remainingCount more',

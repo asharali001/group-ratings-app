@@ -7,6 +7,9 @@ import '/ui_components/__ui_components.dart';
 import '/core/__core.dart';
 
 import 'my_ratings_controller.dart';
+import '../ratings/ratings_items/components/compact_rating_item_card.dart';
+import '../ratings/ratings_items/rating_item_details_page.dart';
+import '../ratings/ratings_items/rating_items_controller.dart';
 
 class MyRatingsPage extends StatelessWidget {
   const MyRatingsPage({super.key});
@@ -52,7 +55,13 @@ class MyRatingsPage extends StatelessWidget {
                   itemCount: controller.filteredRatings.length,
                   itemBuilder: (context, index) {
                     final item = controller.filteredRatings[index];
-                    return _buildRatingCard(item, controller);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: CompactRatingItemCard(
+                        item: item,
+                        onTap: () => _navigateToRatingDetails(item),
+                      ),
+                    );
                   },
                 );
               }),
@@ -121,7 +130,7 @@ class MyRatingsPage extends StatelessWidget {
       selected: isSelected,
       onSelected: (_) => controller.setFilter(value),
       backgroundColor: AppColors.surfaceVariant,
-      selectedColor: AppColors.primary.withOpacity(0.2),
+      selectedColor: AppColors.primary.withValues(alpha: 0.2),
       labelStyle: TextStyle(
         color: isSelected ? AppColors.primary : AppColors.textLight,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -129,76 +138,20 @@ class MyRatingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRatingCard(RatingItem item, MyRatingsController controller) {
-    final userRating = item.ratings.firstWhereOrNull(
-      (r) => r.userId == controller.currentUserId,
-    );
+  Future<void> _navigateToRatingDetails(RatingItem item) async {
+    // Initialize or get the RatingItemController
+    final ratingController = Get.put(RatingItemController());
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: ListTile(
-        tileColor: Theme.of(Get.context!).colorScheme.primaryContainer,
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppBorderRadius.mdRadius,
-        ),
-        leading: item.imageUrl != null && item.imageUrl!.isNotEmpty
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  item.imageUrl!,
-                  width: 56,
-                  height: 56,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    width: 56,
-                    height: 56,
-                    color: AppColors.surfaceVariant,
-                    child: const Icon(Icons.image_not_supported),
-                  ),
-                ),
-              )
-            : Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.star),
-              ),
-        title: Text(
-          item.name,
-          style: AppTypography.titleMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (item.description != null && item.description!.isNotEmpty)
-              Text(
-                item.description!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTypography.bodySmall,
-              ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.star, size: 16, color: AppColors.yellow),
-                const SizedBox(width: 4),
-                Text(
-                  '${userRating?.ratingValue.toStringAsFixed(1) ?? 'N/A'}/${item.ratingScale}',
-                  style: AppTypography.bodySmall.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        trailing: const Icon(Icons.chevron_right),
-      ),
+    // Fetch the group to set the context
+    final group = await GroupService.getGroup(item.groupId);
+    if (group != null) {
+      ratingController.setGroupContext(group);
+    }
+
+    // Navigate to details page
+    Get.to(
+      () => RatingItemDetailsPage(ratingItem: item),
+      transition: Transition.cupertino,
     );
   }
 }

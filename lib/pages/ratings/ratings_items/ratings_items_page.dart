@@ -27,8 +27,12 @@ class RatingsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(group.name),
         actions: [
+          IconButton(
+            onPressed: () => _navigateToEditGroup(context, ratingController),
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit Group',
+          ),
           IconButton(
             onPressed: () => _navigateToAddRating(context, ratingController),
             icon: const Icon(Icons.add),
@@ -227,6 +231,13 @@ class RatingsPage extends StatelessWidget {
       RouteNames.groups.addRatingPage,
       arguments: {'groupId': group.id, 'groupName': group.name},
     );
+  }
+
+  void _navigateToEditGroup(
+    BuildContext context,
+    RatingItemController ratingController,
+  ) {
+    Get.toNamed(RouteNames.groups.editGroupPage, arguments: {'group': group});
   }
 
   void _navigateToRatingDetails(RatingItem item) {
