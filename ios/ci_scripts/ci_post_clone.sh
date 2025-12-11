@@ -20,14 +20,14 @@ flutter pub get
 echo "🌋 Precache iOS engine"
 flutter precache --ios
 
-echo "🧱 Install CocoaPods"
-# Note: CocoaPods is pre-installed in Xcode Cloud, but we need to run it to generate the Pods project linking to Flutter.
-cd ios
-pod install
-
 echo "✨ flutter build ios --config-only (to generate xcconfig)"
 # This ensures Generated.xcconfig exists
 cd ..
 flutter build ios --config-only --no-codesign
+
+echo "🧱 Install CocoaPods"
+# Note: CocoaPods is pre-installed in Xcode Cloud, but we need to run it to generate the Pods project linking to Flutter.
+cd ios
+pod install
 
 echo "✅ Setup Complete"
