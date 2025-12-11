@@ -17,6 +17,9 @@ flutter --version
 echo "📦 Install Flutter Dependencies"
 flutter pub get
 
+echo "🌋 Precache iOS engine"
+flutter precache --ios
+
 echo "🧱 Install CocoaPods"
 # Note: CocoaPods is pre-installed in Xcode Cloud, but we need to run it to generate the Pods project linking to Flutter.
 cd ios
