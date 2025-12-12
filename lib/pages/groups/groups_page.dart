@@ -47,11 +47,9 @@ class GroupsPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  AppButton(
+                  IconButton(
                     onPressed: () => _navigateToCreateGroup(),
-                    text: 'New Group',
-                    icon: Icons.add_rounded,
-                    size: AppButtonSize.sm, // Smaller for header
+                    icon: const Icon(Icons.add_rounded, size: 24),
                   ),
                 ],
               ),
@@ -66,46 +64,6 @@ class GroupsPage extends StatelessWidget {
                 onChanged: (value) {
                   controller.updateSearchQuery(value);
                 },
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.md),
-
-            // Filter Chips
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Obx(
-                  () => Row(
-                    children: [
-                      AppChip(
-                        label: 'All',
-                        isSelected: controller.selectedFilter.value == 'All',
-                        onTap: () => controller.updateFilter('All'),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      AppChip(
-                        label: 'My Groups',
-                        isSelected:
-                            controller.selectedFilter.value == 'My Groups',
-                        onTap: () => controller.updateFilter('My Groups'),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      AppChip(
-                        label: 'Admin',
-                        isSelected: controller.selectedFilter.value == 'Admin',
-                        onTap: () => controller.updateFilter('Admin'),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      AppChip(
-                        label: 'Member',
-                        isSelected: controller.selectedFilter.value == 'Member',
-                        onTap: () => controller.updateFilter('Member'),
-                      ),
-                    ],
-                  ),
-                ),
               ),
             ),
 

@@ -16,145 +16,154 @@ class RatingItemDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<RatingItemController>();
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(ratingItem.name),
-        actions: [
-          if (controller.canEditRating(ratingItem))
-            IconButton(
-              onPressed: () => _navigateToEditRating(context),
-              icon: const Icon(Icons.edit_outlined),
-              tooltip: 'Edit',
-            ),
-          IconButton(
-            onPressed: () => _showDeleteDialog(context, controller),
-            icon: const Icon(Icons.delete_outline),
-            tooltip: 'Delete',
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Hero Image
-            SizedBox(
-              height: 200,
-              width: double.infinity,
-              child: _buildHeroImage(context),
-            ),
+    return Obx(() {
+      final currentItem =
+          controller.getRatingById(ratingItem.id) ??
+          ratingItem; // keep live data
+      final theme = Theme.of(context);
+      final colorScheme = theme.colorScheme;
 
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Location
-                  if (ratingItem.location?.isNotEmpty == true) ...[
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          color: colorScheme.primary,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          ratingItem.location!,
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
-
-                  // Description
-                  if (ratingItem.description?.isNotEmpty == true) ...[
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withValues(
-                          alpha: 0.5,
-                        ),
-                        borderRadius: AppBorderRadius.mdRadius,
-                      ),
-                      child: Text(
-                        ratingItem.description!,
-                        style: AppTypography.bodyMedium.copyWith(
-                          height: 1.6,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
-
-                  // Ratings Stats
-                  _buildRatingsStats(context),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Ratings List
-                  if (ratingItem.ratings.isNotEmpty) ...[
-                    ...ratingItem.ratings.map(
-                      (rating) => _buildRatingItem(context, rating, controller),
-                    ),
-                  ] else
-                    _buildEmptyState(context),
-
-                  // Bottom Padding
-                  const SizedBox(height: 100),
-                ],
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(currentItem.name),
+          actions: [
+            if (controller.canEditRating(currentItem))
+              IconButton(
+                onPressed: () => _navigateToEditRating(context, currentItem),
+                icon: const Icon(Icons.edit_outlined),
+                tooltip: 'Edit',
               ),
+            IconButton(
+              onPressed: () =>
+                  _showDeleteDialog(context, controller, currentItem),
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Delete',
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: controller.canCreateRating()
-          ? Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
-                  ),
-                ],
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Hero Image
+              SizedBox(
+                height: 200,
+                width: double.infinity,
+                child: _buildHeroImage(context, currentItem),
               ),
-              child: SafeArea(
-                child: AppButton(
-                  onPressed: () => _showRatingDialog(controller),
-                  text: controller.hasUserRated(ratingItem.id)
-                      ? 'Edit Rating'
-                      : 'Rate',
-                  icon: controller.hasUserRated(ratingItem.id)
-                      ? Icons.edit_rounded
-                      : Icons.add_rounded,
+
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Location
+                    if (currentItem.location?.isNotEmpty == true) ...[
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            color: colorScheme.primary,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            currentItem.location!,
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                    ],
+
+                    // Description
+                    if (currentItem.description?.isNotEmpty == true) ...[
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest.withValues(
+                            alpha: 0.5,
+                          ),
+                          borderRadius: AppBorderRadius.mdRadius,
+                        ),
+                        child: Text(
+                          currentItem.description!,
+                          style: AppTypography.bodyMedium.copyWith(
+                            height: 1.6,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                    ],
+
+                    // Ratings Stats
+                    _buildRatingsStats(context, currentItem),
+
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // Ratings List
+                    if (currentItem.ratings.isNotEmpty) ...[
+                      ...currentItem.ratings.map(
+                        (rating) => _buildRatingItem(
+                          context,
+                          rating,
+                          controller,
+                          currentItem,
+                        ),
+                      ),
+                    ] else
+                      _buildEmptyState(context),
+
+                    // Bottom Padding
+                    const SizedBox(height: 100),
+                  ],
                 ),
               ),
-            )
-          : null,
-    );
+            ],
+          ),
+        ),
+        bottomNavigationBar: controller.canCreateRating()
+            ? Container(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: AppButton(
+                    onPressed: () => _showRatingDialog(controller, currentItem),
+                    text: controller.hasUserRated(currentItem.id)
+                        ? 'Edit Rating'
+                        : 'Rate',
+                    icon: controller.hasUserRated(currentItem.id)
+                        ? Icons.edit_rounded
+                        : Icons.add_rounded,
+                  ),
+                ),
+              )
+            : null,
+      );
+    });
   }
 
-  Widget _buildHeroImage(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
+  Widget _buildHeroImage(BuildContext context, RatingItem currentItem) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        if (ratingItem.imageUrl != null && ratingItem.imageUrl!.isNotEmpty)
+        if (currentItem.imageUrl != null && currentItem.imageUrl!.isNotEmpty)
           Image.network(
-            ratingItem.imageUrl!,
+            currentItem.imageUrl!,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return _buildPlaceholderGradient(context);
@@ -201,11 +210,11 @@ class RatingItemDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRatingsStats(BuildContext context) {
+  Widget _buildRatingsStats(BuildContext context, RatingItem currentItem) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final avgRating = _calculateAverageRating();
-    final ratingCount = ratingItem.ratings.length;
+    final avgRating = _calculateAverageRating(currentItem);
+    final ratingCount = currentItem.ratings.length;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -266,7 +275,7 @@ class RatingItemDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Scale: 1-${ratingItem.ratingScale}',
+                  'Scale: 1-${currentItem.ratingScale}',
                   style: AppTypography.bodySmall.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -283,12 +292,13 @@ class RatingItemDetailsPage extends StatelessWidget {
     BuildContext context,
     UserRating userRating,
     RatingItemController controller,
+    RatingItem currentItem,
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isCurrentUser =
-        controller.hasUserRated(ratingItem.id) &&
-        controller.getCurrentUserRating(ratingItem.id)?.userId ==
+        controller.hasUserRated(currentItem.id) &&
+        controller.getCurrentUserRating(currentItem.id)?.userId ==
             userRating.userId;
 
     return AppCard(
@@ -371,7 +381,7 @@ class RatingItemDetailsPage extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${userRating.ratingValue.toInt()}/${ratingItem.ratingScale}',
+                            '${userRating.ratingValue.toInt()}/${currentItem.ratingScale}',
                             style: AppTypography.bodySmall.copyWith(
                               fontWeight: FontWeight.w700,
                               color: colorScheme.onSurface,
@@ -442,32 +452,35 @@ class RatingItemDetailsPage extends StatelessWidget {
     );
   }
 
-  double _calculateAverageRating() {
-    if (ratingItem.ratings.isEmpty) return 0.0;
-    final sum = ratingItem.ratings.fold<double>(
+  double _calculateAverageRating(RatingItem currentItem) {
+    if (currentItem.ratings.isEmpty) return 0.0;
+    final sum = currentItem.ratings.fold<double>(
       0.0,
       (sum, rating) => sum + rating.ratingValue,
     );
-    return sum / ratingItem.ratings.length;
+    return sum / currentItem.ratings.length;
   }
 
-  void _showRatingDialog(RatingItemController controller) {
-    final currentUserRating = controller.getCurrentUserRating(ratingItem.id);
+  void _showRatingDialog(
+    RatingItemController controller,
+    RatingItem currentItem,
+  ) {
+    final currentUserRating = controller.getCurrentUserRating(currentItem.id);
 
     Get.bottomSheet(
       AddUserRatingDialog(
-        ratingItem: ratingItem,
+        ratingItem: currentItem,
         existingRating: currentUserRating,
         onRatingSubmitted: (ratingValue, comment) async {
           if (currentUserRating != null) {
             await controller.updateUserRating(
-              ratingItemId: ratingItem.id,
+              ratingItemId: currentItem.id,
               ratingValue: ratingValue,
               comment: comment,
             );
           } else {
             await controller.addUserRating(
-              ratingItemId: ratingItem.id,
+              ratingItemId: currentItem.id,
               ratingValue: ratingValue,
               comment: comment,
             );
@@ -479,27 +492,28 @@ class RatingItemDetailsPage extends StatelessWidget {
     );
   }
 
-  void _navigateToEditRating(BuildContext context) {
+  void _navigateToEditRating(BuildContext context, RatingItem currentItem) {
     Get.toNamed(
       RouteNames.groups.editRatingPage,
-      arguments: {'rating': ratingItem},
+      arguments: {'rating': currentItem},
     );
   }
 
   void _showDeleteDialog(
     BuildContext context,
     RatingItemController controller,
+    RatingItem currentItem,
   ) {
     showDialog(
       context: context,
       builder: (context) => AppDialog(
         title: 'Delete Item',
         description:
-            'Are you sure you want to delete "${ratingItem.name}"? This action cannot be undone.',
+            'Are you sure you want to delete "${currentItem.name}"? This action cannot be undone.',
         primaryActionText: 'Delete',
         onPrimaryAction: () {
           Navigator.of(context).pop();
-          controller.deleteRatingItem(ratingItem.id);
+          controller.deleteRatingItem(currentItem.id);
           Get.back(); // Go back to group details
         },
         secondaryActionText: 'Cancel',

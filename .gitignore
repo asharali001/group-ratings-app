@@ -32,6 +32,12 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+*.dart.js
+*.dart.js.map
+*.info.json      # Coverage info
+*.js_
+*.js.deps
+*.js.map
 
 # Symbolication related
 app.*.symbols
@@ -44,8 +50,39 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android - Sensitive files (keystores, keys, local config)
+android/app/**/*.jks
+android/app/**/*.keystore
+android/app/key.properties
+android/local.properties
+
 # Firebase
 .firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# iOS - CocoaPods
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/ephemeral/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Runner.xcworkspace/xcuserdata/
+ios/Runner.xcodeproj/xcuserdata/
+
+# macOS - CocoaPods and generated files
+macos/Flutter/ephemeral/
+macos/Flutter/Generated.xcconfig
+macos/Flutter/flutter_export_environment.sh
+macos/Pods/
+macos/.symlinks/
+macos/Runner.xcworkspace/xcuserdata/
+macos/Runner.xcodeproj/xcuserdata/
+
+# Node modules (for Firebase Functions and other Node.js projects)
+functions/node_modules/
+**/node_modules/
 
 # Keystore scripts (potentially sensitive)
 android/app/create_keystore.sh
@@ -55,3 +92,19 @@ assets/launcher/
 
 # Marketing site (separate project)
 marketing_site/
+
+# Coverage
+coverage/
+*.lcov
+test/.test_coverage.dart
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*~

@@ -23,7 +23,7 @@ class MyRatingsPage extends StatelessWidget {
         child: Column(
           children: [
             _buildHeader(controller),
-            _buildFilterChips(controller),
+            _buildFilterSection(controller),
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
@@ -74,7 +74,12 @@ class MyRatingsPage extends StatelessWidget {
 
   Widget _buildHeader(MyRatingsController controller) {
     return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -85,57 +90,65 @@ class MyRatingsPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          TextField(
+          AppTextField(
+            label: 'Search',
+            hintText: 'Search ratings...',
+            prefixIcon: EvaIcons.search,
             onChanged: controller.setSearchQuery,
-            decoration: InputDecoration(
-              hintText: 'Search ratings...',
-              prefixIcon: const Icon(EvaIcons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              filled: true,
-              fillColor: AppColors.surfaceVariant,
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChips(MyRatingsController controller) {
+  Widget _buildFilterSection(MyRatingsController controller) {
     return Obx(
       () => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Row(
-          children: [
-            _buildChip('All', 'all', controller),
-            const SizedBox(width: AppSpacing.sm),
-            _buildChip('Highest Rated', 'highest', controller),
-            const SizedBox(width: AppSpacing.sm),
-            _buildChip('Recent', 'recent', controller),
-          ],
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.sm,
+          AppSpacing.lg,
+          AppSpacing.md,
+        ),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _buildFilterChip(
+                  'All',
+                  isSelected: controller.selectedFilter.value == 'all',
+                  onTap: () => controller.setFilter('all'),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                _buildFilterChip(
+                  'Rated',
+                  isSelected: controller.selectedFilter.value == 'rated',
+                  onTap: () => controller.setFilter('rated'),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                _buildFilterChip(
+                  'Pending',
+                  isSelected: controller.selectedFilter.value == 'pending',
+                  onTap: () => controller.setFilter('pending'),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildChip(
-    String label,
-    String value,
-    MyRatingsController controller,
-  ) {
-    final isSelected = controller.selectedFilter.value == value;
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => controller.setFilter(value),
-      backgroundColor: AppColors.surfaceVariant,
-      selectedColor: AppColors.primary.withValues(alpha: 0.2),
-      labelStyle: TextStyle(
-        color: isSelected ? AppColors.primary : AppColors.textLight,
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-      ),
-    );
+  Widget _buildFilterChip(
+    String label, {
+    bool isSelected = false,
+    VoidCallback? onTap,
+  }) {
+    return AppChip(label: label, isSelected: isSelected, onTap: onTap);
   }
 
   Future<void> _navigateToRatingDetails(RatingItem item) async {

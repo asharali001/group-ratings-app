@@ -22,7 +22,7 @@ class CompactRatingItemCard extends StatelessWidget {
     final ratingCount = item.ratings.length;
 
     return AppCard(
-      variant: AppCardVariant.elevated,
+      variant: AppCardVariant.flat,
       onTap: onTap,
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Row(

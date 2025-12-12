@@ -28,7 +28,7 @@ class GroupCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return AppCard(
-      variant: AppCardVariant.elevated,
+      variant: AppCardVariant.flat,
       padding: const EdgeInsets.all(AppSpacing.md),
       onTap: () => groupsListController.navigateToGroupRatings(group),
       child: Column(
@@ -248,8 +248,8 @@ class GroupCard extends StatelessWidget {
       onTap: () => _copyGroupCodeToClipboard(group.groupCode),
       child: _buildChip(
         label: group.groupCode,
-        fg: colorScheme.onSurface,
-        bg: colorScheme.surfaceContainerHighest,
+        fg: colorScheme.surfaceContainerHighest,
+        bg: colorScheme.onSurface,
         icon: Icons.code_rounded,
       ),
     );

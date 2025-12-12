@@ -24,20 +24,36 @@ class AddUserRatingDialog extends StatefulWidget {
 class _AddUserRatingDialogState extends State<AddUserRatingDialog> {
   late double _ratingValue;
   late TextEditingController _commentController;
+  late TextEditingController _ratingInputController;
   bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
-    _ratingValue = widget.existingRating?.ratingValue ?? 
+    _ratingValue = widget.existingRating?.ratingValue ??
         (widget.ratingItem.ratingScale / 2).ceilToDouble();
-    _commentController = TextEditingController(text: widget.existingRating?.comment);
+    _commentController =
+        TextEditingController(text: widget.existingRating?.comment);
+    _ratingInputController =
+        TextEditingController(text: _ratingValue.toInt().toString());
   }
 
   @override
   void dispose() {
+    _ratingInputController.dispose();
     _commentController.dispose();
     super.dispose();
+  }
+
+  void _setRating(double value, {bool fromInput = false}) {
+    final clamped =
+        value.clamp(1, widget.ratingItem.ratingScale).toDouble(); // keep in range
+    setState(() {
+      _ratingValue = clamped;
+      if (!fromInput) {
+        _ratingInputController.text = clamped.toInt().toString();
+      }
+    });
   }
 
   @override
@@ -136,11 +152,7 @@ class _AddUserRatingDialogState extends State<AddUserRatingDialog> {
                 min: 1.0,
                 max: widget.ratingItem.ratingScale.toDouble(),
                 divisions: widget.ratingItem.ratingScale - 1,
-                onChanged: (value) {
-                  setState(() {
-                    _ratingValue = value;
-                  });
-                },
+                onChanged: (value) => _setRating(value),
               ),
 
               // Scale Labels
@@ -166,6 +178,40 @@ class _AddUserRatingDialogState extends State<AddUserRatingDialog> {
                   ],
                 ),
               ),
+
+              if (widget.ratingItem.ratingScale > 10) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  children: [
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => _setRating(_ratingValue - 1),
+                      icon: const Icon(Icons.remove),
+                      tooltip: 'Decrease',
+                    ),
+                    Expanded(
+                      child: AppTextField(
+                        controller: _ratingInputController,
+                        label: 'Precise value',
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        onChanged: (text) {
+                          final parsed = double.tryParse(text);
+                          if (parsed != null) {
+                            _setRating(parsed, fromInput: true);
+                          }
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => _setRating(_ratingValue + 1),
+                      icon: const Icon(Icons.add),
+                      tooltip: 'Increase',
+                    ),
+                  ],
+                ),
+              ],
 
               const SizedBox(height: AppSpacing.lg),
 
