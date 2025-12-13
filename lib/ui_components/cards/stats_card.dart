@@ -8,6 +8,7 @@ class StatsCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color iconColor;
+  final VoidCallback? onTap;
 
   const StatsCard({
     super.key,
@@ -15,6 +16,7 @@ class StatsCard extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.iconColor,
+    this.onTap,
   });
 
   @override
@@ -24,6 +26,7 @@ class StatsCard extends StatelessWidget {
 
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

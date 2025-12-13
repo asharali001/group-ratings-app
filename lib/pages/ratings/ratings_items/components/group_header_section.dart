@@ -31,23 +31,13 @@ class GroupHeaderSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Group Name & Category
-          Row(
-            children: [
-              Text(group.category.emoji, style: const TextStyle(fontSize: 24)),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  group.name,
-                  style: AppTypography.titleLarge.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            group.name,
+            style: AppTypography.titleLarge.copyWith(
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
+            ),
           ),
-
           if (group.description != null && group.description!.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.md),
             Text(

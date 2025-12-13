@@ -61,7 +61,7 @@ class ActivityFeedItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'in ${item.location} • ${_timeAgo(item.updatedAt ?? item.createdAt)}',
+                  'in ${item.location} • ${_timeAgo(item.updatedAt)}',
                   style: AppTypography.labelSmall.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 11,

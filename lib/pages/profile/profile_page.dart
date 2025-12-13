@@ -68,165 +68,154 @@ class ProfilePage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
-            // User Avatar and Info
-            Center(
-              child: Column(
-                children: [
-                  Stack(
+            Column(
+              children: [
+                Center(
+                  child: Column(
                     children: [
-                      AppAvatar(
-                        url: user?.photoURL,
-                        initials: (user?.displayName ?? 'U')
-                            .substring(0, 1)
-                            .toUpperCase(),
-                        size: 100,
-                        backgroundColor: colorScheme.primary.withValues(
-                          alpha: 0.1,
-                        ),
-                        foregroundColor: colorScheme.primary,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: () => _showEditNameDialog(context, controller),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: colorScheme.surface,
-                                width: 2,
+                      Stack(
+                        children: [
+                          AppAvatar(
+                            url: user?.photoURL,
+                            initials: (user?.displayName ?? 'U')
+                                .substring(0, 1)
+                                .toUpperCase(),
+                            size: 100,
+                            backgroundColor: colorScheme.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            foregroundColor: colorScheme.primary,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: () =>
+                                  _showEditNameDialog(context, controller),
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: colorScheme.surface,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.edit_rounded,
+                                  size: 16,
+                                  color: colorScheme.onPrimary,
+                                ),
                               ),
                             ),
-                            child: Icon(
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      GestureDetector(
+                        onTap: () => _showEditNameDialog(context, controller),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                user?.displayName ?? 'User',
+                                style: AppTypography.headlineSmall.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: colorScheme.onSurface,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
                               Icons.edit_rounded,
                               size: 16,
-                              color: colorScheme.onPrimary,
+                              color: colorScheme.onSurfaceVariant,
                             ),
-                          ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        user?.email ?? 'No email',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  GestureDetector(
-                    onTap: () => _showEditNameDialog(context, controller),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            user?.displayName ?? 'User',
-                            style: AppTypography.headlineSmall.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: colorScheme.onSurface,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          Icons.edit_rounded,
-                          size: 16,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ],
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainer,
+                    borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildStatItem(
+                        context,
+                        'Groups',
+                        '${controller.groupsCount}',
+                      ),
+                      Container(
+                        height: 40,
+                        width: 1,
+                        color: colorScheme.outlineVariant,
+                      ),
+                      _buildStatItem(context, 'Joined', controller.memberSince),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: AppSpacing.xs),
+                  child: Text(
+                    'Account Settings',
+                    style: AppTypography.titleSmall.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    user?.email ?? 'No email',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.xl),
-
-            // Stats Row
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildStatItem(
-                    context,
-                    'Groups',
-                    '${controller.groupsCount}',
-                  ),
-                  Container(
-                    height: 40,
-                    width: 1,
-                    color: colorScheme.outlineVariant,
-                  ),
-                  _buildStatItem(context, 'Joined', controller.memberSince),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.xxl),
-
-            // Actions
-            Padding(
-              padding: const EdgeInsets.only(left: AppSpacing.xs),
-              child: Text(
-                'Account Settings',
-                style: AppTypography.titleSmall.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w700,
                 ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-
-            AppCard(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: [
-                  _buildListTile(
-                    context,
-                    icon: Icons.logout_rounded,
-                    title: 'Sign Out',
-                    onTap: () => controller.signOut(),
+                const SizedBox(height: AppSpacing.sm),
+                AppCard(
+                  padding: EdgeInsets.zero,
+                  child: Column(
+                    children: [
+                      _buildListTile(
+                        context,
+                        icon: Icons.logout_rounded,
+                        title: 'Sign Out',
+                        onTap: () => controller.signOut(),
+                      ),
+                      Divider(
+                        height: 1,
+                        color: colorScheme.outlineVariant.withValues(
+                          alpha: 0.5,
+                        ),
+                      ),
+                      _buildListTile(
+                        context,
+                        icon: Icons.delete_forever_rounded,
+                        title: 'Delete Account',
+                        textColor: colorScheme.error,
+                        iconColor: colorScheme.error,
+                        onTap: () => controller.handleDeleteAccount(context),
+                      ),
+                    ],
                   ),
-                  Divider(
-                    height: 1,
-                    color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-                  ),
-                  _buildListTile(
-                    context,
-                    icon: Icons.delete_forever_rounded,
-                    title: 'Delete Account',
-                    textColor: colorScheme.error,
-                    iconColor: colorScheme.error,
-                    onTap: () => controller.handleDeleteAccount(context),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.xxl),
-
-            // Version Info
-            Center(
-              child: Text(
-                'Version 1.0.0',
-                style: AppTypography.bodySmall.copyWith(
-                  color: colorScheme.onSurfaceVariant,
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.lg),
           ],
         );
       }),

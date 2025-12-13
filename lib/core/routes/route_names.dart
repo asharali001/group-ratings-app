@@ -14,7 +14,6 @@ class _MainAppRoutes {
   final String mainLayout = '/main';
   final String homePage = '/home';
   final String profilePage = '/page';
-  final String settingsPage = '/settings';
 }
 
 class _OtherRoutes {

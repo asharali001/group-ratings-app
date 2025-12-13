@@ -75,24 +75,15 @@ class GroupsPage extends StatelessWidget {
                 if (controller.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
-
                 final groups = controller.filteredGroups;
-
                 if (groups.isEmpty) {
                   return _buildEmptyState(context, controller);
                 }
-
-                return GridView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                  ),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    crossAxisSpacing: AppSpacing.md,
-                    mainAxisSpacing: AppSpacing.md,
-                    childAspectRatio: 2.0,
-                  ),
+                return ListView.separated(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   itemCount: groups.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: AppSpacing.sm),
                   itemBuilder: (context, index) {
                     final group = groups[index];
                     return GroupCard(

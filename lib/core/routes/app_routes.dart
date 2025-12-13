@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '/core/__core.dart';
 import '/pages/__pages.dart';
+import '/pages/main_layout_binding.dart';
 
 class AppRoutes {
   static final routes = [
@@ -11,7 +12,11 @@ class AppRoutes {
     GetPage(name: RouteNames.auth.signUpPage, page: () => const SignUpPage()),
 
     // App routes
-    GetPage(name: RouteNames.mainApp.mainLayout, page: () => const MainLayout()),
+    GetPage(
+      name: RouteNames.mainApp.mainLayout,
+      page: () => const MainLayout(),
+      binding: MainLayoutBinding(),
+    ),
     GetPage(name: RouteNames.mainApp.homePage, page: () => const HomePage()),
     GetPage(
       name: RouteNames.mainApp.profilePage,
@@ -76,6 +81,17 @@ class AppRoutes {
           return EditRatingPage(rating: arguments['rating']);
         }
         return const Scaffold(body: Center(child: Text('Rating not found')));
+      },
+    ),
+    GetPage(
+      name: RouteNames.groups.ratingDetailsPage,
+      binding: RatingItemBinding(),
+      page: () {
+        final arguments = Get.arguments;
+        if (arguments != null && arguments['ratingItem'] != null) {
+          return RatingItemDetailsPage(ratingItem: arguments['ratingItem']);
+        }
+        return const Scaffold(body: Center(child: Text('Rating item not found')));
       },
     ),
 

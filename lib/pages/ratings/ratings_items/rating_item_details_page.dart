@@ -26,7 +26,6 @@ class RatingItemDetailsPage extends StatelessWidget {
 
       return Scaffold(
         appBar: AppBar(
-          title: Text(currentItem.name),
           actions: [
             if (controller.canEditRating(currentItem))
               IconButton(
@@ -46,56 +45,59 @@ class RatingItemDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Hero Image
               SizedBox(
-                height: 200,
+                height: 250,
                 width: double.infinity,
-                child: _buildHeroImage(context, currentItem),
+                child:
+                    (currentItem.imageUrl != null &&
+                        currentItem.imageUrl!.isNotEmpty)
+                    ? Image.network(currentItem.imageUrl!, fit: BoxFit.contain)
+                    : null,
               ),
-
-              // Content
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Location
-                    if (currentItem.location?.isNotEmpty == true) ...[
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on_outlined,
-                            color: colorScheme.primary,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            currentItem.location!,
-                            style: AppTypography.bodyMedium.copyWith(
-                              color: colorScheme.onSurfaceVariant,
+                    Row(
+                      spacing: AppSpacing.sm,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            currentItem.name,
+                            style: AppTypography.titleMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface,
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                    ],
-
-                    // Description
-                    if (currentItem.description?.isNotEmpty == true) ...[
-                      Container(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHighest.withValues(
-                            alpha: 0.5,
-                          ),
-                          borderRadius: AppBorderRadius.mdRadius,
                         ),
-                        child: Text(
-                          currentItem.description!,
-                          style: AppTypography.bodyMedium.copyWith(
-                            height: 1.6,
-                            color: colorScheme.onSurfaceVariant,
+                        if (currentItem.location?.isNotEmpty == true) ...[
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                color: colorScheme.primary,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                currentItem.location!,
+                                style: AppTypography.bodyMedium.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                           ),
+                        ],
+                      ],
+                    ),
+
+                    if (currentItem.description?.isNotEmpty == true) ...[
+                      Text(
+                        currentItem.description!,
+                        style: AppTypography.bodyMedium.copyWith(
+                          height: 1.6,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -157,59 +159,6 @@ class RatingItemDetailsPage extends StatelessWidget {
     });
   }
 
-  Widget _buildHeroImage(BuildContext context, RatingItem currentItem) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        if (currentItem.imageUrl != null && currentItem.imageUrl!.isNotEmpty)
-          Image.network(
-            currentItem.imageUrl!,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return _buildPlaceholderGradient(context);
-            },
-          )
-        else
-          _buildPlaceholderGradient(context),
-        // Gradient overlay
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.3)],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPlaceholderGradient(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colorScheme.primaryContainer,
-            colorScheme.secondaryContainer,
-          ],
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.image_outlined,
-          color: colorScheme.primary.withValues(alpha: 0.5),
-          size: 64,
-        ),
-      ),
-    );
-  }
-
   Widget _buildRatingsStats(BuildContext context, RatingItem currentItem) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -217,7 +166,7 @@ class RatingItemDetailsPage extends StatelessWidget {
     final ratingCount = currentItem.ratings.length;
 
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -232,7 +181,6 @@ class RatingItemDetailsPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Average Rating
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
@@ -243,15 +191,10 @@ class RatingItemDetailsPage extends StatelessWidget {
               children: [
                 Text(
                   ratingCount > 0 ? avgRating.toStringAsFixed(1) : '-',
-                  style: AppTypography.headlineMedium.copyWith(
+                  style: AppTypography.headlineSmall.copyWith(
                     color: colorScheme.onPrimary,
                     fontWeight: FontWeight.w700,
                   ),
-                ),
-                Icon(
-                  Icons.star_rounded,
-                  color: colorScheme.onPrimary,
-                  size: 20,
                 ),
               ],
             ),

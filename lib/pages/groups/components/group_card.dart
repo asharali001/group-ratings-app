@@ -34,14 +34,13 @@ class GroupCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: name + role/category + menu
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Text(
                   group.name,
-                  style: AppTypography.titleSmall.copyWith(
+                  style: AppTypography.titleMedium.copyWith(
                     fontWeight: FontWeight.w700,
                     color: colorScheme.onSurface,
                   ),
@@ -52,9 +51,7 @@ class GroupCard extends StatelessWidget {
               _buildOptionsMenu(context),
             ],
           ),
-
-          const SizedBox(height: AppSpacing.xs),
-
+          const SizedBox(height: AppSpacing.sm),
           Wrap(
             spacing: AppSpacing.xs,
             runSpacing: AppSpacing.xs,
@@ -64,44 +61,24 @@ class GroupCard extends StatelessWidget {
                 fg: colorScheme.primary,
                 bg: colorScheme.primary.withValues(alpha: 0.1),
               ),
-              _buildChip(
-                label: group.category.displayName,
-                fg: colorScheme.onSurfaceVariant,
-                bg: colorScheme.surfaceContainerHighest,
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.sm),
-
-          // Code + date
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.xs,
-            children: [
               _buildCodeChip(colorScheme),
               _buildChip(
-                label: _formatDate(group.createdAt),
-                fg: colorScheme.onSurfaceVariant,
-                bg: colorScheme.surfaceContainerHighest,
-                icon: Icons.schedule_rounded,
+                label: group.category.displayName,
+                fg: colorScheme.onSurface,
+                bg: colorScheme.surfaceContainer,
               ),
             ],
           ),
-
           const SizedBox(height: AppSpacing.sm),
-
-          // Description
           Text(
             group.description ?? 'No description',
-            style: AppTypography.bodySmall.copyWith(
+            style: AppTypography.bodyMedium.copyWith(
               color: colorScheme.onSurfaceVariant,
               height: 1.4,
             ),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
-
           const SizedBox(height: AppSpacing.md),
         ],
       ),
@@ -214,6 +191,7 @@ class GroupCard extends StatelessWidget {
     required Color fg,
     required Color bg,
     IconData? icon,
+    bool isOutlined = false,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -223,17 +201,20 @@ class GroupCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: AppBorderRadius.smRadius,
+        border: isOutlined
+            ? Border.all(color: fg.withValues(alpha: 0.4))
+            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 12, color: fg),
+            Icon(icon, size: 14, color: fg),
             const SizedBox(width: 4),
           ],
           Text(
             label,
-            style: AppTypography.labelSmall.copyWith(
+            style: AppTypography.labelMedium.copyWith(
               color: fg,
               fontWeight: FontWeight.w600,
             ),
@@ -248,107 +229,11 @@ class GroupCard extends StatelessWidget {
       onTap: () => _copyGroupCodeToClipboard(group.groupCode),
       child: _buildChip(
         label: group.groupCode,
-        fg: colorScheme.surfaceContainerHighest,
-        bg: colorScheme.onSurface,
+        fg: colorScheme.onSurface,
+        bg: colorScheme.surfaceContainer,
         icon: Icons.code_rounded,
+        isOutlined: true,
       ),
     );
-  }
-
-  Widget _buildStat({
-    required IconData icon,
-    required String label,
-    required ColorScheme colorScheme,
-  }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: AppTypography.labelSmall.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMembersPreview(ColorScheme colorScheme) {
-    final displayMembers = group.members.take(3).toList();
-    final remaining = group.members.length - displayMembers.length;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ...displayMembers.map(
-          (member) => Container(
-            margin: const EdgeInsets.only(left: 4),
-            width: 26,
-            height: 26,
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withValues(alpha: 0.1),
-              borderRadius: AppBorderRadius.fullRadius,
-              border: Border.all(
-                color: colorScheme.primary.withValues(alpha: 0.35),
-              ),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              _initials(member.name),
-              style: AppTypography.labelSmall.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ),
-        if (remaining > 0)
-          Container(
-            margin: const EdgeInsets.only(left: 6),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
-            ),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: AppBorderRadius.mdRadius,
-            ),
-            child: Text(
-              '+$remaining',
-              style: AppTypography.labelSmall.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final diff = now.difference(date);
-
-    if (diff.inDays == 0) return 'Today';
-    if (diff.inDays == 1) return 'Yesterday';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
-    if (diff.inDays < 30) return '${(diff.inDays / 7).floor()}w ago';
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
-  String _initials(String name) {
-    final parts = name
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((p) => p.isNotEmpty)
-        .toList();
-    if (parts.isEmpty) return '?';
-    if (parts.length == 1) {
-      final first = parts.first;
-      return first.substring(0, first.length >= 2 ? 2 : 1).toUpperCase();
-    }
-    return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 }

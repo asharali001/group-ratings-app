@@ -1,7 +1,5 @@
 export 'apis/__apis.dart';
 export 'extensions/__extensions.dart';
-export 'middlewares/__middlewares.dart';
-export 'mixins/__mixins.dart';
 export 'models/__models.dart';
 export 'routes/__routes.dart';
 export 'services/__services.dart';

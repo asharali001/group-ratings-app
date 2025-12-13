@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '/core/__core.dart';
 import '/ui_components/__ui_components.dart';
+import '/pages/main_layout_controller.dart';
 
 class HomeController extends GetxController {
   final RxList<Group> _userGroups = <Group>[].obs;
@@ -112,10 +113,6 @@ class HomeController extends GetxController {
     _isLoading.value = false;
   }
 
-  void navigateToGroupRatings(Group group) {
-    Get.toNamed(RouteNames.groups.ratingsPage, arguments: {'group': group});
-  }
-
   void navigateToRatingDetails(RatingItem item) {
     Get.toNamed(
       RouteNames.groups.ratingDetailsPage,
@@ -133,5 +130,24 @@ class HomeController extends GetxController {
 
   void navigateToGroupsPage() {
     Get.toNamed(RouteNames.groups.groupsPage);
+  }
+
+  void navigateToGroupsTab() {
+    try {
+      final mainLayoutController = Get.find<MainLayoutController>();
+      mainLayoutController.changeTab(1);
+    } catch (e) {
+      // If MainLayoutController is not found, fallback to navigation
+      navigateToGroupsPage();
+    }
+  }
+
+  void navigateToMyRatingsTab() {
+    try {
+      final mainLayoutController = Get.find<MainLayoutController>();
+      mainLayoutController.changeTab(2);
+    } catch (e) {
+      // If MainLayoutController is not found, do nothing
+    }
   }
 }

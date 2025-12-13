@@ -143,14 +143,6 @@ class _GroupMembersSectionState extends State<GroupMembersSection> {
               fontWeight: isAdmin ? FontWeight.w600 : FontWeight.w500,
             ),
           ),
-          if (isAdmin) ...[
-            const SizedBox(width: AppSpacing.xs),
-            Icon(
-              Icons.admin_panel_settings_rounded,
-              size: 14,
-              color: colorScheme.primary,
-            ),
-          ],
         ],
       ),
     );
