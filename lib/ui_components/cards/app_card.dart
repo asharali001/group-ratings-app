@@ -28,8 +28,6 @@ class AppCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    // Determine Shape & Elevation based on variant
     ShapeBorder? shape;
     double? elevation;
     Color? effectiveColor = color;
@@ -53,7 +51,7 @@ class AppCard extends StatelessWidget {
         break;
       case AppCardVariant.flat:
         elevation = 0;
-        effectiveColor ??= theme.colorScheme.surfaceContainerHighest;
+        effectiveColor ??= theme.colorScheme.primaryContainer;
         shape = const RoundedRectangleBorder(
           borderRadius: AppBorderRadius.mdRadius,
           side: BorderSide.none,

@@ -51,7 +51,7 @@ class AppRoutes {
       page: () {
         final arguments = Get.arguments;
         if (arguments != null && arguments['group'] != null) {
-          return RatingsPage(group: arguments['group']);
+          return GroupDetailsPage(group: arguments['group']);
         }
         return const Scaffold(body: Center(child: Text('Group not found')));
       },
@@ -91,7 +91,9 @@ class AppRoutes {
         if (arguments != null && arguments['ratingItem'] != null) {
           return RatingItemDetailsPage(ratingItem: arguments['ratingItem']);
         }
-        return const Scaffold(body: Center(child: Text('Rating item not found')));
+        return const Scaffold(
+          body: Center(child: Text('Rating item not found')),
+        );
       },
     ),
 

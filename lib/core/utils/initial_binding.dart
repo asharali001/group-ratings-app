@@ -1,5 +1,6 @@
 import 'package:get/instance_manager.dart';
 
+import '../../pages/groups/groups_list/__groups_list.dart';
 import '../__core.dart';
 import '../../pages/__pages.dart';
 

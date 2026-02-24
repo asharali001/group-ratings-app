@@ -2,91 +2,70 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 
-import '/pages/__pages.dart';
 import '/styles/__styles.dart';
 import 'main_layout_controller.dart';
 
 class MainLayout extends GetView<MainLayoutController> {
   const MainLayout({super.key});
 
-  final List<Widget> _pages = const [
-    HomePage(),
-    GroupsPage(),
-    MyRatingsPage(),
-    AskAIPage(),
-    ProfilePage(),
-  ];
+  @override
+  Widget build(BuildContext context) {
+    final pages = controller.pages;
+    return Scaffold(
+      body: Obx(
+        () => IndexedStack(index: controller.currentIndex, children: pages),
+      ),
+      bottomNavigationBar: const NavigationBar(),
+    );
+  }
+}
+
+class NavigationBar extends StatelessWidget {
+  const NavigationBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Obx(
-        () => IndexedStack(index: controller.currentIndex, children: _pages),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.sm,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  context: context,
-                  index: 0,
-                  icon: EvaIcons.home,
-                  label: 'Home',
-                ),
-                _buildNavItem(
-                  context: context,
-                  index: 1,
-                  icon: EvaIcons.people,
-                  label: 'Groups',
-                ),
-                _buildNavItem(
-                  context: context,
-                  index: 2,
-                  icon: EvaIcons.star,
-                  label: 'My Ratings',
-                ),
-                _buildNavItem(
-                  context: context,
-                  index: 3,
-                  icon: EvaIcons.messageCircle,
-                  label: 'Ask AI',
-                ),
-                _buildNavItem(
-                  context: context,
-                  index: 4,
-                  icon: EvaIcons.person,
-                  label: 'Profile',
-                ),
-              ],
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -1),
           ),
+        ],
+      ),
+      child: const SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            NavbarItem(index: 0, icon: EvaIcons.home, label: 'Home'),
+            NavbarItem(index: 1, icon: EvaIcons.people, label: 'Groups'),
+            NavbarItem(index: 2, icon: EvaIcons.star, label: 'My Ratings'),
+            NavbarItem(index: 3, icon: EvaIcons.messageCircle, label: 'Ask AI'),
+            NavbarItem(index: 4, icon: EvaIcons.person, label: 'Profile'),
+          ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildNavItem({
-    required BuildContext context,
-    required int index,
-    required IconData icon,
-    required String label,
-  }) {
+class NavbarItem extends GetView<MainLayoutController> {
+  const NavbarItem({
+    super.key,
+    required this.index,
+    required this.icon,
+    required this.label,
+  });
+
+  final int index;
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
     return Obx(() {
       final isSelected = controller.currentIndex == index;
       final color = isSelected

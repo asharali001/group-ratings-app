@@ -60,6 +60,7 @@ class GroupCard extends StatelessWidget {
                 label: isCreator ? 'Owner' : 'Member',
                 fg: colorScheme.primary,
                 bg: colorScheme.primary.withValues(alpha: 0.1),
+                isOutlined: true,
               ),
               _buildCodeChip(colorScheme),
               _buildChip(

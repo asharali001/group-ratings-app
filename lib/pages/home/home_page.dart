@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
+import '/ui_components/__ui_components.dart';
 import '/styles/__styles.dart';
 
 import 'home_controller.dart';
@@ -11,24 +12,16 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: SafeArea(
+    return const PageLayout(
+      title: 'Group Ratings',
+      subtitle: 'Rate and review together',
+      child: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustomAppbar(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    StatsSection(),
-                    SizedBox(height: AppSpacing.xl),
-                    QuickActionsSection(),
-                  ],
-                ),
-              ),
-            ),
+            StatsSection(),
+            SizedBox(height: AppSpacing.xl),
+            QuickActionsSection(),
           ],
         ),
       ),

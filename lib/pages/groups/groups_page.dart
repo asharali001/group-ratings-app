@@ -17,86 +17,50 @@ class GroupsPage extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Groups',
-                        style: AppTypography.headlineMedium.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'Manage and explore your groups',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () => _navigateToCreateGroup(),
-                    icon: const Icon(Icons.add_rounded, size: 24),
-                  ),
-                ],
-              ),
-            ),
-
-            // Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              child: AppTextField(
-                label: 'Search groups...',
-                prefixIcon: Icons.search_rounded,
-                onChanged: (value) {
-                  controller.updateSearchQuery(value);
-                },
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // Groups Grid
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final groups = controller.filteredGroups;
-                if (groups.isEmpty) {
-                  return _buildEmptyState(context, controller);
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  itemCount: groups.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: AppSpacing.sm),
-                  itemBuilder: (context, index) {
-                    final group = groups[index];
-                    return GroupCard(
-                      group: group,
-                      isCreator: controller.isGroupCreator(group),
-                      index: index,
-                    );
-                  },
-                );
-              }),
-            ),
-          ],
+    return PageLayout(
+      title: 'Groups',
+      subtitle: 'Manage and explore your groups',
+      actions: [
+        IconButton(
+          onPressed: () => _navigateToCreateGroup(),
+          icon: const Icon(Icons.add_rounded, size: 24),
         ),
+      ],
+      child: Column(
+        children: [
+          AppTextField(
+            label: 'Search groups...',
+            prefixIcon: Icons.search_rounded,
+            onChanged: (value) {
+              controller.updateSearchQuery(value);
+            },
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Expanded(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final groups = controller.filteredGroups;
+              if (groups.isEmpty) {
+                return _buildEmptyState(context, controller);
+              }
+              return ListView.separated(
+                itemCount: groups.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: AppSpacing.sm),
+                itemBuilder: (context, index) {
+                  final group = groups[index];
+                  return GroupCard(
+                    group: group,
+                    isCreator: controller.isGroupCreator(group),
+                    index: index,
+                  );
+                },
+              );
+            }),
+          ),
+        ],
       ),
     );
   }

@@ -12,19 +12,13 @@ class App extends StatelessWidget {
   const App({super.key});
 
   String _getInitialRoute() {
-    try {
-      // Check if Firebase is initialized before accessing auth
-      if (Firebase.apps.isEmpty) {
-        return RouteNames.auth.signInPage;
-      }
-      final currentUser = FirebaseService.auth.currentUser;
-      return currentUser != null
-          ? RouteNames.mainApp.mainLayout
-          : RouteNames.auth.signInPage;
-    } catch (e) {
-      // If there's any error accessing Firebase, default to sign-in page
+    if (Firebase.apps.isEmpty) {
       return RouteNames.auth.signInPage;
     }
+    final currentUser = FirebaseService.auth.currentUser;
+    return currentUser != null
+        ? RouteNames.mainApp.mainLayout
+        : RouteNames.auth.signInPage;
   }
 
   @override
@@ -40,14 +34,15 @@ class App extends StatelessWidget {
         initialRoute: _getInitialRoute(),
         getPages: AppRoutes.routes,
         initialBinding: InitialBinding(),
-        defaultTransition: Transition.noTransition,
-        transitionDuration: const Duration(milliseconds: 400),
+        defaultTransition: Transition.cupertino,
+        transitionDuration: const Duration(milliseconds: 100),
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeService.theme,
-        scrollBehavior:
-            const MaterialScrollBehavior().copyWith(scrollbars: false),
+        scrollBehavior: const MaterialScrollBehavior().copyWith(
+          scrollbars: false,
+        ),
       ),
     );
   }

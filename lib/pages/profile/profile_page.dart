@@ -43,22 +43,10 @@ class ProfilePage extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Profile',
-          style: AppTypography.headlineSmall.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        elevation: 0,
-        centerTitle: false,
-      ),
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Obx(() {
+    return PageLayout(
+      title: 'Profile',
+      subtitle: 'Manage your profile',
+      child: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -66,7 +54,6 @@ class ProfilePage extends StatelessWidget {
         final user = controller.currentUser;
 
         return ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
             Column(
               children: [
@@ -175,15 +162,13 @@ class ProfilePage extends StatelessWidget {
               ],
             ),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: AppSpacing.xs),
-                  child: Text(
-                    'Account Settings',
-                    style: AppTypography.titleSmall.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
+                Text(
+                  'Account Settings',
+                  style: AppTypography.titleSmall.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),

@@ -28,66 +28,49 @@ class _GroupMembersSectionState extends State<GroupMembersSection> {
         ? members
         : members.take(_maxDisplayedMembers).toList();
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Members ($totalMembers)', style: AppTypography.titleMedium),
+            if (shouldShowExpandButton)
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 4,
+                  ),
+                ),
+                child: Text(
+                  _isExpanded ? 'Show less' : 'Show all',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+          ],
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Members ($totalMembers)',
-                style: AppTypography.titleMedium.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              if (shouldShowExpandButton)
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _isExpanded = !_isExpanded;
-                    });
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: 4,
-                    ),
-                  ),
-                  child: Text(
-                    _isExpanded ? 'Show less' : 'Show all',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              ...displayedMembers.map(
-                (member) => _buildMemberChip(context, member),
-              ),
-              if (!_isExpanded && shouldShowExpandButton)
-                _buildMoreChip(context, totalMembers - _maxDisplayedMembers),
-            ],
-          ),
-        ],
-      ),
+        const SizedBox(height: AppSpacing.sm),
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
+          children: [
+            ...displayedMembers.map(
+              (member) => _buildMemberChip(context, member),
+            ),
+            if (!_isExpanded && shouldShowExpandButton)
+              _buildMoreChip(context, totalMembers - _maxDisplayedMembers),
+          ],
+        ),
+      ],
     );
   }
 

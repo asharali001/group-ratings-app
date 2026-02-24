@@ -18,83 +18,59 @@ class MyRatingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(MyRatingsController());
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(controller),
-            _buildFilterSection(controller),
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (controller.filteredRatings.isEmpty) {
-                  return EmptyStateWidget(
-                    icon: Icons.star_outline,
-                    title: controller.searchQuery.value.isNotEmpty
-                        ? 'No results found'
-                        : 'No ratings yet',
-                    description: controller.searchQuery.value.isNotEmpty
-                        ? 'Try adjusting your search or filters'
-                        : 'Start rating items in your groups to see them here',
-                    actions: controller.searchQuery.value.isNotEmpty
-                        ? [
-                            TextButton(
-                              onPressed: controller.clearFilters,
-                              child: const Text('Clear Filters'),
-                            ),
-                          ]
-                        : const [],
-                  );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  itemCount: controller.filteredRatings.length,
-                  itemBuilder: (context, index) {
-                    final item = controller.filteredRatings[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                      child: CompactRatingItemCard(
-                        item: item,
-                        onTap: () => _navigateToRatingDetails(item),
-                      ),
-                    );
-                  },
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(MyRatingsController controller) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.sm,
-      ),
+    return PageLayout(
+      title: 'My Ratings',
+      subtitle: 'Manage and explore your ratings',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'My Ratings',
-            style: AppTypography.headlineLarge.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
           AppTextField(
             label: 'Search',
             hintText: 'Search ratings...',
             prefixIcon: EvaIcons.search,
             onChanged: controller.setSearchQuery,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          _buildFilterSection(controller),
+          const SizedBox(height: AppSpacing.sm),
+          Expanded(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (controller.filteredRatings.isEmpty) {
+                return EmptyStateWidget(
+                  icon: Icons.star_outline,
+                  title: controller.searchQuery.value.isNotEmpty
+                      ? 'No results found'
+                      : 'No ratings yet',
+                  description: controller.searchQuery.value.isNotEmpty
+                      ? 'Try adjusting your search or filters'
+                      : 'Start rating items in your groups to see them here',
+                  actions: controller.searchQuery.value.isNotEmpty
+                      ? [
+                          TextButton(
+                            onPressed: controller.clearFilters,
+                            child: const Text('Clear Filters'),
+                          ),
+                        ]
+                      : const [],
+                );
+              }
+
+              return ListView.separated(
+                itemCount: controller.filteredRatings.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: AppSpacing.sm),
+                itemBuilder: (context, index) {
+                  final item = controller.filteredRatings[index];
+                  return CompactRatingItemCard(
+                    item: item,
+                    onTap: () => _navigateToRatingDetails(item),
+                  );
+                },
+              );
+            }),
           ),
         ],
       ),
@@ -103,40 +79,32 @@ class MyRatingsPage extends StatelessWidget {
 
   Widget _buildFilterSection(MyRatingsController controller) {
     return Obx(
-      () => Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.sm,
-          AppSpacing.lg,
-          AppSpacing.md,
-        ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _buildFilterChip(
-                  'All',
-                  isSelected: controller.selectedFilter.value == 'all',
-                  onTap: () => controller.setFilter('all'),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                _buildFilterChip(
-                  'Rated',
-                  isSelected: controller.selectedFilter.value == 'rated',
-                  onTap: () => controller.setFilter('rated'),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                _buildFilterChip(
-                  'Pending',
-                  isSelected: controller.selectedFilter.value == 'pending',
-                  onTap: () => controller.setFilter('pending'),
-                ),
-              ],
-            ),
+      () => Align(
+        alignment: Alignment.centerLeft,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _buildFilterChip(
+                'All',
+                isSelected: controller.selectedFilter.value == 'all',
+                onTap: () => controller.setFilter('all'),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              _buildFilterChip(
+                'Rated',
+                isSelected: controller.selectedFilter.value == 'rated',
+                onTap: () => controller.setFilter('rated'),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              _buildFilterChip(
+                'Pending',
+                isSelected: controller.selectedFilter.value == 'pending',
+                onTap: () => controller.setFilter('pending'),
+              ),
+            ],
           ),
         ),
       ),
