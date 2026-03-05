@@ -1,5 +1,6 @@
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 import '/core/__core.dart';
 import '/styles/__styles.dart';
@@ -17,8 +18,7 @@ class GroupDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ratingController = Get.put(RatingItemController());
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     // Set the group context when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -32,58 +32,82 @@ class GroupDetailsPage extends StatelessWidget {
           icon: const Icon(Icons.edit),
           tooltip: 'Edit Group',
         ),
-        IconButton(
-          onPressed: () => _navigateToAddRating(context, ratingController),
-          icon: const Icon(Icons.add),
-          tooltip: 'Add Rating',
-        ),
       ],
+      bottomNavigationBar: Obx(() {
+        if (!ratingController.canCreateRating()) return const SizedBox.shrink();
+        return Container(
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.shadow.withValues(alpha: 0.08),
+                blurRadius: 12,
+                offset: const Offset(0, -3),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: AppButton(
+                      variant: AppButtonVariant.outline,
+                      text: 'Invite',
+                      icon: Icons.person_add_rounded,
+                      onPressed: () {
+                        Clipboard.setData(
+                          ClipboardData(text: group.groupCode),
+                        );
+                        showCustomSnackBar(
+                          message: 'Group code "${group.groupCode}" copied!',
+                          isSuccess: true,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: AppButton(
+                      text: 'Add Item',
+                      icon: Icons.add_rounded,
+                      onPressed: () =>
+                          _navigateToAddRating(context, ratingController),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }),
       child: Obx(() {
         final itemCount = ratingController.filteredRatings.length;
         final totalCount = ratingController.groupRatings.length;
+        final hasSearchOrFilter =
+            ratingController.searchQuery.value.isNotEmpty ||
+            ratingController.selectedFilter.value != 'All';
 
-        if (itemCount == 0 &&
-            ratingController.searchQuery.value.isEmpty &&
-            ratingController.selectedFilter.value == 'All') {
+        if (totalCount == 0 && !hasSearchOrFilter) {
           return Column(
             children: [
               GroupHeaderSection(group: group, itemCount: 0),
               GroupMembersSection(group: group),
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.star_rounded,
-                        size: 64,
-                        color: AppColors.yellow,
+                child: EmptyStateWidget(
+                  icon: Icons.star_rounded,
+                  title: 'No items yet',
+                  description:
+                      'Be the first to add an item to this group!',
+                  actions: [
+                    if (ratingController.canCreateRating())
+                      AppButton(
+                        onPressed: () =>
+                            _navigateToAddRating(context, ratingController),
+                        text: 'Add First Item',
                       ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        'No items yet',
-                        style: AppTypography.titleLarge.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'Be the first to add an item to this group!',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      if (ratingController.canCreateRating())
-                        AppButton(
-                          onPressed: () =>
-                              _navigateToAddRating(context, ratingController),
-                          text: 'Add First Item',
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ],
@@ -93,7 +117,7 @@ class GroupDetailsPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GroupHeaderSection(group: group, itemCount: itemCount),
+            GroupHeaderSection(group: group, itemCount: totalCount),
             const SizedBox(height: AppSpacing.sm),
             GroupMembersSection(group: group),
             const SizedBox(height: AppSpacing.sm),
@@ -156,21 +180,35 @@ class GroupDetailsPage extends StatelessWidget {
                   : 'Items ($itemCount of $totalCount)',
               style: AppTypography.titleMedium.copyWith(
                 fontWeight: FontWeight.w600,
-                color: colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Expanded(
-              child: ListView.separated(
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: AppSpacing.sm),
-                itemCount: ratingController.filteredRatings.length,
-                itemBuilder: (context, index) => CompactRatingItemCard(
-                  item: ratingController.filteredRatings[index],
-                  onTap: () => _navigateToRatingDetails(
-                    ratingController.filteredRatings[index],
-                  ),
-                ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: itemCount == 0 && hasSearchOrFilter
+                    ? const EmptyStateWidget(
+                        key: ValueKey('empty_search'),
+                        icon: Icons.search_off_rounded,
+                        title: 'No items match your search',
+                        description:
+                            'Try adjusting your search or filter criteria',
+                        actions: [],
+                      )
+                    : ListView.separated(
+                        key: const ValueKey('items_list'),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: AppSpacing.sm),
+                        itemCount: ratingController.filteredRatings.length,
+                        itemBuilder: (context, index) =>
+                            CompactRatingItemCard(
+                          item: ratingController.filteredRatings[index],
+                          onTap: () => _navigateToRatingDetails(
+                            ratingController.filteredRatings[index],
+                          ),
+                        ),
+                      ),
               ),
             ),
           ],

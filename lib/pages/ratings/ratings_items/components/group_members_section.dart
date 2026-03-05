@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '/core/__core.dart';
 import '/styles/__styles.dart';
 import '/constants/enums.dart';
+import '/ui_components/__ui_components.dart';
 
 class GroupMembersSection extends StatefulWidget {
   final Group group;
@@ -15,156 +16,134 @@ class GroupMembersSection extends StatefulWidget {
 
 class _GroupMembersSectionState extends State<GroupMembersSection> {
   bool _isExpanded = false;
-  static const int _maxDisplayedMembers = 6;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
     final members = widget.group.members;
-    final colorScheme = theme.colorScheme;
     final totalMembers = members.length;
-    final shouldShowExpandButton = totalMembers > _maxDisplayedMembers;
-    final displayedMembers = _isExpanded
-        ? members
-        : members.take(_maxDisplayedMembers).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Members ($totalMembers)', style: AppTypography.titleMedium),
-            if (shouldShowExpandButton)
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _isExpanded = !_isExpanded;
-                  });
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: 4,
+        SectionHeader(
+          title: 'Members ($totalMembers)',
+          trailing: totalMembers > 5
+              ? GestureDetector(
+                  onTap: () => setState(() => _isExpanded = !_isExpanded),
+                  child: Text(
+                    _isExpanded ? 'Show less' : 'Show all',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                child: Text(
-                  _isExpanded ? 'Show less' : 'Show all',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-          ],
+                )
+              : null,
         ),
         const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.sm,
-          runSpacing: AppSpacing.sm,
-          children: [
-            ...displayedMembers.map(
-              (member) => _buildMemberChip(context, member),
+        AvatarStack(
+          avatars: members
+              .map((m) => AvatarStackItem(name: m.name))
+              .toList(),
+          maxDisplay: 5,
+          avatarSize: 36,
+          onOverflowTap: () => setState(() => _isExpanded = true),
+        ),
+        AnimatedCrossFade(
+          firstChild: const SizedBox.shrink(),
+          secondChild: Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
+            child: AppCard(
+              variant: AppCardVariant.flat,
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: members.asMap().entries.map((entry) {
+                  final i = entry.key;
+                  final member = entry.value;
+                  return _buildMemberListItem(
+                    context,
+                    member,
+                    showDivider: i < members.length - 1,
+                  );
+                }).toList(),
+              ),
             ),
-            if (!_isExpanded && shouldShowExpandButton)
-              _buildMoreChip(context, totalMembers - _maxDisplayedMembers),
-          ],
+          ),
+          crossFadeState: _isExpanded
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+          duration: const Duration(milliseconds: 250),
         ),
       ],
     );
   }
 
-  Widget _buildMemberChip(BuildContext context, GroupMember member) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+  Widget _buildMemberListItem(
+    BuildContext context,
+    GroupMember member, {
+    bool showDivider = true,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isAdmin = member.role == GroupMemberRole.admin;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      decoration: BoxDecoration(
-        color: isAdmin
-            ? colorScheme.primary.withValues(alpha: 0.1)
-            : colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(AppBorderRadius.full),
-        border: Border.all(
-          color: isAdmin
-              ? colorScheme.primary.withValues(alpha: 0.3)
-              : colorScheme.outlineVariant,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Avatar
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: isAdmin ? colorScheme.primary : colorScheme.secondary,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
-                style: AppTypography.bodySmall.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              AppAvatar(
+                initials: member.name.isNotEmpty
+                    ? member.name[0].toUpperCase()
+                    : '?',
+                backgroundColor:
+                    isAdmin ? colorScheme.primary : colorScheme.secondary,
+                foregroundColor: colorScheme.onPrimary,
+                size: 36,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      member.name,
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      isAdmin ? 'Admin' : 'Member',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
+              if (isAdmin)
+                Icon(
+                  Icons.workspace_premium_rounded,
+                  size: 18,
+                  color: colorScheme.primary,
+                ),
+            ],
           ),
-          const SizedBox(width: AppSpacing.sm),
-          // Name
-          Text(
-            member.name,
-            style: AppTypography.bodyMedium.copyWith(
-              color: isAdmin ? colorScheme.primary : colorScheme.onSurface,
-              fontWeight: isAdmin ? FontWeight.w600 : FontWeight.w500,
-            ),
+        ),
+        if (showDivider)
+          Divider(
+            height: 1,
+            indent: AppSpacing.md,
+            endIndent: AppSpacing.md,
+            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMoreChip(BuildContext context, int remainingCount) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isExpanded = true;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: colorScheme.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppBorderRadius.full),
-          border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.add_rounded, size: 16, color: colorScheme.primary),
-            const SizedBox(width: 4),
-            Text(
-              '$remainingCount more',
-              style: AppTypography.bodyMedium.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
+      ],
     );
   }
 }

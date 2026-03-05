@@ -108,3 +108,4 @@ test/.test_coverage.dart
 *.temp
 *.bak
 *~
+fastlane/

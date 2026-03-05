@@ -11,8 +11,7 @@ class FormSection extends GetView<AddRatingController> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,24 +37,52 @@ class FormSection extends GetView<AddRatingController> {
 
         const SizedBox(height: AppSpacing.md),
 
-        // Rating Scale Selection
+        // Rating Scale as chips
+        Text(
+          'Rating Scale',
+          style: AppTypography.bodyMedium.copyWith(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
         Obx(() {
-          return AppDropdown<int>(
-            label: 'Rating Scale',
-            value: controller.ratingScale.value,
-            onChanged: (value) {
-              if (value != null) {
-                controller.setRatingScale(value);
-              }
-            },
-            prefixIcon: Icons.star_outline_rounded,
-            items: AddRatingController.availableRatingScales.map((scale) {
-              return DropdownMenuItem<int>(
-                value: scale,
-                child: Text('$scale Points'),
-              );
-            }).toList(),
-            validator: (value) => value == null ? 'Selection required' : null,
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children:
+                  AddRatingController.availableRatingScales.map((scale) {
+                final isSelected = controller.ratingScale.value == scale;
+                return Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  child: ChoiceChip(
+                    label: Text('$scale'),
+                    selected: isSelected,
+                    onSelected: (_) => controller.setRatingScale(scale),
+                    selectedColor: colorScheme.primary,
+                    labelStyle: AppTypography.labelMedium.copyWith(
+                      color: isSelected
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      side: BorderSide(
+                        color: isSelected
+                            ? colorScheme.primary
+                            : colorScheme.outlineVariant,
+                      ),
+                    ),
+                    showCheckmark: false,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.xs,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
           );
         }),
 
@@ -99,63 +126,79 @@ class FormSection extends GetView<AddRatingController> {
 
         const SizedBox(height: AppSpacing.xl),
 
-        // Instant Rating Section
-        Text(
-          'Your Rating (Optional)',
-          style: AppTypography.titleMedium.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          'Rate this item now to save time',
-          style: AppTypography.bodySmall.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
+        // Your Rating Section
+        const SectionHeader(
+          title: 'Your Rating',
+          subtitle: 'Rate this item now or later',
         ),
         const SizedBox(height: AppSpacing.md),
 
-        // Rating Slider
+        // Rating display with color coding
         Obx(() {
+          final rating = controller.initialRating.value;
+          final scale = controller.ratingScale.value;
+          final normalized = scale > 0 ? rating / scale : 0.0;
+          final ratingColor = _getRatingColor(normalized, colorScheme);
+
           return Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Rating',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
+              // Centered rating indicator
+              Center(
+                child: TweenAnimationBuilder<Color?>(
+                  tween: ColorTween(
+                    begin: colorScheme.outlineVariant,
+                    end: ratingColor,
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.sm,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: AppBorderRadius.smRadius,
-                    ),
-                    child: Text(
-                      controller.initialRating.value > 0
-                          ? '${controller.initialRating.value.toStringAsFixed(1)}/${controller.ratingScale.value}'
-                          : 'Not rated',
-                      style: AppTypography.titleMedium.copyWith(
-                        color: colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.w600,
+                  duration: const Duration(milliseconds: 300),
+                  builder: (context, color, child) {
+                    return Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: color ?? colorScheme.outlineVariant,
+                          width: 3,
+                        ),
                       ),
-                    ),
-                  ),
-                ],
+                      child: Center(
+                        child: rating > 0
+                            ? Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    rating.toStringAsFixed(rating == rating.roundToDouble() ? 0 : 1),
+                                    style:
+                                        AppTypography.headlineSmall.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: color,
+                                    ),
+                                  ),
+                                  Text(
+                                    '/ $scale',
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                'N/A',
+                                style: AppTypography.titleMedium.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                      ),
+                    );
+                  },
+                ),
               ),
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacing.md),
               AppSlider(
-                value: controller.initialRating.value,
+                value: rating,
                 min: 0,
-                max: controller.ratingScale.value.toDouble(),
-                divisions: controller.ratingScale.value, // One tick per point
+                max: scale.toDouble(),
+                divisions: scale,
                 onChanged: (value) {
                   controller.initialRating.value = value;
                 },
@@ -184,5 +227,12 @@ class FormSection extends GetView<AddRatingController> {
         ),
       ],
     );
+  }
+
+  Color _getRatingColor(double normalized, ColorScheme colorScheme) {
+    if (normalized <= 0) return colorScheme.outlineVariant;
+    if (normalized < 0.33) return AppColors.error;
+    if (normalized < 0.66) return AppColors.warning;
+    return AppColors.success;
   }
 }

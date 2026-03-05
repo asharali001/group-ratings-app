@@ -31,56 +31,154 @@ class GroupCard extends StatelessWidget {
       variant: AppCardVariant.flat,
       padding: const EdgeInsets.all(AppSpacing.md),
       onTap: () => groupsListController.navigateToGroupRatings(group),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  group.name,
-                  style: AppTypography.titleMedium.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              _buildOptionsMenu(context),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.xs,
-            runSpacing: AppSpacing.xs,
-            children: [
-              _buildChip(
-                label: isCreator ? 'Owner' : 'Member',
-                fg: colorScheme.primary,
-                bg: colorScheme.primary.withValues(alpha: 0.1),
-                isOutlined: true,
-              ),
-              _buildCodeChip(colorScheme),
-              _buildChip(
-                label: group.category.displayName,
-                fg: colorScheme.onSurface,
-                bg: colorScheme.surfaceContainer,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            group.description ?? 'No description',
-            style: AppTypography.bodyMedium.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              height: 1.4,
+          // Left: emoji circle
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
             ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
+            child: Center(
+              child: Text(
+                group.category.emoji,
+                style: const TextStyle(fontSize: 24),
+              ),
+            ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(width: AppSpacing.sm),
+          // Right: all content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Name row + owner/member badge + options menu
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        group.name,
+                        style: AppTypography.titleMedium.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: AppSpacing.xs,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: AppBorderRadius.smRadius,
+                        border: Border.all(
+                          color: colorScheme.primary.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: Text(
+                        isCreator ? 'Owner' : 'Member',
+                        style: AppTypography.labelSmall.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    _buildOptionsMenu(context),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                // Metadata row: members • items • category
+                Row(
+                  children: [
+                    Icon(
+                      Icons.people_rounded,
+                      size: 13,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      '${group.members.length}',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs),
+                      child: Text(
+                        '•',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.star_rounded,
+                      size: 13,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      '${group.ratingItemsCount}',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs),
+                      child: Text(
+                        '•',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: Text(
+                        group.category.displayName,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                if (group.description != null &&
+                    group.description!.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    group.description!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      height: 1.4,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.xs),
+                // Avatar stack
+                AvatarStack(
+                  avatars: group.members
+                      .take(5)
+                      .map((m) => AvatarStackItem(name: m.name))
+                      .toList(),
+                  maxDisplay: 4,
+                  avatarSize: 26,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -185,56 +283,5 @@ class GroupCard extends StatelessWidget {
   void _copyGroupCodeToClipboard(String code) {
     Clipboard.setData(ClipboardData(text: code));
     Get.snackbar('Success', 'Group code copied');
-  }
-
-  Widget _buildChip({
-    required String label,
-    required Color fg,
-    required Color bg,
-    IconData? icon,
-    bool isOutlined = false,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: AppBorderRadius.smRadius,
-        border: isOutlined
-            ? Border.all(color: fg.withValues(alpha: 0.4))
-            : null,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 14, color: fg),
-            const SizedBox(width: 4),
-          ],
-          Text(
-            label,
-            style: AppTypography.labelMedium.copyWith(
-              color: fg,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCodeChip(ColorScheme colorScheme) {
-    return GestureDetector(
-      onTap: () => _copyGroupCodeToClipboard(group.groupCode),
-      child: _buildChip(
-        label: group.groupCode,
-        fg: colorScheme.onSurface,
-        bg: colorScheme.surfaceContainer,
-        icon: Icons.code_rounded,
-        isOutlined: true,
-      ),
-    );
   }
 }

@@ -115,7 +115,7 @@ class RatingItem {
       'location': location ?? '',
       'ratingScale': ratingScale,
       'ratedBy': ratedBy,
-      'ratings': ratings,
+      'ratings': ratings.map((r) => r.toMap()).toList(),
       'groupId': groupId,
       'createdBy': createdBy,
       'createdAt': createdAt,

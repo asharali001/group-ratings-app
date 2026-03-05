@@ -19,79 +19,121 @@ class RatingItemDetailsPage extends StatelessWidget {
 
     return Obx(() {
       final currentItem =
-          controller.getRatingById(ratingItem.id) ??
-          ratingItem; // keep live data
+          controller.getRatingById(ratingItem.id) ?? ratingItem;
       final theme = Theme.of(context);
       final colorScheme = theme.colorScheme;
+      final hasImage =
+          currentItem.imageUrl != null && currentItem.imageUrl!.isNotEmpty;
 
       return Scaffold(
-        appBar: AppBar(
-          actions: [
-            if (controller.canEditRating(currentItem))
-              IconButton(
-                onPressed: () => _navigateToEditRating(context, currentItem),
-                icon: const Icon(Icons.edit_outlined),
-                tooltip: 'Edit',
+        body: CustomScrollView(
+          slivers: [
+            // SliverAppBar with hero image
+            SliverAppBar(
+              expandedHeight: 280,
+              pinned: true,
+              leading: _ScrimmedIconButton(
+                icon: Icons.arrow_back,
+                onPressed: () => Get.back(),
               ),
-            IconButton(
-              onPressed: () =>
-                  _showDeleteDialog(context, controller, currentItem),
-              icon: const Icon(Icons.delete_outline),
-              tooltip: 'Delete',
+              actions: [
+                if (controller.canEditRating(currentItem))
+                  _ScrimmedIconButton(
+                    icon: Icons.edit_outlined,
+                    onPressed: () =>
+                        _navigateToEditRating(context, currentItem),
+                  ),
+                _ScrimmedIconButton(
+                  icon: Icons.delete_outline,
+                  onPressed: () =>
+                      _showDeleteDialog(context, controller, currentItem),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Image or gradient fallback
+                    if (hasImage)
+                      Image.network(
+                        currentItem.imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildGradientFallback(colorScheme);
+                        },
+                      )
+                    else
+                      _buildGradientFallback(colorScheme),
+
+                    // Bottom gradient overlay
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.6),
+                            ],
+                            stops: const [0.0, 0.4, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Bottom-left: Item name + location
+                    Positioned(
+                      bottom: AppSpacing.lg,
+                      left: AppSpacing.lg,
+                      right: AppSpacing.lg,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            currentItem.name,
+                            style: AppTypography.titleLarge.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          if (currentItem.location?.isNotEmpty == true) ...[
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on_outlined,
+                                  color: Colors.white70,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  currentItem.location!,
+                                  style: AppTypography.bodyMedium.copyWith(
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 250,
-                width: double.infinity,
-                child:
-                    (currentItem.imageUrl != null &&
-                        currentItem.imageUrl!.isNotEmpty)
-                    ? Image.network(currentItem.imageUrl!, fit: BoxFit.contain)
-                    : null,
-              ),
-              Padding(
+
+            // Content
+            SliverToBoxAdapter(
+              child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      spacing: AppSpacing.sm,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            currentItem.name,
-                            style: AppTypography.titleMedium.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        if (currentItem.location?.isNotEmpty == true) ...[
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                color: colorScheme.primary,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                currentItem.location!,
-                                style: AppTypography.bodyMedium.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
-
+                    // Description
                     if (currentItem.description?.isNotEmpty == true) ...[
                       Text(
                         currentItem.description!,
@@ -103,31 +145,34 @@ class RatingItemDetailsPage extends StatelessWidget {
                       const SizedBox(height: AppSpacing.lg),
                     ],
 
-                    // Ratings Stats
-                    _buildRatingsStats(context, currentItem),
+                    // Reviews section
+                    SectionHeader(
+                      title: 'Reviews (${currentItem.ratings.length})',
+                    ),
+                    const SizedBox(height: AppSpacing.md),
 
-                    const SizedBox(height: AppSpacing.lg),
-
-                    // Ratings List
-                    if (currentItem.ratings.isNotEmpty) ...[
+                    if (currentItem.ratings.isNotEmpty)
                       ...currentItem.ratings.map(
-                        (rating) => _buildRatingItem(
-                          context,
-                          rating,
-                          controller,
-                          currentItem,
+                        (rating) => UserRatingCard(
+                          userRating: rating,
+                          ratingItem: currentItem,
+                          isCurrentUser: _isCurrentUser(
+                            rating,
+                            controller,
+                            currentItem,
+                          ),
                         ),
-                      ),
-                    ] else
+                      )
+                    else
                       _buildEmptyState(context),
 
-                    // Bottom Padding
+                    // Bottom padding for FAB clearance
                     const SizedBox(height: 100),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         bottomNavigationBar: controller.canCreateRating()
             ? Container(
@@ -144,7 +189,8 @@ class RatingItemDetailsPage extends StatelessWidget {
                 ),
                 child: SafeArea(
                   child: AppButton(
-                    onPressed: () => _showRatingDialog(controller, currentItem),
+                    onPressed: () =>
+                        _showRatingDialog(controller, currentItem),
                     text: controller.hasUserRated(currentItem.id)
                         ? 'Edit Rating'
                         : 'Rate',
@@ -159,203 +205,40 @@ class RatingItemDetailsPage extends StatelessWidget {
     });
   }
 
-  Widget _buildRatingsStats(BuildContext context, RatingItem currentItem) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final avgRating = _calculateAverageRating(currentItem);
-    final ratingCount = currentItem.ratings.length;
-
+  Widget _buildGradientFallback(ColorScheme colorScheme) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            colorScheme.primary.withValues(alpha: 0.1),
-            colorScheme.secondary.withValues(alpha: 0.05),
+            colorScheme.primary.withValues(alpha: 0.3),
+            colorScheme.secondary.withValues(alpha: 0.2),
           ],
         ),
-        borderRadius: AppBorderRadius.lgRadius,
-        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.2)),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: colorScheme.primary,
-              borderRadius: AppBorderRadius.mdRadius,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  ratingCount > 0 ? avgRating.toStringAsFixed(1) : '-',
-                  style: AppTypography.headlineSmall.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: AppSpacing.lg),
-
-          // Stats
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  ratingCount == 0
-                      ? 'No ratings yet'
-                      : '$ratingCount rating${ratingCount == 1 ? '' : 's'}',
-                  style: AppTypography.titleMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Scale: 1-${currentItem.ratingScale}',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      child: Center(
+        child: Icon(
+          Icons.star_rounded,
+          size: 48,
+          color: Colors.white.withValues(alpha: 0.3),
+        ),
       ),
     );
   }
 
-  Widget _buildRatingItem(
-    BuildContext context,
+  bool _isCurrentUser(
     UserRating userRating,
     RatingItemController controller,
     RatingItem currentItem,
   ) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isCurrentUser =
-        controller.hasUserRated(currentItem.id) &&
+    return controller.hasUserRated(currentItem.id) &&
         controller.getCurrentUserRating(currentItem.id)?.userId ==
             userRating.userId;
-
-    return AppCard(
-      variant: AppCardVariant.outlined,
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // User Avatar
-          AppAvatar(
-            url: null, // Assuming no URL for now, can add if available
-            initials: userRating.userName.isNotEmpty
-                ? userRating.userName[0].toUpperCase()
-                : '?',
-            backgroundColor: isCurrentUser
-                ? colorScheme.primary
-                : colorScheme.secondary,
-            foregroundColor: colorScheme.onPrimary,
-            size: 40,
-          ),
-
-          const SizedBox(width: AppSpacing.md),
-
-          // User Info and Rating
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      userRating.userName,
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    if (isCurrentUser) ...[
-                      const SizedBox(width: 8),
-                      // "You" badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          'You',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: colorScheme.onPrimary,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                    const Spacer(),
-                    // Rating Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.warning.withValues(
-                          alpha: 0.2,
-                        ), // Or colorScheme.tertiary
-                        borderRadius: AppBorderRadius.smRadius,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.star_rounded,
-                            size: 14,
-                            color: AppColors.warning,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${userRating.ratingValue.toInt()}/${currentItem.ratingScale}',
-                            style: AppTypography.bodySmall.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                if (userRating.comment != null &&
-                    userRating.comment!.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    userRating.comment!,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
@@ -393,15 +276,6 @@ class RatingItemDetailsPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  double _calculateAverageRating(RatingItem currentItem) {
-    if (currentItem.ratings.isEmpty) return 0.0;
-    final sum = currentItem.ratings.fold<double>(
-      0.0,
-      (sum, rating) => sum + rating.ratingValue,
-    );
-    return sum / currentItem.ratings.length;
   }
 
   void _showRatingDialog(
@@ -457,10 +331,42 @@ class RatingItemDetailsPage extends StatelessWidget {
         onPrimaryAction: () {
           Navigator.of(context).pop();
           controller.deleteRatingItem(currentItem.id);
-          Get.back(); // Go back to group details
+          Get.back();
         },
         secondaryActionText: 'Cancel',
         isDestructive: true,
+      ),
+    );
+  }
+}
+
+class _ScrimmedIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _ScrimmedIconButton({
+    required this.icon,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.sm,
+      ),
+      child: Material(
+        color: Colors.black.withValues(alpha: 0.35),
+        shape: const CircleBorder(),
+        child: InkWell(
+          onTap: onPressed,
+          customBorder: const CircleBorder(),
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: Icon(icon, color: Colors.white, size: 20),
+          ),
+        ),
       ),
     );
   }

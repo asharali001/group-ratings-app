@@ -113,7 +113,7 @@ class RatingService {
     try {
       final updateData = <String, dynamic>{'updatedAt': Timestamp.now()};
 
-      if (itemName != null) updateData['itemName'] = itemName;
+      if (itemName != null) updateData['name'] = itemName;
       if (description != null) updateData['description'] = description;
       if (location != null) updateData['location'] = location;
       if (ratingScale != null) updateData['ratingScale'] = ratingScale;

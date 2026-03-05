@@ -11,6 +11,7 @@ class PageLayout extends StatelessWidget {
   final bool isEmpty;
   final Widget emptyStateWidget;
   final Widget child;
+  final Widget? bottomNavigationBar;
 
   const PageLayout({
     super.key,
@@ -22,6 +23,7 @@ class PageLayout extends StatelessWidget {
     this.isEmpty = false,
     this.emptyStateWidget = const SizedBox.shrink(),
     this.child = const SizedBox.shrink(),
+    this.bottomNavigationBar,
   });
 
   @override
@@ -32,6 +34,7 @@ class PageLayout extends StatelessWidget {
     return Hero(
       tag: title ?? '',
       child: Scaffold(
+        bottomNavigationBar: bottomNavigationBar,
         appBar: AppBar(
           centerTitle: false,
           title: Column(

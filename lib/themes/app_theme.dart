@@ -214,8 +214,8 @@ class AppTheme {
       brightness: brightness,
       primary: AppColors.primary,
       onPrimary: AppColors.onPrimary,
-      primaryContainer: AppColors.primaryContainer,
-      onPrimaryContainer: AppColors.onPrimaryContainer,
+      primaryContainer: isDark ? const Color(0xFF1E293B) : AppColors.primaryContainer,
+      onPrimaryContainer: isDark ? const Color(0xFFF1F5F9) : AppColors.onPrimaryContainer,
 
       secondary: AppColors.secondary,
       onSecondary: AppColors.onSecondary,

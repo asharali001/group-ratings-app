@@ -45,6 +45,7 @@ class EditGroupController extends GetxController {
         message: 'Group updated successfully!',
         isSuccess: true,
       );
+      Get.back();
       return true;
     } catch (e) {
       showCustomSnackBar(

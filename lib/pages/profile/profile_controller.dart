@@ -8,6 +8,7 @@ import '/core/models/user_model.dart';
 import '/core/services/auth_service.dart';
 import '/core/services/user_service.dart';
 import '/core/services/group_service.dart';
+import '/core/services/theme_service.dart';
 import '/styles/colors.dart';
 import '/ui_components/__ui_components.dart';
 
@@ -15,6 +16,7 @@ class ProfileController extends GetxController {
   final AuthService _authService = AuthService.to;
   final RxBool isLoading = false.obs;
   final RxInt groupsCount = 0.obs;
+  final RxBool isDarkMode = false.obs;
 
   StreamSubscription<int>? _groupsCountSubscription;
   StreamSubscription<UserModel?>? _authStateSubscription;
@@ -22,6 +24,8 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    isDarkMode.value = ThemeService.appearenceMode == ThemeMode.dark.name;
+
     // Listen to auth state changes to reload data when user logs in
     _authStateSubscription = _authService.authStateChanges.listen((user) {
       if (user != null) {
@@ -73,6 +77,12 @@ class ProfileController extends GetxController {
   String get memberSince {
     if (currentUser?.createdAt == null) return 'Unknown';
     return DateFormat('MMM yyyy').format(currentUser!.createdAt!);
+  }
+
+  void toggleTheme(bool value) {
+    final mode = value ? ThemeMode.dark : ThemeMode.light;
+    ThemeService.switchTheme(mode);
+    isDarkMode.value = value;
   }
 
   Future<void> updateDisplayName(String newName) async {

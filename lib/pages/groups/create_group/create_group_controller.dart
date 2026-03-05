@@ -58,6 +58,7 @@ class CreateGroupController extends GetxController {
         message: 'Group "${group.name}" created successfully!',
         isSuccess: true,
       );
+      Get.offNamed(RouteNames.groups.ratingsPage, arguments: {'group': group});
       return true;
     } catch (e) {
       showCustomSnackBar(
@@ -70,9 +71,7 @@ class CreateGroupController extends GetxController {
     }
   }
 
-  void updateSelectedCategory(GroupCategory? newValue) {
-    if (newValue != null) {
-      _selectedCategory.value = newValue;
-    }
+  void updateSelectedCategory(GroupCategory newValue) {
+    _selectedCategory.value = newValue;
   }
 }

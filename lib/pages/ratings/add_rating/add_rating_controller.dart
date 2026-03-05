@@ -123,10 +123,6 @@ class AddRatingController extends GetxController {
       );
 
       if (success) {
-        showCustomSnackBar(
-          message: 'Rating added successfully!',
-          isSuccess: true,
-        );
         return true;
       } else {
         showCustomSnackBar(

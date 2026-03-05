@@ -21,7 +21,7 @@ class AddRatingPage extends GetView<AddRatingController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Rating'),
+        title: Text('Add to $groupName'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -30,10 +30,10 @@ class AddRatingPage extends GetView<AddRatingController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HeaderSection(groupName: groupName),
-              const SizedBox(height: AppSpacing.lg),
+              const SectionHeader(title: 'Item Details'),
+              const SizedBox(height: AppSpacing.md),
               const ImageSection(),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.md),
               const FormSection(),
               const SizedBox(height: AppSpacing.lg),
               Obx(

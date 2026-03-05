@@ -9,22 +9,13 @@ class HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Add New Rating',
-          style: AppTypography.titleLarge.copyWith(
-            color: AppColors.text,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          'Share your experience with "$groupName"',
-          style: AppTypography.bodyMedium.copyWith(color: AppColors.textLight),
-        ),
-      ],
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Text(
+      'Share your experience with "$groupName"',
+      style: AppTypography.bodyMedium.copyWith(
+        color: colorScheme.onSurfaceVariant,
+      ),
     );
   }
 }

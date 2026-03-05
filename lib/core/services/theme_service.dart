@@ -6,12 +6,12 @@ class ThemeService {
   static final _box = GetStorage();
   static const _key = 'appearanceMode';
 
-  static ThemeMode get theme => ThemeMode.light;
-  // appearenceMode == ThemeMode.system.name
-  //     ? ThemeMode.system
-  //     : appearenceMode == ThemeMode.light.name
-  //         ? ThemeMode.light
-  //         : ThemeMode.dark;
+  static ThemeMode get theme {
+    final mode = appearenceMode;
+    if (mode == ThemeMode.dark.name) return ThemeMode.dark;
+    if (mode == ThemeMode.light.name) return ThemeMode.light;
+    return ThemeMode.system;
+  }
 
   static String get appearenceMode => _box.read(_key) ?? ThemeMode.system.name;
 
