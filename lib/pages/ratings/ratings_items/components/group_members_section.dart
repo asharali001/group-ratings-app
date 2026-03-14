@@ -5,75 +5,35 @@ import '/styles/__styles.dart';
 import '/constants/enums.dart';
 import '/ui_components/__ui_components.dart';
 
-class GroupMembersSection extends StatefulWidget {
+class GroupMembersSection extends StatelessWidget {
   final Group group;
 
   const GroupMembersSection({super.key, required this.group});
 
   @override
-  State<GroupMembersSection> createState() => _GroupMembersSectionState();
-}
-
-class _GroupMembersSectionState extends State<GroupMembersSection> {
-  bool _isExpanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final members = widget.group.members;
+    final members = group.members;
     final totalMembers = members.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(
-          title: 'Members ($totalMembers)',
-          trailing: totalMembers > 5
-              ? GestureDetector(
-                  onTap: () => setState(() => _isExpanded = !_isExpanded),
-                  child: Text(
-                    _isExpanded ? 'Show less' : 'Show all',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                )
-              : null,
-        ),
+        SectionHeader(title: 'Members ($totalMembers)'),
         const SizedBox(height: AppSpacing.sm),
-        AvatarStack(
-          avatars: members
-              .map((m) => AvatarStackItem(name: m.name))
-              .toList(),
-          maxDisplay: 5,
-          avatarSize: 36,
-          onOverflowTap: () => setState(() => _isExpanded = true),
-        ),
-        AnimatedCrossFade(
-          firstChild: const SizedBox.shrink(),
-          secondChild: Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.sm),
-            child: AppCard(
-              variant: AppCardVariant.flat,
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: members.asMap().entries.map((entry) {
-                  final i = entry.key;
-                  final member = entry.value;
-                  return _buildMemberListItem(
-                    context,
-                    member,
-                    showDivider: i < members.length - 1,
-                  );
-                }).toList(),
-              ),
-            ),
+        AppCard(
+          variant: AppCardVariant.flat,
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: members.asMap().entries.map((entry) {
+              final i = entry.key;
+              final member = entry.value;
+              return _buildMemberListItem(
+                context,
+                member,
+                showDivider: i < members.length - 1,
+              );
+            }).toList(),
           ),
-          crossFadeState: _isExpanded
-              ? CrossFadeState.showSecond
-              : CrossFadeState.showFirst,
-          duration: const Duration(milliseconds: 250),
         ),
       ],
     );
@@ -104,7 +64,7 @@ class _GroupMembersSectionState extends State<GroupMembersSection> {
                 backgroundColor:
                     isAdmin ? colorScheme.primary : colorScheme.secondary,
                 foregroundColor: colorScheme.onPrimary,
-                size: 36,
+                size: 40,
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -127,12 +87,6 @@ class _GroupMembersSectionState extends State<GroupMembersSection> {
                   ],
                 ),
               ),
-              if (isAdmin)
-                Icon(
-                  Icons.workspace_premium_rounded,
-                  size: 18,
-                  color: colorScheme.primary,
-                ),
             ],
           ),
         ),

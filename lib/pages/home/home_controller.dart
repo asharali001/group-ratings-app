@@ -21,6 +21,21 @@ class HomeController extends GetxController {
 
   // Stats
   int get totalRatings => _ratings.length;
+  int get totalMembers {
+    final unique = <String>{};
+    for (final group in _userGroups) {
+      unique.addAll(group.memberIds);
+    }
+    final userId = Get.find<AuthService>().effectiveUserId;
+    if (userId != null) unique.remove(userId);
+    return unique.length;
+  }
+
+  List<RatingItem> get recentRatings {
+    final sorted = List<RatingItem>.from(_ratings);
+    sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return sorted.take(5).toList();
+  }
 
   @override
   void onInit() {
@@ -36,8 +51,16 @@ class HomeController extends GetxController {
       }
     });
 
+    // Reload when mirrored user changes
+    ever(authService.mirroredUserIdObs, (_) {
+      if (authService.effectiveUserId != null) {
+        _loadUserGroups();
+        _loadRatings();
+      }
+    });
+
     // Load initial data if user is already authenticated
-    if (authService.currentUserId != null) {
+    if (authService.effectiveUserId != null) {
       _loadUserGroups();
       _loadRatings();
     }
@@ -58,7 +81,7 @@ class HomeController extends GetxController {
 
       _isLoading.value = true;
       final authService = Get.find<AuthService>();
-      final userId = authService.currentUserId;
+      final userId = authService.effectiveUserId;
 
       if (userId != null) {
         // Listen to groups
@@ -84,7 +107,7 @@ class HomeController extends GetxController {
 
       _isLoading.value = true;
       final authService = Get.find<AuthService>();
-      final userId = authService.currentUserId;
+      final userId = authService.effectiveUserId;
       if (userId != null) {
         final ratingService = Get.put(RatingService());
         _ratingsSubscription = ratingService.getUserRatingItems(userId).listen((

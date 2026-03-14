@@ -22,6 +22,10 @@ class AppRoutes {
       name: RouteNames.mainApp.profilePage,
       page: () => const ProfilePage(),
     ),
+    GetPage(
+      name: RouteNames.mainApp.mirrorUserPage,
+      page: () => const MirrorUserPage(),
+    ),
 
     // Group routes
     GetPage(name: RouteNames.groups.groupsPage, page: () => const GroupsPage()),

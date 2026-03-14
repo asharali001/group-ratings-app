@@ -45,7 +45,7 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -63,10 +63,18 @@ class AppTextField extends StatelessWidget {
           focusNode: focusNode,
           textCapitalization: textCapitalization,
           decoration: InputDecoration(
+            alignLabelWithHint: true, // Fixes the placeholder text
+            prefixIcon: prefixIcon != null
+                ? Padding(
+                    padding: EdgeInsets.only(
+                      bottom: (maxLines ?? 1) > 1 ? maxLines! * 20.0 : 0,
+                    ),
+                    child: Icon(prefixIcon),
+                  )
+                : null,
             labelText: label,
             hintText: hintText,
             errorText: errorText,
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppBorderRadius.md),

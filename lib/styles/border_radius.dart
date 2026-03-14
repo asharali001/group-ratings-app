@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AppBorderRadius {
-  // Radius Scale
-  static const double sm = 4.0;
-  static const double md = 8.0;
-  static const double lg = 12.0;
-  static const double xl = 16.0;
+  // Radius Scale (per CLAUDE.md: 12px default, 16px cards, 20px modals, no corners < 8px)
+  static const double sm = 8.0;
+  static const double md = 12.0;
+  static const double lg = 16.0;
+  static const double xl = 20.0;
   static const double full = 999.0;
 
   // BorderRadius Objects

@@ -30,13 +30,20 @@ class GroupsListController extends GetxController {
       }
     });
 
+    // Reload when mirrored user changes
+    ever(_authService.mirroredUserIdObs, (_) {
+      if (_authService.effectiveUserId != null) {
+        loadUserGroups();
+      }
+    });
+
     // Listen to search and filter changes
     ever(searchQuery, (_) => _applyFilters());
     ever(selectedFilter, (_) => _applyFilters());
     ever(userGroups, (_) => _applyFilters());
 
     // Load initial data if user is already authenticated
-    if (_authService.currentUserId != null) {
+    if (_authService.effectiveUserId != null) {
       loadUserGroups();
     }
   }
@@ -52,7 +59,7 @@ class GroupsListController extends GetxController {
     // Cancel existing subscription
     _groupsSubscription?.cancel();
 
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     if (userId != null) {
       _groupsSubscription = GroupService.getUserGroups(userId).listen((groups) {
         userGroups.value = groups;
@@ -77,7 +84,7 @@ class GroupsListController extends GetxController {
   /// Apply search and filter
   void _applyFilters() {
     var results = userGroups.toList();
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
 
     // Apply search
     if (searchQuery.value.isNotEmpty) {
@@ -144,13 +151,13 @@ class GroupsListController extends GetxController {
   }
 
   bool isGroupCreator(Group group) {
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     return group.members.firstWhereOrNull((e) => e.userId == userId)?.role ==
         GroupMemberRole.admin;
   }
 
   bool isGroupMember(Group group) {
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     return userId != null && group.members.any((e) => e.userId == userId);
   }
 

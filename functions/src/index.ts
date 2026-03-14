@@ -34,7 +34,17 @@ export const queryAI = onCall(
     throw new HttpsError("invalid-argument", "question is required.");
   }
 
-  const userId = request.auth.uid;
+  // Support mirror mode: use provided userId if the caller is an allowed admin
+  let userId = request.auth.uid;
+  const mirrorUserId: string | undefined = request.data.mirrorUserId;
+  if (mirrorUserId && typeof mirrorUserId === "string") {
+    const configDoc = await admin.firestore().collection("app_config").doc("mirror_access").get();
+    const allowedEmails: string[] = configDoc.exists ? (configDoc.data()?.allowedEmails ?? []) : [];
+    const callerEmail = request.auth.token.email ?? "";
+    if (allowedEmails.includes(callerEmail)) {
+      userId = mirrorUserId;
+    }
+  }
 
   // 1. Embed the question
   const questionEmbedding = await embedText(question.trim());
@@ -42,7 +52,12 @@ export const queryAI = onCall(
   // 2. Query Pinecone (filtered to user's groups)
   const results = await queryVectors(userId, questionEmbedding, 10);
 
-  if (results.length === 0) {
+  // Only include context from results that are at least loosely related (≥0.5)
+  const CONTEXT_THRESHOLD = 0.5;
+
+  const relevantResults = results.filter((r) => r.score >= CONTEXT_THRESHOLD);
+
+  if (relevantResults.length === 0) {
     return {
       answer:
         "I don't have enough data to answer that yet. Try rating some items in your groups first!",
@@ -50,24 +65,30 @@ export const queryAI = onCall(
     };
   }
 
-  // 3. Build context string
-  const contextLines = results
+  // 3. Build context string and ID list (from loosely relevant results)
+  const contextLines = relevantResults
     .map((r) => r.metadata.textContent ?? "")
     .filter(Boolean);
   const context = contextLines.join("\n");
 
-  // 4. Generate answer
-  const answer = await generateAnswer(context, question.trim());
+  // Build a map of Pinecone vector ID → result for reference lookup
+  const resultById = new Map(relevantResults.map((r) => [r.id, r]));
+  const contextIds = relevantResults.map((r) => r.id);
 
-  // 5. Extract unique references from results
-  const seenIds = new Set<string>();
+  // 4. Generate answer — GPT tells us which IDs it actually cited
+  const { answer, usedIds } = await generateAnswer(context, question.trim(), contextIds);
+
+  // 5. Build references only from IDs GPT explicitly cited
+  const seenRefIds = new Set<string>();
   const references: AIReference[] = [];
 
-  for (const r of results) {
+  for (const vectorId of usedIds) {
+    const r = resultById.get(vectorId);
+    if (!r) continue;
     const meta = r.metadata;
 
-    if (meta.type === "group" && meta.groupId && !seenIds.has(meta.groupId)) {
-      seenIds.add(meta.groupId);
+    if (meta.type === "group" && meta.groupId && !seenRefIds.has(meta.groupId)) {
+      seenRefIds.add(meta.groupId);
       references.push({
         type: "group",
         id: meta.groupId,
@@ -78,9 +99,9 @@ export const queryAI = onCall(
     if (
       (meta.type === "item" || meta.type === "user_rating") &&
       meta.itemId &&
-      !seenIds.has(meta.itemId)
+      !seenRefIds.has(meta.itemId)
     ) {
-      seenIds.add(meta.itemId);
+      seenRefIds.add(meta.itemId);
       references.push({
         type: "ratingItem",
         id: meta.itemId,

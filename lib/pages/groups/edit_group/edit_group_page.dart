@@ -16,16 +16,58 @@ class EditGroupPage extends GetView<EditGroupController> {
   Widget build(BuildContext context) {
     controller.initializeForm(group);
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Group')),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Form(
           key: controller.formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SectionHeader(title: 'Group Details'),
+              // Hero emoji circle
+              Center(
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryTint,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      group.category.emoji,
+                      style: const TextStyle(fontSize: 36),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                'Edit Group',
+                style: AppTypography.headlineSmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Update your group details',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Overline label
+              Text(
+                'GROUP DETAILS',
+                style: AppTypography.labelSmall.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
 
               AppTextField(
@@ -68,9 +110,19 @@ class EditGroupPage extends GetView<EditGroupController> {
 
               const SizedBox(height: AppSpacing.xl),
 
-              const SectionHeader(
-                title: 'Category',
-                subtitle: 'Choose a category for your group',
+              Text(
+                'CATEGORY',
+                style: AppTypography.labelSmall.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Choose a category for your group',
+                style: AppTypography.bodySmall.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
 

@@ -42,7 +42,7 @@ class NavigationBar extends StatelessWidget {
           children: [
             NavbarItem(index: 0, icon: EvaIcons.home, label: 'Home'),
             NavbarItem(index: 1, icon: EvaIcons.people, label: 'Groups'),
-            NavbarItem(index: 2, icon: EvaIcons.star, label: 'My Ratings'),
+            NavbarItem(index: 2, icon: EvaIcons.star, label: 'Ratings'),
             NavbarItem(index: 3, icon: EvaIcons.messageCircle, label: 'Ask AI'),
             NavbarItem(index: 4, icon: EvaIcons.person, label: 'Profile'),
           ],

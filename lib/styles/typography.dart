@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTypography {
   // Font weights
-  static const FontWeight light = FontWeight.w300;
   static const FontWeight regular = FontWeight.w400;
   static const FontWeight medium = FontWeight.w500;
   static const FontWeight semiBold = FontWeight.w600;
@@ -11,119 +10,123 @@ class AppTypography {
   static const FontWeight extraBold = FontWeight.w800;
 
   // Base text theme using Google Fonts - used for ThemeData
-  static TextTheme get textTheme => GoogleFonts.kanitTextTheme();
+  static TextTheme get textTheme => GoogleFonts.dmSansTextTheme();
 
-  // Custom text styles with consistent sizing and weights
-  // Using GoogleFonts.kanit directly to ensure font family is always applied
-  
-  // Display
-  static TextStyle get displayLarge => GoogleFonts.kanit(
-    fontSize: 57,
-    fontWeight: regular,
-    letterSpacing: -0.25,
+  // Display - 48px/700/-0.03em (CLAUDE.md Display)
+  static TextStyle get displayLarge => GoogleFonts.dmSans(
+    fontSize: 48,
+    fontWeight: bold,
+    letterSpacing: -0.03 * 48,
     height: 1.12,
   );
 
-  static TextStyle get displayMedium => GoogleFonts.kanit(
+  static TextStyle get displayMedium => GoogleFonts.dmSans(
     fontSize: 45,
-    fontWeight: regular,
-    letterSpacing: 0,
+    fontWeight: bold,
+    letterSpacing: -0.03 * 45,
     height: 1.16,
   );
 
-  static TextStyle get displaySmall => GoogleFonts.kanit(
+  static TextStyle get displaySmall => GoogleFonts.dmSans(
     fontSize: 36,
-    fontWeight: regular,
-    letterSpacing: 0,
+    fontWeight: bold,
+    letterSpacing: -0.02 * 36,
     height: 1.22,
   );
 
-  // Headline
-  static TextStyle get headlineLarge => GoogleFonts.kanit(
-    fontSize: 32,
-    fontWeight: regular,
-    letterSpacing: 0,
+  // Headline - H1: 36px/700/-0.02em, H2: 24px/700/-0.02em
+  static TextStyle get headlineLarge => GoogleFonts.dmSans(
+    fontSize: 36,
+    fontWeight: bold,
+    letterSpacing: -0.02 * 36,
     height: 1.25,
   );
 
-  static TextStyle get headlineMedium => GoogleFonts.kanit(
+  static TextStyle get headlineMedium => GoogleFonts.dmSans(
     fontSize: 28,
-    fontWeight: regular,
-    letterSpacing: 0,
+    fontWeight: bold,
+    letterSpacing: -0.02 * 28,
     height: 1.29,
   );
 
-  static TextStyle get headlineSmall => GoogleFonts.kanit(
+  static TextStyle get headlineSmall => GoogleFonts.dmSans(
     fontSize: 24,
-    fontWeight: regular,
-    letterSpacing: 0,
+    fontWeight: bold,
+    letterSpacing: -0.02 * 24,
     height: 1.33,
   );
 
-  // Title
-  static TextStyle get titleLarge => GoogleFonts.kanit(
+  // Title - H3: 18px/600/-0.01em
+  static TextStyle get titleLarge => GoogleFonts.dmSans(
     fontSize: 22,
-    fontWeight: regular,
-    letterSpacing: 0,
+    fontWeight: semiBold,
+    letterSpacing: -0.01 * 22,
     height: 1.27,
   );
 
-  static TextStyle get titleMedium => GoogleFonts.kanit(
-    fontSize: 16,
-    fontWeight: medium,
-    letterSpacing: 0.15,
+  static TextStyle get titleMedium => GoogleFonts.dmSans(
+    fontSize: 18,
+    fontWeight: semiBold,
+    letterSpacing: -0.01 * 18,
     height: 1.5,
   );
 
-  static TextStyle get titleSmall => GoogleFonts.kanit(
+  static TextStyle get titleSmall => GoogleFonts.dmSans(
     fontSize: 14,
     fontWeight: medium,
-    letterSpacing: 0.1,
+    letterSpacing: 0,
     height: 1.43,
   );
 
-  // Body
-  static TextStyle get bodyLarge => GoogleFonts.kanit(
+  // Body - 16px/400/1.6
+  static TextStyle get bodyLarge => GoogleFonts.dmSans(
     fontSize: 16,
     fontWeight: regular,
-    letterSpacing: 0.5,
-    height: 1.5,
+    letterSpacing: 0,
+    height: 1.6,
   );
 
-  static TextStyle get bodyMedium => GoogleFonts.kanit(
+  static TextStyle get bodyMedium => GoogleFonts.dmSans(
     fontSize: 14,
     fontWeight: regular,
-    letterSpacing: 0.25,
+    letterSpacing: 0,
     height: 1.43,
   );
 
-  static TextStyle get bodySmall => GoogleFonts.kanit(
+  static TextStyle get bodySmall => GoogleFonts.dmSans(
     fontSize: 12,
     fontWeight: regular,
-    letterSpacing: 0.4,
+    letterSpacing: 0,
     height: 1.33,
   );
 
-  // Label
-  static TextStyle get labelLarge => GoogleFonts.kanit(
+  // Label - Caption: 13px/500, Overline: 12px/600/0.08em
+  static TextStyle get labelLarge => GoogleFonts.dmSans(
     fontSize: 14,
     fontWeight: medium,
-    letterSpacing: 0.1,
+    letterSpacing: 0,
     height: 1.43,
   );
 
-  static TextStyle get labelMedium => GoogleFonts.kanit(
-    fontSize: 12,
+  static TextStyle get labelMedium => GoogleFonts.dmSans(
+    fontSize: 13,
     fontWeight: medium,
-    letterSpacing: 0.5,
+    letterSpacing: 0,
     height: 1.33,
   );
 
-  static TextStyle get labelSmall => GoogleFonts.kanit(
-    fontSize: 11,
-    fontWeight: medium,
-    letterSpacing: 0.5,
+  static TextStyle get labelSmall => GoogleFonts.dmSans(
+    fontSize: 12,
+    fontWeight: semiBold,
+    letterSpacing: 0.08 * 12,
     height: 1.45,
+  );
+
+  // Monospace for code/technical elements
+  static TextStyle get mono => GoogleFonts.jetBrainsMono(
+    fontSize: 14,
+    fontWeight: regular,
+    height: 1.5,
   );
 
   // Utility method to apply color to text styles

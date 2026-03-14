@@ -127,9 +127,20 @@ class FormSection extends GetView<AddRatingController> {
         const SizedBox(height: AppSpacing.xl),
 
         // Your Rating Section
-        const SectionHeader(
-          title: 'Your Rating',
-          subtitle: 'Rate this item now or later',
+        Text(
+          'YOUR RATING',
+          style: AppTypography.labelSmall.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            letterSpacing: 1.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          'Rate this item now or later',
+          style: AppTypography.bodySmall.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: AppSpacing.md),
 
@@ -193,6 +204,16 @@ class FormSection extends GetView<AddRatingController> {
                   },
                 ),
               ),
+
+              if (rating == 0) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Tap to rate',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               AppSlider(
                 value: rating,
@@ -210,8 +231,17 @@ class FormSection extends GetView<AddRatingController> {
         const SizedBox(height: AppSpacing.md),
 
         // Comment Field
+        Text(
+          'YOUR REVIEW',
+          style: AppTypography.labelSmall.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            letterSpacing: 1.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
         AppTextField(
-          label: 'Your Review (Optional)',
+          label: '',
           hintText: 'Share your thoughts about this item...',
           controller: controller.commentController,
           prefixIcon: Icons.comment_rounded,

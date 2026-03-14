@@ -21,17 +21,17 @@ class AppColors {
   static const _neutral900 = Color(0xFF0F172A);
 
   // Functional Colors
-  static const _green500 = Color(0xFF22C55E);
+  static const _green500 = Color(0xFF10B981);
   static const _green50 = Color(0xFFF0FDF4); // Success Background
-  
+
   static const _red500 = Color(0xFFEF4444);
-  static const _red50 = Color(0xFFFEF2F2);   // Error Background
+  static const _red50 = Color(0xFFFEF2F2); // Error Background
 
   static const _orange500 = Color(0xFFF97316);
   static const _orange50 = Color(0xFFFFF7ED); // Warning Background
 
   static const _blue500 = Color(0xFF3B82F6);
-  static const _blue50 = Color(0xFFEFF6FF);   // Info Background
+  static const _blue50 = Color(0xFFEFF6FF); // Info Background
 
   static const white = Color(0xFFFFFFFF);
   static const black = Color(0xFF000000);
@@ -43,6 +43,9 @@ class AppColors {
 
   // Primary
   static const primary = _shiebleBlue;
+  static const primaryDark = Color(0xFF0284C7);
+  static const primaryLight = Color(0xFF7DD3FC);
+  static const primaryTint = Color(0xFFE0F2FE);
   static const onPrimary = white;
   static const primaryContainer = Color(0xFFE0F2FE); // Light Blue
   static const onPrimaryContainer = Color(0xFF0369A1); // Dark Blue
@@ -52,43 +55,46 @@ class AppColors {
   static const onSecondary = white;
 
   // Backgrounds
-  static const background = _neutral50;
+  static const background = _neutral100;
   static const surface = white;
   static const onSurface = textPrimary;
   static const surfaceVariant = _neutral100;
   static const onSurfaceVariant = textSecondary; // Also useful
-  
+
   // Text
   static const textPrimary = _neutral900;
-  
+  static const slate = Color(0xFF334155);
+
   // Semantic Aliases for common colors
   static const green = _green500;
   static const red = _red500;
   static const blue = _blue500;
-  static const yellow = _orange500; // Mapping yellow to orange/warning color or add actual yellow
-  static const purple = _shiebleIndigo; // Mapping purple to indigo
+  static const yellow = _orange500;
+  static const purple = _shiebleIndigo;
+  static const starGold = Color(0xFFF59E0B);
   static const textSecondary = _neutral500;
   static const textTertiary = _neutral400;
-  
+
   // Borders
   static const border = _neutral200;
   static const borderFocus = _shiebleBlue;
+  static const grayLight = _neutral300;
+  static const grayLightest = _neutral50;
 
   // Feedback (Toast / functional)
   static const success = _green500;
   static const successContainer = _green50;
-  
+
   static const error = _red500;
   static const errorContainer = _red50;
-  
+
   static const warning = _orange500;
   static const warningContainer = _orange50;
-  
+
   static const info = _blue500;
   static const infoContainer = _blue50;
 
   // Legacy mappings for backward compatibility during refactor
-  // TODO: Remove these once migration is complete
   static const gray = _neutral400;
   static const darkGray = _neutral800;
   static const silver = _neutral300;

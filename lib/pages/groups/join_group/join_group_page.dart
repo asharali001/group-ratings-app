@@ -15,35 +15,61 @@ class JoinGroupPage extends GetView<JoinGroupController> {
     var colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Join Group')),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Form(
           key: controller.formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Join a Group',
-                    style: AppTypography.headlineMedium.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Hero illustration
+              Center(
+                child: Container(
+                  width: 160,
+                  height: 160,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryTint,
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Enter the group code to join an existing group',
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                  child: const Icon(
+                    Icons.group_add_rounded,
+                    color: AppColors.primary,
+                    size: 72,
                   ),
-                ],
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.lg),
+
+              // Title + subtitle
+              Text(
+                'Enter Invite Code',
+                style: AppTypography.headlineSmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Paste the unique code you received to instantly join your team or community group.',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
               ),
 
               const SizedBox(height: AppSpacing.xl),
+
+              // Overline label
+              Text(
+                'INVITE CODE',
+                style: AppTypography.labelSmall.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
 
               AppTextField(
                 controller: controller.groupCodeController,
@@ -69,36 +95,14 @@ class JoinGroupPage extends GetView<JoinGroupController> {
                 },
               ),
 
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.sm),
 
-              // Info Text
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.info.withValues(alpha: 0.1),
-                  borderRadius: AppBorderRadius.mdRadius,
-                  border: Border.all(
-                    color: AppColors.info.withValues(alpha: 0.3),
-                  ),
+              Text(
+                'Codes are case-sensitive and typically 6 characters long.',
+                style: AppTypography.bodySmall.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.info_outline_rounded,
-                      color: AppColors.info,
-                      size: 20,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        'Group codes are 6 characters long and can contain letters and numbers. Ask the group creator for the code.',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.info,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                textAlign: TextAlign.center,
               ),
 
               const SizedBox(height: AppSpacing.xl),

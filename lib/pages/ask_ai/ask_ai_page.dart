@@ -4,7 +4,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 
 import '/core/models/chat_message.dart';
 import '/styles/__styles.dart';
-import '/ui_components/__ui_components.dart';
 import 'ask_ai_controller.dart';
 
 class AskAIPage extends StatelessWidget {
@@ -24,7 +23,21 @@ class AskAIPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: Text('Ask AI', style: AppTypography.titleLarge),
+        centerTitle: false,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Ask AI', style: AppTypography.titleLarge),
+            Text(
+              'GROUP INTELLIGENCE',
+              style: AppTypography.labelSmall.copyWith(
+                color: theme.colorScheme.primary,
+                fontSize: 10,
+                letterSpacing: 2.0,
+              ),
+            ),
+          ],
+        ),
         backgroundColor: theme.colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
@@ -46,6 +59,13 @@ class AskAIPage extends StatelessWidget {
               return _buildMessageList(context, controller);
             }),
           ),
+          // Suggestion chips after messages
+          Obx(() {
+            if (controller.messages.isNotEmpty && !controller.isLoading.value) {
+              return _buildSuggestionChipsRow(context, controller);
+            }
+            return const SizedBox.shrink();
+          }),
           _buildInputRow(context, controller),
         ],
       ),
@@ -116,14 +136,93 @@ class AskAIPage extends StatelessWidget {
         horizontal: AppSpacing.md,
         vertical: AppSpacing.md,
       ),
-      itemCount: controller.messages.length + (controller.isLoading.value ? 1 : 0),
+      itemCount:
+          controller.messages.length +
+          (controller.isLoading.value ? 1 : 0) +
+          1, // +1 for TODAY badge
       itemBuilder: (context, index) {
-        if (index == controller.messages.length) {
+        // TODAY badge at top
+        if (index == 0) {
+          return _buildTodayBadge(context);
+        }
+        final msgIndex = index - 1;
+        if (msgIndex == controller.messages.length) {
           return const _TypingIndicator();
         }
-        final message = controller.messages[index];
+        final message = controller.messages[msgIndex];
         return _MessageBubble(message: message);
       },
+    );
+  }
+
+  Widget _buildTodayBadge(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest,
+          borderRadius: AppBorderRadius.fullRadius,
+        ),
+        child: Text(
+          'TODAY',
+          style: AppTypography.labelSmall.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 10,
+            letterSpacing: 1.5,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSuggestionChipsRow(
+    BuildContext context,
+    AskAIController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: _suggestions.map((q) {
+            return Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
+              child: GestureDetector(
+                onTap: () => controller.sendMessage(q),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: colorScheme.primary.withValues(alpha: 0.4),
+                    ),
+                    borderRadius: AppBorderRadius.fullRadius,
+                  ),
+                  child: Text(
+                    q,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: colorScheme.primary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
@@ -148,15 +247,27 @@ class AskAIPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-            child: AppTextField(
-              label: '',
-              hintText: 'Ask about your ratings...',
+            child: TextField(
               controller: controller.inputController,
               textCapitalization: TextCapitalization.sentences,
               maxLines: 1,
               textInputAction: TextInputAction.send,
-              onFieldSubmitted: (_) => controller.sendMessage(
-                controller.inputController.text,
+              onSubmitted: (_) =>
+                  controller.sendMessage(controller.inputController.text),
+              style: AppTypography.bodyMedium.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Ask about your ratings...',
+                hintStyle: AppTypography.bodyMedium.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.sm,
+                  horizontal: AppSpacing.md,
+                ),
               ),
             ),
           ),
@@ -165,7 +276,8 @@ class AskAIPage extends StatelessWidget {
             () => IconButton.filled(
               onPressed: controller.isLoading.value
                   ? null
-                  : () => controller.sendMessage(controller.inputController.text),
+                  : () =>
+                        controller.sendMessage(controller.inputController.text),
               icon: controller.isLoading.value
                   ? const SizedBox(
                       width: 18,
@@ -175,13 +287,15 @@ class AskAIPage extends StatelessWidget {
                         color: Colors.white,
                       ),
                     )
-                  : const Icon(EvaIcons.arrowUpward, size: 20),
+                  : const Icon(EvaIcons.diagonalArrowRightUpOutline, size: 20),
               style: IconButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
+                disabledBackgroundColor: AppColors.primary.withValues(
+                  alpha: 0.4,
+                ),
                 shape: const CircleBorder(),
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(6.0),
               ),
             ),
           ),
@@ -201,22 +315,38 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.role == ChatRole.user;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!isUser) ...[
-            _AIAvatar(),
-            const SizedBox(width: AppSpacing.sm),
-          ],
+          if (!isUser) ...[_AIAvatar(), const SizedBox(width: AppSpacing.sm)],
           Flexible(
             child: Column(
-              crossAxisAlignment:
-                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isUser
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
+                // Sender label
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: AppSpacing.xs,
+                    left: 2,
+                    right: 2,
+                  ),
+                  child: Text(
+                    isUser ? 'You' : 'Kretik',
+                    style: AppTypography.labelMedium.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
                 _BubbleContent(message: message, isUser: isUser),
                 if (!isUser && message.references.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.sm),
@@ -238,7 +368,7 @@ class _AIAvatar extends StatelessWidget {
     return Container(
       width: 32,
       height: 32,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.primary,
         borderRadius: AppBorderRadius.fullRadius,
       ),
@@ -268,16 +398,18 @@ class _BubbleContent extends StatelessWidget {
         borderRadius: BorderRadius.only(
           topLeft: const Radius.circular(AppBorderRadius.lg),
           topRight: const Radius.circular(AppBorderRadius.lg),
-          bottomLeft: Radius.circular(isUser ? AppBorderRadius.lg : AppBorderRadius.sm),
-          bottomRight: Radius.circular(isUser ? AppBorderRadius.sm : AppBorderRadius.lg),
+          bottomLeft: Radius.circular(
+            isUser ? AppBorderRadius.lg : AppBorderRadius.sm,
+          ),
+          bottomRight: Radius.circular(
+            isUser ? AppBorderRadius.sm : AppBorderRadius.lg,
+          ),
         ),
       ),
       child: Text(
         message.text,
         style: AppTypography.bodyMedium.copyWith(
-          color: isUser
-              ? Colors.white
-              : theme.colorScheme.onSurface,
+          color: isUser ? Colors.white : theme.colorScheme.onSurface,
         ),
       ),
     );
@@ -303,7 +435,10 @@ class _ReferenceCards extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: AppSpacing.sm),
           child: isGroup
               ? _GroupReferenceCard(reference: ref, controller: controller)
-              : _RatingItemReferenceCard(reference: ref, controller: controller),
+              : _RatingItemReferenceCard(
+                  reference: ref,
+                  controller: controller,
+                ),
         );
       }).toList(),
     );
@@ -314,7 +449,10 @@ class _GroupReferenceCard extends StatelessWidget {
   final AIReference reference;
   final AskAIController controller;
 
-  const _GroupReferenceCard({required this.reference, required this.controller});
+  const _GroupReferenceCard({
+    required this.reference,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -342,7 +480,6 @@ class _GroupReferenceCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // Category emoji circle
                   Container(
                     width: 44,
                     height: 44,
@@ -370,10 +507,13 @@ class _GroupReferenceCard extends StatelessWidget {
                           maxLines: 1,
                         ),
                         const SizedBox(height: 2),
-                        // Metadata row
                         Row(
                           children: [
-                            Icon(Icons.people_rounded, size: 13, color: colorScheme.onSurfaceVariant),
+                            Icon(
+                              Icons.people_rounded,
+                              size: 13,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                             const SizedBox(width: 3),
                             Text(
                               group != null
@@ -390,7 +530,11 @@ class _GroupReferenceCard extends StatelessWidget {
                                   color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
-                              Icon(Icons.star_rounded, size: 13, color: colorScheme.onSurfaceVariant),
+                              Icon(
+                                Icons.star_rounded,
+                                size: 13,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
                               const SizedBox(width: 3),
                               Text(
                                 '${group.ratingItemsCount} item${group.ratingItemsCount == 1 ? '' : 's'}',
@@ -436,7 +580,10 @@ class _RatingItemReferenceCard extends StatelessWidget {
   final AIReference reference;
   final AskAIController controller;
 
-  const _RatingItemReferenceCard({required this.reference, required this.controller});
+  const _RatingItemReferenceCard({
+    required this.reference,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -454,7 +601,10 @@ class _RatingItemReferenceCard extends StatelessWidget {
           color: colorScheme.surfaceContainerLow,
           borderRadius: AppBorderRadius.mdRadius,
           child: InkWell(
-            onTap: () => controller.navigateToRatingItem(reference.id, reference.groupId),
+            onTap: () => controller.navigateToRatingItem(
+              reference.id,
+              reference.groupId,
+            ),
             borderRadius: AppBorderRadius.mdRadius,
             child: Container(
               padding: EdgeInsets.zero,
@@ -467,7 +617,6 @@ class _RatingItemReferenceCard extends StatelessWidget {
               child: IntrinsicHeight(
                 child: Row(
                   children: [
-                    // Image thumbnail
                     Container(
                       width: 64,
                       height: 64,
@@ -478,7 +627,8 @@ class _RatingItemReferenceCard extends StatelessWidget {
                           bottomLeft: Radius.circular(AppBorderRadius.md),
                         ),
                       ),
-                      child: item?.imageUrl != null && item!.imageUrl!.isNotEmpty
+                      child:
+                          item?.imageUrl != null && item!.imageUrl!.isNotEmpty
                           ? ClipRRect(
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(AppBorderRadius.md),
@@ -490,7 +640,8 @@ class _RatingItemReferenceCard extends StatelessWidget {
                                 errorBuilder: (_, __, ___) => Center(
                                   child: Icon(
                                     Icons.image_outlined,
-                                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                                    color: colorScheme.onSurfaceVariant
+                                        .withValues(alpha: 0.4),
                                     size: 24,
                                   ),
                                 ),
@@ -499,17 +650,19 @@ class _RatingItemReferenceCard extends StatelessWidget {
                           : Center(
                               child: Icon(
                                 Icons.image_outlined,
-                                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                                color: colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.4,
+                                ),
                                 size: 24,
                               ),
                             ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
-
-                    // Item info
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.sm,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -526,7 +679,11 @@ class _RatingItemReferenceCard extends StatelessWidget {
                               const SizedBox(height: 2),
                               Row(
                                 children: [
-                                  Icon(Icons.location_on_outlined, size: 13, color: colorScheme.onSurfaceVariant),
+                                  Icon(
+                                    Icons.location_on_outlined,
+                                    size: 13,
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
                                   const SizedBox(width: 3),
                                   Expanded(
                                     child: Text(
@@ -542,10 +699,13 @@ class _RatingItemReferenceCard extends StatelessWidget {
                               ),
                             ],
                             const SizedBox(height: 2),
-                            // Rating row
                             Row(
                               children: [
-                                const Icon(Icons.star_rounded, size: 14, color: AppColors.warning),
+                                const Icon(
+                                  Icons.star_rounded,
+                                  size: 14,
+                                  color: AppColors.starGold,
+                                ),
                                 const SizedBox(width: 3),
                                 Text(
                                   ratingCount > 0
@@ -569,8 +729,6 @@ class _RatingItemReferenceCard extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                    // Chevron
                     Padding(
                       padding: const EdgeInsets.only(right: AppSpacing.sm),
                       child: Icon(
@@ -710,15 +868,13 @@ class _SuggestionChip extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               EvaIcons.messageCircleOutline,
               color: AppColors.primary,
               size: 18,
             ),
             const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(question, style: AppTypography.bodyMedium),
-            ),
+            Expanded(child: Text(question, style: AppTypography.bodyMedium)),
             Icon(
               EvaIcons.arrowForwardOutline,
               color: theme.colorScheme.onSurface.withValues(alpha: 0.3),

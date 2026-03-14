@@ -37,7 +37,7 @@ class AppCard extends StatelessWidget {
         elevation = 1;
         effectiveColor ??= theme.colorScheme.primaryContainer;
         shape = const RoundedRectangleBorder(
-          borderRadius: AppBorderRadius.mdRadius,
+          borderRadius: AppBorderRadius.lgRadius,
           side: BorderSide.none,
         );
         break;
@@ -45,7 +45,7 @@ class AppCard extends StatelessWidget {
         elevation = 0;
         effectiveColor ??= theme.colorScheme.surface;
         shape = RoundedRectangleBorder(
-          borderRadius: AppBorderRadius.mdRadius,
+          borderRadius: AppBorderRadius.lgRadius,
           side: BorderSide(color: theme.colorScheme.outline),
         );
         break;
@@ -53,7 +53,7 @@ class AppCard extends StatelessWidget {
         elevation = 0;
         effectiveColor ??= theme.colorScheme.primaryContainer;
         shape = const RoundedRectangleBorder(
-          borderRadius: AppBorderRadius.mdRadius,
+          borderRadius: AppBorderRadius.lgRadius,
           side: BorderSide.none,
         );
         break;
@@ -69,7 +69,7 @@ class AppCard extends StatelessWidget {
     if (onTap != null) {
       cardContent = InkWell(
         onTap: onTap,
-        borderRadius: AppBorderRadius.mdRadius,
+        borderRadius: AppBorderRadius.lgRadius,
         child: cardContent,
       );
     }

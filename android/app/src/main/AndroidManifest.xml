@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     
     <application
-        android:label="group_ratings_app"
+        android:label="Kretik"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

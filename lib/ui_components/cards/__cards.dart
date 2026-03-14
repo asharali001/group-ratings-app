@@ -3,3 +3,4 @@ export 'empty_state_card.dart';
 export 'quick_action_card.dart';
 export 'stats_card.dart';
 export 'app_card.dart';
+export 'stat_pill.dart';

@@ -132,13 +132,13 @@ class AppButton extends StatelessWidget {
              if (states.contains(WidgetState.disabled)) {
               return AppColors.textSecondary.withValues(alpha: 0.12);
             }
-            return AppColors.secondary;
+            return AppColors.background;
           }),
           foregroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) {
               return AppColors.textSecondary.withValues(alpha: 0.38);
             }
-            return AppColors.onSecondary;
+            return AppColors.slate;
           }),
         );
       case AppButtonVariant.destructive:

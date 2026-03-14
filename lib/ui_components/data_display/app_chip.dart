@@ -33,7 +33,7 @@ class AppChip extends StatelessWidget {
             label,
             style: AppTypography.bodyMedium.copyWith(
               color: isSelected
-                  ? colorScheme.primary
+                  ? Colors.white
                   : colorScheme.onSurfaceVariant,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             ),
@@ -45,11 +45,11 @@ class AppChip extends StatelessWidget {
             onPressed?.call();
           },
           backgroundColor: colorScheme.surfaceVariant,
-          selectedColor: colorScheme.primary.withValues(alpha: 0.2),
-          checkmarkColor: colorScheme.primary,
+          selectedColor: colorScheme.primary,
+          checkmarkColor: Colors.white,
           side: BorderSide(
             color: isSelected
-                ? colorScheme.primary.withValues(alpha: 0.5)
+                ? colorScheme.primary
                 : colorScheme.outlineVariant,
           ),
         );

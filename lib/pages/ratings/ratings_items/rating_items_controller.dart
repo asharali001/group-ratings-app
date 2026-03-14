@@ -112,7 +112,7 @@ class RatingItemController extends GetxController {
     // Apply filter
     switch (selectedFilter.value) {
       case 'My Ratings':
-        final currentUserId = _authService.currentUserId;
+        final currentUserId = _authService.effectiveUserId;
         results = results
             .where((item) => item.ratedBy.contains(currentUserId))
             .toList();
@@ -283,13 +283,13 @@ class RatingItemController extends GetxController {
 
   /// Check if user can edit/delete a rating
   bool canEditRating(RatingItem rating) {
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     return userId == rating.createdBy;
   }
 
   /// Check if user can create ratings in the current group
   bool canCreateRating() {
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     final group = currentGroup.value;
     return userId != null && group != null && group.memberIds.contains(userId);
   }
@@ -315,7 +315,7 @@ class RatingItemController extends GetxController {
 
   /// Get ratings created by current user
   List<RatingItem> getCurrentUserRatings() {
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     if (userId == null) return [];
 
     return groupRatings.where((rating) => rating.createdBy == userId).toList();
@@ -323,7 +323,7 @@ class RatingItemController extends GetxController {
 
   /// Get ratings created by other users
   List<RatingItem> getOtherUsersRatings() {
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     if (userId == null) return [];
 
     return groupRatings.where((rating) => rating.createdBy != userId).toList();
@@ -446,7 +446,7 @@ class RatingItemController extends GetxController {
 
   /// Get the current user's rating for a specific rating item
   UserRating? getCurrentUserRating(String ratingItemId) {
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     if (userId == null) return null;
 
     final ratingItem = getRatingById(ratingItemId);

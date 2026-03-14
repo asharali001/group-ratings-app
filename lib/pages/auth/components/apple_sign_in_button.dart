@@ -13,9 +13,10 @@ class AppleSignInButton extends StatelessWidget {
       child: GetBuilder<AuthController>(
         builder: (controller) {
           return SignInWithAppleButton(
-            onPressed: controller.isLoading 
-              ? () {} 
-              : () => controller.signInWithApple(),
+            text: 'Apple',
+            onPressed: controller.isLoading
+                ? () {}
+                : () => controller.signInWithApple(),
           );
         },
       ),

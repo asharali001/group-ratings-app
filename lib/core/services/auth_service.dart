@@ -11,12 +11,37 @@ class AuthService extends GetxService {
   final Rx<UserModel?> _currentUser = Rx<UserModel?>(null);
   final RxBool _isLoading = false.obs;
   final RxBool _isAuthenticated = false.obs;
+  final Rx<String?> _mirroredUserId = Rx<String?>(null);
+  final Rx<String?> _mirroredUserName = Rx<String?>(null);
+  final Rx<String?> _mirroredUserPhotoURL = Rx<String?>(null);
   Stream<UserModel?>? _authStateChanges;
 
   UserModel? get currentUser => _currentUser.value;
   String? get currentUserId => _currentUser.value?.uid;
   bool get isLoading => _isLoading.value;
   bool get isAuthenticated => _isAuthenticated.value;
+
+  /// When mirroring, returns the mirrored UID; otherwise the real user's UID.
+  String? get effectiveUserId => _mirroredUserId.value ?? currentUserId;
+
+  bool get isMirroring => _mirroredUserId.value != null;
+  String? get mirroredUserId => _mirroredUserId.value;
+  String? get mirroredUserName => _mirroredUserName.value;
+
+  /// Observable for controllers to react to mirror changes.
+  Rx<String?> get mirroredUserIdObs => _mirroredUserId;
+
+  void setMirrorUser(String uid, String name, {String? photoURL}) {
+    _mirroredUserId.value = uid;
+    _mirroredUserName.value = name;
+    _mirroredUserPhotoURL.value = photoURL;
+  }
+
+  void clearMirrorUser() {
+    _mirroredUserId.value = null;
+    _mirroredUserName.value = null;
+    _mirroredUserPhotoURL.value = null;
+  }
   Stream<UserModel?> get authStateChanges =>
       _authStateChanges ?? Stream.value(null);
 
@@ -165,6 +190,7 @@ class AuthService extends GetxService {
   Future<void> signOut() async {
     try {
       _isLoading.value = true;
+      clearMirrorUser();
       await AuthApi.signOut();
       _currentUser.value = null;
       _isAuthenticated.value = false;
@@ -276,4 +302,12 @@ class AuthService extends GetxService {
 
   /// Get user photo URL
   String? get userPhotoURL => _currentUser.value?.photoURL;
+
+  /// Mirror-aware display name
+  String get effectiveUserDisplayName =>
+      isMirroring ? (_mirroredUserName.value ?? userDisplayName) : userDisplayName;
+
+  /// Mirror-aware photo URL
+  String? get effectiveUserPhotoURL =>
+      isMirroring ? _mirroredUserPhotoURL.value : userPhotoURL;
 }

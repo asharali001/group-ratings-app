@@ -19,7 +19,6 @@ class GroupsPage extends StatelessWidget {
 
     return PageLayout(
       title: 'Groups',
-      subtitle: 'Manage and explore your groups',
       actions: [
         IconButton(
           onPressed: () => _navigateToCreateGroup(),

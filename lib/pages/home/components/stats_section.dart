@@ -11,43 +11,32 @@ class StatsSection extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Overview',
-          style: AppTypography.titleLarge.copyWith(
-            color: AppColors.onSurface,
-            fontWeight: FontWeight.w600,
+    return Obx(
+      () => Row(
+        children: [
+          Expanded(
+            child: StatPill(
+              value: '${controller.totalRatings}',
+              label: 'Ratings',
+              usePrimaryColor: true,
+            ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Obx(
-          () => Row(
-            children: [
-              Expanded(
-                child: StatsCard(
-                  title: 'Active Groups',
-                  value: '${controller.activeGroupsCount}',
-                  icon: Icons.group,
-                  iconColor: AppColors.primary,
-                  onTap: controller.navigateToGroupsTab,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: StatsCard(
-                  title: 'Total Ratings',
-                  value: '${controller.totalRatings}',
-                  icon: Icons.star,
-                  iconColor: AppColors.yellow,
-                  onTap: controller.navigateToMyRatingsTab,
-                ),
-              ),
-            ],
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: StatPill(
+              value: '${controller.activeGroupsCount}',
+              label: 'Groups',
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: StatPill(
+              value: '${controller.totalMembers}',
+              label: 'Members',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

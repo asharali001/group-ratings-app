@@ -33,41 +33,14 @@ class ProfileHeaderSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Stack(
-            children: [
-              AppAvatar(
-                url: user?.photoURL,
-                initials: (user?.displayName ?? 'U')
-                    .substring(0, 1)
-                    .toUpperCase(),
-                size: 100,
-                backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
-                foregroundColor: colorScheme.primary,
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: onEditName,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: colorScheme.surface,
-                        width: 2,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.edit_rounded,
-                      size: 16,
-                      color: colorScheme.onPrimary,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          AppAvatar(
+            url: user?.photoURL,
+            initials: (user?.displayName ?? 'U')
+                .substring(0, 1)
+                .toUpperCase(),
+            size: 100,
+            backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+            foregroundColor: colorScheme.primary,
           ),
           const SizedBox(height: AppSpacing.md),
           GestureDetector(
@@ -99,7 +72,7 @@ class ProfileHeaderSection extends StatelessWidget {
           Text(
             user?.email ?? 'No email',
             style: AppTypography.bodyMedium.copyWith(
-              color: colorScheme.onSurfaceVariant,
+              color: colorScheme.primary,
             ),
           ),
         ],

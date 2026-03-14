@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '/core/__core.dart';
 import '/styles/__styles.dart';
@@ -18,8 +19,7 @@ class RatingItemDetailsPage extends StatelessWidget {
     final controller = Get.find<RatingItemController>();
 
     return Obx(() {
-      final currentItem =
-          controller.getRatingById(ratingItem.id) ?? ratingItem;
+      final currentItem = controller.getRatingById(ratingItem.id) ?? ratingItem;
       final theme = Theme.of(context);
       final colorScheme = theme.colorScheme;
       final hasImage =
@@ -145,6 +145,29 @@ class RatingItemDetailsPage extends StatelessWidget {
                       const SizedBox(height: AppSpacing.lg),
                     ],
 
+                    // Created date
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_rounded,
+                          size: 14,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          'Added ${DateFormat('MMM d, yyyy').format(currentItem.createdAt)}',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // Rating overview (avg + distribution)
+                    // RatingOverviewSection(ratingItem: currentItem),
+                    // const SizedBox(height: AppSpacing.lg),
+
                     // Reviews section
                     SectionHeader(
                       title: 'Reviews (${currentItem.ratings.length})',
@@ -152,17 +175,32 @@ class RatingItemDetailsPage extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
 
                     if (currentItem.ratings.isNotEmpty)
-                      ...currentItem.ratings.map(
-                        (rating) => UserRatingCard(
-                          userRating: rating,
-                          ratingItem: currentItem,
-                          isCurrentUser: _isCurrentUser(
-                            rating,
-                            controller,
-                            currentItem,
+                      ...currentItem.ratings.map((rating) {
+                        final isCurrent = _isCurrentUser(
+                          rating,
+                          controller,
+                          currentItem,
+                        );
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: UserRatingCard(
+                            userRating: rating,
+                            ratingItem: currentItem,
+                            isCurrentUser: isCurrent,
+                            onEdit: isCurrent
+                                ? () =>
+                                      _showRatingDialog(controller, currentItem)
+                                : null,
+                            onDelete: isCurrent
+                                ? () => _showDeleteUserRatingDialog(
+                                    context,
+                                    controller,
+                                    currentItem,
+                                  )
+                                : null,
                           ),
-                        ),
-                      )
+                        );
+                      })
                     else
                       _buildEmptyState(context),
 
@@ -189,8 +227,7 @@ class RatingItemDetailsPage extends StatelessWidget {
                 ),
                 child: SafeArea(
                   child: AppButton(
-                    onPressed: () =>
-                        _showRatingDialog(controller, currentItem),
+                    onPressed: () => _showRatingDialog(controller, currentItem),
                     text: controller.hasUserRated(currentItem.id)
                         ? 'Edit Rating'
                         : 'Rate',
@@ -316,6 +353,28 @@ class RatingItemDetailsPage extends StatelessWidget {
     );
   }
 
+  void _showDeleteUserRatingDialog(
+    BuildContext context,
+    RatingItemController controller,
+    RatingItem currentItem,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AppDialog(
+        title: 'Delete Rating',
+        description:
+            'Are you sure you want to delete your rating? This action cannot be undone.',
+        primaryActionText: 'Delete',
+        onPrimaryAction: () {
+          Navigator.of(context).pop();
+          controller.removeUserRating(ratingItemId: currentItem.id);
+        },
+        secondaryActionText: 'Cancel',
+        isDestructive: true,
+      ),
+    );
+  }
+
   void _showDeleteDialog(
     BuildContext context,
     RatingItemController controller,
@@ -344,10 +403,7 @@ class _ScrimmedIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
 
-  const _ScrimmedIconButton({
-    required this.icon,
-    required this.onPressed,
-  });
+  const _ScrimmedIconButton({required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

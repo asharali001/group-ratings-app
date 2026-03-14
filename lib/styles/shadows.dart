@@ -124,8 +124,15 @@ class AppShadows {
     ),
   ];
 
-  // Component-specific shadows
-  static const List<BoxShadow> cardShadow = level1Shadow;
+  // Component-specific shadows (card: 0 1px 3px rgba(0,0,0,0.08) per CLAUDE.md)
+  static const List<BoxShadow> cardShadow = [
+    BoxShadow(
+      color: Color(0x14000000),
+      offset: Offset(0, 1),
+      blurRadius: 3,
+      spreadRadius: 0,
+    ),
+  ];
   static const List<BoxShadow> buttonShadow = level1Shadow;
   static const List<BoxShadow> fabShadow = level3Shadow;
   static const List<BoxShadow> dialogShadow = level5Shadow;

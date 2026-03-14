@@ -21,7 +21,7 @@ class CompactRatingItemCard extends StatelessWidget {
     final ratingCount = item.ratings.length;
 
     return AppCard(
-      variant: AppCardVariant.flat,
+      variant: AppCardVariant.outlined,
       onTap: onTap,
       padding: EdgeInsets.zero,
       child: IntrinsicHeight(
@@ -111,24 +111,40 @@ class CompactRatingItemCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xs),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.star_rounded,
-                          size: 16,
-                          color: AppColors.warning,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          ratingCount > 0
-                              ? '${averageRating.toStringAsFixed(1)} / ${item.ratingScale}'
-                              : 'No ratings yet',
-                          style: AppTypography.labelMedium.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w700,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.starGold.withValues(alpha: 0.15),
+                            borderRadius: AppBorderRadius.fullRadius,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                size: 14,
+                                color: AppColors.starGold,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                ratingCount > 0
+                                    ? '${averageRating.toStringAsFixed(1)} / ${item.ratingScale}'
+                                    : 'No ratings',
+                                style: AppTypography.labelSmall.copyWith(
+                                  color: AppColors.starGold,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         if (ratingCount > 0) ...[
+                          const SizedBox(width: AppSpacing.sm),
                           Text(
-                            ' \u2022 $ratingCount rating${ratingCount == 1 ? '' : 's'}',
+                            '$ratingCount rating${ratingCount == 1 ? '' : 's'}',
                             style: AppTypography.bodySmall.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),

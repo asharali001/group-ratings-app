@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import '/core/__core.dart';
 import '/styles/__styles.dart';
 import '/ui_components/__ui_components.dart';
 
@@ -17,26 +16,28 @@ class QuickActionsSection extends GetView<HomeController> {
       children: [
         Text(
           'Quick Actions',
-          style: AppTypography.titleLarge.copyWith(
-            color: context.colors.onSurface,
+          style: AppTypography.titleMedium.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
-        QuickActionCard(
-          title: 'Create New Group',
-          subtitle: 'Start rating with friends',
-          icon: Icons.add_circle_outline,
-          iconColor: AppColors.primary,
-          onTap: controller.navigateToCreateGroup,
-        ),
-        const SizedBox(height: AppSpacing.md),
-        QuickActionCard(
-          title: 'Join Existing Group',
-          subtitle: 'Enter group code',
-          icon: Icons.group_add,
-          iconColor: AppColors.secondary,
-          onTap: controller.navigateToJoinGroup,
+        const SizedBox(height: AppSpacing.sm),
+        ActionChipRow(
+          chips: [
+            ActionChipItem(
+              label: 'Rate Item',
+              icon: Icons.add,
+              isFilled: true,
+              onTap: controller.navigateToGroupsTab,
+            ),
+            ActionChipItem(
+              label: 'Join Group',
+              onTap: controller.navigateToJoinGroup,
+            ),
+            ActionChipItem(
+              label: 'Create Group',
+              onTap: controller.navigateToCreateGroup,
+            ),
+          ],
         ),
       ],
     );

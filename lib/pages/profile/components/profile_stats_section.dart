@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
-import '/styles/__styles.dart';
 import '/ui_components/__ui_components.dart';
+import '/styles/__styles.dart';
 
 class ProfileStatsSection extends StatelessWidget {
   final String groupsCount;
   final String memberSince;
+  final String ratingsCount;
+  final String peersCount;
 
   const ProfileStatsSection({
     super.key,
     required this.groupsCount,
     required this.memberSince,
+    this.ratingsCount = '0',
+    this.peersCount = '0',
   });
 
   @override
@@ -18,64 +22,27 @@ class ProfileStatsSection extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: _buildStatCard(
-            context,
-            icon: Icons.group_rounded,
+          child: StatPill(
+            value: ratingsCount,
+            label: 'Ratings',
+            usePrimaryColor: true,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: StatPill(
             value: groupsCount,
             label: 'Groups',
           ),
         ),
-        const SizedBox(width: AppSpacing.md),
+        const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: _buildStatCard(
-            context,
-            icon: Icons.calendar_today_rounded,
-            value: memberSince,
-            label: 'Joined',
+          child: StatPill(
+            value: peersCount,
+            label: 'Peers',
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildStatCard(
-    BuildContext context, {
-    required IconData icon,
-    required String value,
-    required String label,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return AppCard(
-      variant: AppCardVariant.outlined,
-      child: Column(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 20, color: colorScheme.primary),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            value,
-            style: AppTypography.titleLarge.copyWith(
-              fontWeight: FontWeight.w700,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: AppTypography.bodySmall.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

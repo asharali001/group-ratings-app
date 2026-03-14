@@ -40,14 +40,10 @@ class AskAIController extends GetxController {
   Future<void> sendMessage(String question) async {
     final trimmed = question.trim();
     if (trimmed.isEmpty || isLoading.value) return;
-
     inputController.clear();
-
     messages.add(ChatMessage(role: ChatRole.user, text: trimmed));
     _scrollToBottom();
-
     isLoading.value = true;
-
     try {
       final result = await _aiService.queryAI(trimmed);
       messages.add(

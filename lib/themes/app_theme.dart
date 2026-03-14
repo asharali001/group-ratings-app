@@ -38,7 +38,7 @@ class AppTheme {
       scaffoldBackgroundColor: colorScheme.surface,
 
       // Typography
-      fontFamily: 'Kanit', // Ensure fallback
+      fontFamily: 'DM Sans',
       textTheme: _buildTextTheme(colorScheme.onSurface),
 
       // App Bar
@@ -55,13 +55,13 @@ class AppTheme {
         iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
 
-      // Card
+      // Card (16px radius per CLAUDE.md)
       cardTheme: CardThemeData(
         elevation: 0,
         color: isDark ? AppColors.surfaceVariant : AppColors.white,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: AppBorderRadius.mdRadius,
+          borderRadius: AppBorderRadius.lgRadius,
           side: BorderSide(
             color: isDark ? AppColors.transparent : AppColors.border,
             width: 1,
@@ -69,7 +69,7 @@ class AppTheme {
         ),
       ),
 
-      // Buttons
+      // Buttons (12px radius per CLAUDE.md)
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           elevation: 0,
@@ -78,7 +78,7 @@ class AppTheme {
             vertical: AppSpacing.md,
           ),
           shape: const RoundedRectangleBorder(
-            borderRadius: AppBorderRadius.smRadius,
+            borderRadius: AppBorderRadius.mdRadius,
           ),
           textStyle: AppTypography.labelLarge.copyWith(
             fontWeight: AppTypography.semiBold,
@@ -94,7 +94,7 @@ class AppTheme {
           ),
           side: const BorderSide(color: AppColors.border),
           shape: const RoundedRectangleBorder(
-            borderRadius: AppBorderRadius.smRadius,
+            borderRadius: AppBorderRadius.mdRadius,
           ),
           textStyle: AppTypography.labelLarge.copyWith(
             fontWeight: AppTypography.semiBold,
@@ -109,7 +109,7 @@ class AppTheme {
             vertical: AppSpacing.sm,
           ),
           shape: const RoundedRectangleBorder(
-            borderRadius: AppBorderRadius.smRadius,
+            borderRadius: AppBorderRadius.mdRadius,
           ),
           textStyle: AppTypography.labelLarge.copyWith(
             fontWeight: AppTypography.semiBold,
@@ -117,7 +117,7 @@ class AppTheme {
         ),
       ),
 
-      // Inputs
+      // Inputs (12px radius, #F1F5F9 fill, #CBD5E1 border per CLAUDE.md)
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark ? AppColors.surfaceVariant : AppColors.background,
@@ -132,13 +132,17 @@ class AppTheme {
           color: AppColors.textTertiary,
         ),
         errorStyle: AppTypography.labelSmall.copyWith(color: AppColors.error),
-        border: const OutlineInputBorder(
+        border: OutlineInputBorder(
           borderRadius: AppBorderRadius.mdRadius,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.border : AppColors.grayLight,
+          ),
         ),
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.mdRadius,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.border : AppColors.grayLight,
+          ),
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: AppBorderRadius.mdRadius,
@@ -154,12 +158,12 @@ class AppTheme {
         ),
       ),
 
-      // Dialogs & Sheets
+      // Dialogs & Sheets (20px radius per CLAUDE.md)
       dialogTheme: DialogThemeData(
         backgroundColor: colorScheme.surface,
         elevation: 0,
         shape: const RoundedRectangleBorder(
-          borderRadius: AppBorderRadius.lgRadius,
+          borderRadius: AppBorderRadius.xlRadius,
         ),
         titleTextStyle: AppTypography.headlineSmall.copyWith(
           fontWeight: AppTypography.semiBold,
@@ -214,8 +218,12 @@ class AppTheme {
       brightness: brightness,
       primary: AppColors.primary,
       onPrimary: AppColors.onPrimary,
-      primaryContainer: isDark ? const Color(0xFF1E293B) : AppColors.primaryContainer,
-      onPrimaryContainer: isDark ? const Color(0xFFF1F5F9) : AppColors.onPrimaryContainer,
+      primaryContainer: isDark
+          ? const Color(0xFF1E293B)
+          : AppColors.primaryContainer,
+      onPrimaryContainer: isDark
+          ? const Color(0xFFF1F5F9)
+          : AppColors.onPrimaryContainer,
 
       secondary: AppColors.secondary,
       onSecondary: AppColors.onSecondary,
@@ -223,7 +231,7 @@ class AppTheme {
       error: AppColors.error,
       onError: AppColors.white,
 
-      surface: isDark ? const Color(0xFF0F172A) : AppColors.surface,
+      surface: isDark ? const Color(0xFF0F172A) : AppColors.grayLightest,
       onSurface: isDark ? const Color(0xFFF1F5F9) : AppColors.onSurface,
 
       // Background is usually same as surface in M3 or slightly different

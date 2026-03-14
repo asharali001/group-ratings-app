@@ -20,7 +20,6 @@ class MyRatingsPage extends StatelessWidget {
 
     return PageLayout(
       title: 'My Ratings',
-      subtitle: 'Manage and explore your ratings',
       child: Column(
         children: [
           AppTextField(
@@ -57,7 +56,6 @@ class MyRatingsPage extends StatelessWidget {
                       : const [],
                 );
               }
-
               return ListView.separated(
                 itemCount: controller.filteredRatings.length,
                 separatorBuilder: (context, index) =>

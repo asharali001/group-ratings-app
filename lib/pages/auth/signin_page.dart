@@ -24,32 +24,39 @@ class SignInPage extends StatelessWidget {
                 children: [
                   const SizedBox(height: AppSpacing.xl),
 
-                  // App Logo/Title
-                  Column(
-                    children: [
-                      const Icon(
-                        Icons.group,
-                        size: 80,
-                        color: AppColors.primary,
+                  // Hero icon
+                  Center(
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryTint,
+                        shape: BoxShape.circle,
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        'Group Ratings',
-                        style: AppTypography.headlineLarge.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
+                      child: const Center(
+                        child: KretikLogo(
+                          size: 36,
+                          variant: KretikLogoVariant.markOnly,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'Welcome back! Sign in to continue',
-                        style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Title + subtitle
+                  Text(
+                    'Welcome Back',
+                    style: AppTypography.headlineSmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Sign in to continue rating with your groups',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
 
                   const SizedBox(height: AppSpacing.xl),
@@ -68,9 +75,10 @@ class SignInPage extends StatelessWidget {
                           horizontal: AppSpacing.md,
                         ),
                         child: Text(
-                          'OR',
-                          style: AppTypography.bodyMedium.copyWith(
+                          'OR CONTINUE WITH',
+                          style: AppTypography.labelSmall.copyWith(
                             color: AppColors.textSecondary,
+                            letterSpacing: 1.5,
                           ),
                         ),
                       ),
@@ -80,28 +88,27 @@ class SignInPage extends StatelessWidget {
 
                   const SizedBox(height: AppSpacing.lg),
 
-                  // Google Sign In Button
-                  AppButton(
-                    text: 'Continue with Google',
-                    variant: AppButtonVariant.outline,
-                    isFullWidth: true,
-                    iconWidget: Image.asset(
-                      'assets/images/google-logo.png',
-                      width: 24,
-                      height: 24,
-                    ),
-                    onPressed: controller.isLoading
-                        ? null
-                        : controller.signInWithGoogle,
+                  // Social buttons side-by-side
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppButton(
+                          text: 'Google',
+                          variant: AppButtonVariant.outline,
+                          iconWidget: Image.asset(
+                            'assets/images/google-logo.png',
+                            width: 20,
+                            height: 20,
+                          ),
+                          onPressed: controller.isLoading
+                              ? null
+                              : controller.signInWithGoogle,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      const Expanded(child: AppleSignInButton()),
+                    ],
                   ),
-
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Apple Sign In Button
-                  // Keeping the wrapper as it likely handles specific Apple JS/Native logic internally or styling quirks
-                  // But checking if we should replace it? logic is simple controller call.
-                  // For now, keep as is for safety, but ensure height matches.
-                  const AppleSignInButton(),
 
                   const SizedBox(height: AppSpacing.lg),
 
@@ -174,6 +181,23 @@ class SignInPage extends StatelessWidget {
           );
         }),
 
+        const SizedBox(height: AppSpacing.sm),
+
+        // Forgot Password link
+        Align(
+          alignment: Alignment.centerRight,
+          child: GestureDetector(
+            onTap: controller.isLoading ? null : controller.resetPassword,
+            child: Text(
+              'Forgot Password?',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+
         const SizedBox(height: AppSpacing.md),
 
         // Error Message
@@ -220,18 +244,6 @@ class SignInPage extends StatelessWidget {
             isFullWidth: true,
           );
         }),
-
-        const SizedBox(height: AppSpacing.md),
-
-        // Forgot Password
-        Align(
-          alignment: Alignment.center,
-          child: AppButton(
-            variant: AppButtonVariant.ghost,
-            onPressed: controller.isLoading ? null : controller.resetPassword,
-            text: 'Forgot Password?',
-          ),
-        ),
       ],
     );
   }

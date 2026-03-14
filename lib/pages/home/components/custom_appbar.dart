@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
+import '/core/services/auth_service.dart';
 import '/styles/__styles.dart';
 
-class CustomAppbar extends StatefulWidget {
+class CustomAppbar extends StatelessWidget {
   const CustomAppbar({super.key});
 
-  @override
-  State<CustomAppbar> createState() => _CustomAppbarState();
-}
-
-class _CustomAppbarState extends State<CustomAppbar> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -28,10 +26,10 @@ class _CustomAppbarState extends State<CustomAppbar> {
               color: colorScheme.surfaceContainerHighest,
               borderRadius: AppBorderRadius.mdRadius,
             ),
-            child: const Icon(
-              Icons.rate_review,
-              color: AppColors.primary,
-              size: 24,
+            child: SvgPicture.asset(
+              'assets/images/kretik-logo-mark.svg',
+              width: 24,
+              height: 24,
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -40,14 +38,14 @@ class _CustomAppbarState extends State<CustomAppbar> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Group Ratings',
+                  'Kretik',
                   style: AppTypography.titleLarge.copyWith(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
-                  'Rate and review together',
+                  'Rate Together',
                   style: AppTypography.bodySmall.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -55,6 +53,42 @@ class _CustomAppbarState extends State<CustomAppbar> {
               ],
             ),
           ),
+          Obx(() {
+            final auth = AuthService.to;
+            if (!auth.isMirroring) return const SizedBox.shrink();
+            return GestureDetector(
+              onTap: auth.clearMirrorUser,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF3C7),
+                  borderRadius: BorderRadius.circular(9999),
+                  border: Border.all(color: const Color(0xFFF59E0B), width: 1),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.supervisor_account_rounded,
+                      size: 14,
+                      color: Color(0xFFD97706),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Mirroring: ${auth.mirroredUserName ?? '…'}',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: const Color(0xFFD97706),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );

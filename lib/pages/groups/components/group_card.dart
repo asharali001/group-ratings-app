@@ -28,158 +28,143 @@ class GroupCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return AppCard(
-      variant: AppCardVariant.flat,
-      padding: const EdgeInsets.all(AppSpacing.md),
+      variant: AppCardVariant.outlined,
+      padding: EdgeInsets.zero,
       onTap: () => groupsListController.navigateToGroupRatings(group),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Left: emoji circle
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                group.category.emoji,
-                style: const TextStyle(fontSize: 24),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Left accent bar
+            Container(
+              width: 4,
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(AppBorderRadius.lg),
+                  bottomLeft: Radius.circular(AppBorderRadius.lg),
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          // Right: all content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Name row + owner/member badge + options menu
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+            // Card content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        group.name,
-                        style: AppTypography.titleMedium.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: colorScheme.onSurface,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
+                    // Left: emoji circle
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.xs,
-                      ),
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: AppBorderRadius.smRadius,
-                        border: Border.all(
-                          color: colorScheme.primary.withValues(alpha: 0.4),
-                        ),
+                        color: colorScheme.primary.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
                       ),
-                      child: Text(
-                        isCreator ? 'Owner' : 'Member',
-                        style: AppTypography.labelSmall.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w600,
+                      child: Center(
+                        child: Text(
+                          group.category.emoji,
+                          style: const TextStyle(fontSize: 24),
                         ),
                       ),
                     ),
-                    _buildOptionsMenu(context),
+                    const SizedBox(width: AppSpacing.sm),
+                    // Right: all content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Overline: ENTRY #XX · CATEGORY
+                          Text(
+                            'ENTRY #${(index + 1).toString().padLeft(2, '0')} \u00B7 ${group.category.displayName.toUpperCase()}',
+                            style: AppTypography.labelSmall.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 10,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          // Name row + options menu
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  group.name,
+                                  style: AppTypography.titleMedium.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              _buildOptionsMenu(context),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          // Metadata row: members • items
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.people_rounded,
+                                size: 13,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                '${group.members.length}',
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.xs,
+                                ),
+                                child: Text(
+                                  '\u2022',
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                Icons.star_rounded,
+                                size: 13,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                '${group.ratingItemsCount}',
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (group.description != null &&
+                              group.description!.isNotEmpty) ...[
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              group.description!,
+                              style: AppTypography.bodySmall.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                height: 1.4,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                // Metadata row: members • items • category
-                Row(
-                  children: [
-                    Icon(
-                      Icons.people_rounded,
-                      size: 13,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      '${group.members.length}',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xs),
-                      child: Text(
-                        '•',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      Icons.star_rounded,
-                      size: 13,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      '${group.ratingItemsCount}',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xs),
-                      child: Text(
-                        '•',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        group.category.displayName,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                if (group.description != null &&
-                    group.description!.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    group.description!,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      height: 1.4,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-                const SizedBox(height: AppSpacing.xs),
-                // Avatar stack
-                AvatarStack(
-                  avatars: group.members
-                      .take(5)
-                      .map((m) => AvatarStackItem(name: m.name))
-                      .toList(),
-                  maxDisplay: 4,
-                  avatarSize: 26,
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -273,9 +258,7 @@ class GroupCard extends StatelessWidget {
         onPrimaryAction: () {
           Get.find<GroupsListController>().leaveGroup(group.id);
         },
-        onSecondaryAction: () {
-          // Dialog auto-closes, no need to manually pop
-        },
+        onSecondaryAction: () {},
       ),
     );
   }

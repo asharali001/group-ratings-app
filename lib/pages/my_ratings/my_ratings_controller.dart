@@ -20,7 +20,7 @@ class MyRatingsController extends GetxController {
   StreamSubscription<UserModel?>? _authStateSubscription;
   final Map<String, RatingItem> _allItemsMap = <String, RatingItem>{};
 
-  String? get currentUserId => _authService.currentUser?.uid;
+  String? get currentUserId => _authService.effectiveUserId;
 
   @override
   void onInit() {
@@ -34,8 +34,15 @@ class MyRatingsController extends GetxController {
       }
     });
 
+    // Reload when mirrored user changes
+    ever(_authService.mirroredUserIdObs, (_) {
+      if (_authService.effectiveUserId != null) {
+        _loadAllRatingItems();
+      }
+    });
+
     // Load initial data if user is already authenticated
-    if (_authService.currentUserId != null) {
+    if (_authService.effectiveUserId != null) {
       _loadAllRatingItems();
     }
   }
@@ -57,12 +64,15 @@ class MyRatingsController extends GetxController {
 
   Future<void> _loadAllRatingItems() async {
     try {
-      // Cancel existing subscriptions
+      // Cancel existing subscriptions and clear stale data
       _groupsSubscription?.cancel();
       _cancelAllRatingSubscriptions();
+      _allItemsMap.clear();
+      allRatings.clear();
+      filteredRatings.clear();
 
       isLoading.value = true;
-      final userId = _authService.currentUser?.uid;
+      final userId = _authService.effectiveUserId;
       if (userId == null) {
         isLoading.value = false;
         return;
@@ -243,13 +253,13 @@ class MyRatingsController extends GetxController {
   }
 
   bool _hasUserRated(RatingItem item) {
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     if (userId == null) return false;
     return item.ratedBy.contains(userId);
   }
 
   double? _getUserRating(RatingItem item) {
-    final userId = _authService.currentUser?.uid;
+    final userId = _authService.effectiveUserId;
     if (userId == null) return null;
 
     final userRating = item.ratings.firstWhereOrNull((r) => r.userId == userId);

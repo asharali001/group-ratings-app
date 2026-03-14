@@ -68,6 +68,19 @@ class UserService {
     }
   }
 
+  /// Get all user documents from Firestore
+  static Future<List<UserModel>> getAllUsers() async {
+    try {
+      final snapshot = await _firestore.collection(_usersCollection).get();
+      return snapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data()))
+          .toList();
+    } catch (e) {
+      log('Error getting all users: $e', name: 'UserService');
+      return [];
+    }
+  }
+
   /// Delete user document from Firestore
   static Future<void> deleteUserDocument(String uid) async {
     try {

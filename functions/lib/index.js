@@ -46,7 +46,7 @@ const pinecone_client_1 = require("./pinecone_client");
 admin.initializeApp();
 // ─── HTTPS Callable: queryAI ─────────────────────────────────────────────────
 exports.queryAI = (0, https_1.onCall)({ secrets: [openAIKey, pineconeKey] }, async (request) => {
-    var _a, _b;
+    var _a, _b, _c, _d, _e;
     process.env.OPENAI_API_KEY = openAIKey.value();
     process.env.PINECONE_API_KEY = pineconeKey.value();
     if (!request.auth) {
@@ -56,45 +56,64 @@ exports.queryAI = (0, https_1.onCall)({ secrets: [openAIKey, pineconeKey] }, asy
     if (!question || typeof question !== "string" || question.trim().length === 0) {
         throw new https_1.HttpsError("invalid-argument", "question is required.");
     }
-    const userId = request.auth.uid;
+    // Support mirror mode: use provided userId if the caller is an allowed admin
+    let userId = request.auth.uid;
+    const mirrorUserId = request.data.mirrorUserId;
+    if (mirrorUserId && typeof mirrorUserId === "string") {
+        const configDoc = await admin.firestore().collection("app_config").doc("mirror_access").get();
+        const allowedEmails = configDoc.exists ? ((_b = (_a = configDoc.data()) === null || _a === void 0 ? void 0 : _a.allowedEmails) !== null && _b !== void 0 ? _b : []) : [];
+        const callerEmail = (_c = request.auth.token.email) !== null && _c !== void 0 ? _c : "";
+        if (allowedEmails.includes(callerEmail)) {
+            userId = mirrorUserId;
+        }
+    }
     // 1. Embed the question
     const questionEmbedding = await (0, openai_client_1.embedText)(question.trim());
     // 2. Query Pinecone (filtered to user's groups)
     const results = await (0, pinecone_client_1.queryVectors)(userId, questionEmbedding, 10);
-    if (results.length === 0) {
+    // Only include context from results that are at least loosely related (≥0.5)
+    const CONTEXT_THRESHOLD = 0.5;
+    const relevantResults = results.filter((r) => r.score >= CONTEXT_THRESHOLD);
+    if (relevantResults.length === 0) {
         return {
             answer: "I don't have enough data to answer that yet. Try rating some items in your groups first!",
             references: [],
         };
     }
-    // 3. Build context string
-    const contextLines = results
+    // 3. Build context string and ID list (from loosely relevant results)
+    const contextLines = relevantResults
         .map((r) => { var _a; return (_a = r.metadata.textContent) !== null && _a !== void 0 ? _a : ""; })
         .filter(Boolean);
     const context = contextLines.join("\n");
-    // 4. Generate answer
-    const answer = await (0, openai_client_1.generateAnswer)(context, question.trim());
-    // 5. Extract unique references from results
-    const seenIds = new Set();
+    // Build a map of Pinecone vector ID → result for reference lookup
+    const resultById = new Map(relevantResults.map((r) => [r.id, r]));
+    const contextIds = relevantResults.map((r) => r.id);
+    // 4. Generate answer — GPT tells us which IDs it actually cited
+    const { answer, usedIds } = await (0, openai_client_1.generateAnswer)(context, question.trim(), contextIds);
+    // 5. Build references only from IDs GPT explicitly cited
+    const seenRefIds = new Set();
     const references = [];
-    for (const r of results) {
+    for (const vectorId of usedIds) {
+        const r = resultById.get(vectorId);
+        if (!r)
+            continue;
         const meta = r.metadata;
-        if (meta.type === "group" && meta.groupId && !seenIds.has(meta.groupId)) {
-            seenIds.add(meta.groupId);
+        if (meta.type === "group" && meta.groupId && !seenRefIds.has(meta.groupId)) {
+            seenRefIds.add(meta.groupId);
             references.push({
                 type: "group",
                 id: meta.groupId,
-                name: (_a = meta.groupName) !== null && _a !== void 0 ? _a : "Group",
+                name: (_d = meta.groupName) !== null && _d !== void 0 ? _d : "Group",
             });
         }
         if ((meta.type === "item" || meta.type === "user_rating") &&
             meta.itemId &&
-            !seenIds.has(meta.itemId)) {
-            seenIds.add(meta.itemId);
+            !seenRefIds.has(meta.itemId)) {
+            seenRefIds.add(meta.itemId);
             references.push({
                 type: "ratingItem",
                 id: meta.itemId,
-                name: (_b = meta.itemName) !== null && _b !== void 0 ? _b : "Item",
+                name: (_e = meta.itemName) !== null && _e !== void 0 ? _e : "Item",
                 groupId: meta.groupId,
             });
         }

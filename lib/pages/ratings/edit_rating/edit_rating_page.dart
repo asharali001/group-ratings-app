@@ -18,9 +18,7 @@ class EditRatingPage extends GetView<EditRatingController> {
     controller.initializeForm(rating);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Rating'),
-      ),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Form(
@@ -55,21 +53,36 @@ class EditRatingPage extends GetView<EditRatingController> {
   Widget _buildHeaderSection(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: const BoxDecoration(
+            color: AppColors.primaryTint,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.edit_rounded,
+            color: AppColors.primary,
+            size: 32,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
         Text(
           'Edit Rating',
-          style: AppTypography.titleLarge.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.headlineSmall,
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Update your rating for "${rating.name}"',
-          style: AppTypography.bodyMedium.copyWith(color: colorScheme.onSurfaceVariant),
+          style: AppTypography.bodyMedium.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -168,13 +181,13 @@ class EditRatingPage extends GetView<EditRatingController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Item Photo',
-          style: AppTypography.titleMedium.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
+          'ITEM PHOTO',
+          style: AppTypography.labelSmall.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            letterSpacing: 1.5,
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           'Update the photo for your rating (optional)',
           style: AppTypography.bodySmall.copyWith(color: colorScheme.onSurfaceVariant),

@@ -423,7 +423,7 @@ class RatingItemCard extends StatelessWidget {
                     const Icon(
                       Icons.star_rounded,
                       size: 16,
-                      color: Colors.amber,
+                      color: AppColors.starGold,
                     ),
                     const SizedBox(width: 4),
                     Text(

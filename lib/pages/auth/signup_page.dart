@@ -24,32 +24,39 @@ class SignUpPage extends StatelessWidget {
                 children: [
                   const SizedBox(height: AppSpacing.xl),
 
-                  // App Logo/Title
-                  Column(
-                    children: [
-                      const Icon(
-                        Icons.group,
-                        size: 80,
-                        color: AppColors.primary,
+                  // Hero icon
+                  Center(
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryTint,
+                        shape: BoxShape.circle,
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        'Group Ratings',
-                        style: AppTypography.headlineLarge.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
+                      child: const Center(
+                        child: KretikLogo(
+                          size: 36,
+                          variant: KretikLogoVariant.markOnly,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'Create your account to get started',
-                        style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Title + subtitle
+                  Text(
+                    'Create Account',
+                    style: AppTypography.headlineSmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Join Kretik to start rating with friends',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
 
                   const SizedBox(height: AppSpacing.xl),
@@ -68,9 +75,10 @@ class SignUpPage extends StatelessWidget {
                           horizontal: AppSpacing.md,
                         ),
                         child: Text(
-                          'OR',
-                          style: AppTypography.bodyMedium.copyWith(
+                          'OR CONTINUE WITH',
+                          style: AppTypography.labelSmall.copyWith(
                             color: AppColors.textSecondary,
+                            letterSpacing: 1.5,
                           ),
                         ),
                       ),
@@ -80,25 +88,27 @@ class SignUpPage extends StatelessWidget {
 
                   const SizedBox(height: AppSpacing.lg),
 
-                  // Google Sign In Button
-                  AppButton(
-                    text: 'Continue with Google',
-                    variant: AppButtonVariant.outline,
-                    isFullWidth: true,
-                    iconWidget: Image.asset(
-                      'assets/images/google-logo.png',
-                      width: 24,
-                      height: 24,
-                    ),
-                    onPressed: controller.isLoading
-                        ? null
-                        : controller.signInWithGoogle,
+                  // Social buttons side-by-side
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppButton(
+                          text: 'Google',
+                          variant: AppButtonVariant.outline,
+                          iconWidget: Image.asset(
+                            'assets/images/google-logo.png',
+                            width: 20,
+                            height: 20,
+                          ),
+                          onPressed: controller.isLoading
+                              ? null
+                              : controller.signInWithGoogle,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      const Expanded(child: AppleSignInButton()),
+                    ],
                   ),
-
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Apple Sign In Button
-                  const AppleSignInButton(),
 
                   const SizedBox(height: AppSpacing.lg),
 
@@ -120,6 +130,27 @@ class SignUpPage extends StatelessWidget {
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                           ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Security banner
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.lock_outline_rounded,
+                        size: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text(
+                        'Your data is encrypted and secure',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],

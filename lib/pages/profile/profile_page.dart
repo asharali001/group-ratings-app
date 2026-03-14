@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '/core/routes/route_names.dart';
 import '/styles/__styles.dart';
 import '/ui_components/__ui_components.dart';
 import 'profile_controller.dart';
@@ -41,7 +42,6 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(ProfileController());
-    final colorScheme = Theme.of(context).colorScheme;
 
     return PageLayout(
       title: 'Profile',
@@ -53,27 +53,18 @@ class ProfilePage extends StatelessWidget {
 
         return ListView(
           children: [
-            ProfileHeaderSection(
-              user: controller.currentUser,
-              onEditName: () => _showEditNameDialog(context, controller),
-            ),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-              child: ProfileStatsSection(
-                groupsCount: '${controller.groupsCount}',
-                memberSince: controller.memberSince,
+            Obx(
+              () => ProfileHeaderSection(
+                user: controller.effectiveUser,
+                onEditName: controller.isMirroring
+                    ? () {}
+                    : () => _showEditNameDialog(context, controller),
               ),
             ),
 
-            const SizedBox(height: AppSpacing.xl),
-
+            const SizedBox(height: AppSpacing.lg),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               child: Obx(
                 () => ProfileSettingsSection(
                   isDarkMode: controller.isDarkMode.value,
@@ -81,22 +72,13 @@ class ProfilePage extends StatelessWidget {
                   onSignOut: () => controller.signOut(),
                   onDeleteAccount: () =>
                       controller.handleDeleteAccount(context),
+                  canMirror: controller.canMirror.value,
+                  isMirroring: controller.isMirroring,
+                  onMirrorUser: () => Get.toNamed(RouteNames.mainApp.mirrorUserPage),
+                  onStopMirroring: controller.stopMirroring,
                 ),
               ),
             ),
-
-            const SizedBox(height: AppSpacing.xxl),
-
-            // App version
-            Center(
-              child: Text(
-                'Version 1.0.0',
-                style: AppTypography.bodySmall.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-
             const SizedBox(height: AppSpacing.lg),
           ],
         );
