@@ -126,9 +126,9 @@ class ProfileController extends GetxController {
     final uid = _authService.effectiveUserId;
     if (uid != null) {
       final ratingService = Get.put(RatingService());
-      _ratingsSubscription = ratingService
-          .getUserRatingItems(uid)
-          .listen((ratings) {
+      _ratingsSubscription = ratingService.getUserRatingItems(uid).listen((
+        ratings,
+      ) {
         ratingsCount.value = ratings.length;
       });
     }
@@ -181,7 +181,11 @@ class ProfileController extends GetxController {
   }
 
   void startMirroring(UserModel user) {
-    _authService.setMirrorUser(user.uid, user.displayName ?? user.uid, photoURL: user.photoURL);
+    _authService.setMirrorUser(
+      user.uid,
+      user.displayName ?? 'User',
+      photoURL: user.photoURL,
+    );
     mirroredUser.value = user;
   }
 

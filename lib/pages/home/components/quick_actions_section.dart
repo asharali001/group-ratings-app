@@ -24,13 +24,9 @@ class QuickActionsSection extends GetView<HomeController> {
         ActionChipRow(
           chips: [
             ActionChipItem(
-              label: 'Rate Item',
+              label: 'Join Group',
               icon: Icons.add,
               isFilled: true,
-              onTap: controller.navigateToGroupsTab,
-            ),
-            ActionChipItem(
-              label: 'Join Group',
               onTap: controller.navigateToJoinGroup,
             ),
             ActionChipItem(

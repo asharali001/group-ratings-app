@@ -14,8 +14,6 @@ class GroupsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(GroupsListController());
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return PageLayout(
       title: 'Groups',
@@ -70,59 +68,33 @@ class GroupsPage extends StatelessWidget {
   ) {
     final hasSearch = controller.searchQuery.value.isNotEmpty;
     final hasFilter = controller.selectedFilter.value != 'All';
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: colorScheme.primaryContainer.withValues(
-                  alpha: 0.2,
-                ), // Standardize
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                hasSearch || hasFilter
-                    ? Icons.search_off
-                    : Icons.group_outlined,
-                color: colorScheme.primary,
-                size: 48,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              hasSearch || hasFilter ? 'No groups found' : 'No groups yet',
-              style: AppTypography.titleLarge.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              hasSearch || hasFilter
-                  ? 'Try adjusting your search or filters'
-                  : 'Create your first group to get started!',
-              style: AppTypography.bodyMedium.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            if (!hasSearch && !hasFilter) ...[
-              const SizedBox(height: AppSpacing.xl),
-              AppButton(
-                onPressed: () => _navigateToCreateGroup(),
-                text: 'Create Group',
-              ),
-            ],
-          ],
+    if (hasSearch || hasFilter) {
+      return EmptyStateWidget(
+        icon: Icons.search_off,
+        title: 'No groups found',
+        description: 'Try adjusting your search or filters',
+        actions: const [],
+      );
+    }
+
+    return EmptyStateWidget(
+      svgAsset: 'assets/animations/team.svg',
+      title: 'No groups yet',
+      description: 'Create your first group to get started!',
+      actions: [
+        AppButton(
+          onPressed: () => _navigateToCreateGroup(),
+          text: 'Create Group',
         ),
-      ),
+        const SizedBox(width: AppSpacing.md),
+        AppButton(
+          onPressed: () => Get.toNamed(RouteNames.groups.joinGroupPage),
+          text: 'Join Group',
+          variant: AppButtonVariant.outline,
+          icon: Icons.login_rounded,
+        ),
+      ],
     );
   }
 

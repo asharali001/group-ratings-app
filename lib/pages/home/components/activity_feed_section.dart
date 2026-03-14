@@ -43,18 +43,20 @@ class ActivityFeedSection extends GetView<HomeController> {
           final items = controller.recentRatings;
 
           if (items.isEmpty) {
-            return AppCard(
-              variant: AppCardVariant.outlined,
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Center(
-                child: Text(
-                  'No ratings yet. Join a group and start rating!',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
+            return EmptyStateWidget(
+              svgAsset: 'assets/animations/feedback.svg',
+              title: 'No ratings yet',
+              description:
+                  'Join a group and start rating items with your friends',
+              actions: [
+                AppButton(
+                  text: 'Join a Group',
+                  variant: AppButtonVariant.outline,
+                  icon: Icons.group_add_rounded,
+                  onPressed: () =>
+                      Get.toNamed(RouteNames.groups.joinGroupPage),
                 ),
-              ),
+              ],
             );
           }
 

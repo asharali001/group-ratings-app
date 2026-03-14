@@ -42,6 +42,7 @@ class AuthService extends GetxService {
     _mirroredUserName.value = null;
     _mirroredUserPhotoURL.value = null;
   }
+
   Stream<UserModel?> get authStateChanges =>
       _authStateChanges ?? Stream.value(null);
 
@@ -304,8 +305,9 @@ class AuthService extends GetxService {
   String? get userPhotoURL => _currentUser.value?.photoURL;
 
   /// Mirror-aware display name
-  String get effectiveUserDisplayName =>
-      isMirroring ? (_mirroredUserName.value ?? userDisplayName) : userDisplayName;
+  String get effectiveUserDisplayName => isMirroring
+      ? (_mirroredUserName.value ?? userDisplayName)
+      : userDisplayName;
 
   /// Mirror-aware photo URL
   String? get effectiveUserPhotoURL =>

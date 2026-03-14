@@ -38,22 +38,31 @@ class MyRatingsPage extends StatelessWidget {
               }
 
               if (controller.filteredRatings.isEmpty) {
+                final hasSearch = controller.searchQuery.value.isNotEmpty;
                 return EmptyStateWidget(
-                  icon: Icons.star_outline,
-                  title: controller.searchQuery.value.isNotEmpty
-                      ? 'No results found'
-                      : 'No ratings yet',
-                  description: controller.searchQuery.value.isNotEmpty
+                  svgAsset: hasSearch ? null : 'assets/animations/opinion.svg',
+                  icon: hasSearch ? Icons.search_off : null,
+                  title: hasSearch ? 'No results found' : 'No ratings yet',
+                  description: hasSearch
                       ? 'Try adjusting your search or filters'
                       : 'Start rating items in your groups to see them here',
-                  actions: controller.searchQuery.value.isNotEmpty
+                  actions: hasSearch
                       ? [
                           TextButton(
                             onPressed: controller.clearFilters,
                             child: const Text('Clear Filters'),
                           ),
                         ]
-                      : const [],
+                      : [
+                          AppButton(
+                            text: 'Go to Groups',
+                            variant: AppButtonVariant.outline,
+                            icon: Icons.group_rounded,
+                            onPressed: () => Get.toNamed(
+                              RouteNames.groups.groupsPage,
+                            ),
+                          ),
+                        ],
                 );
               }
               return ListView.separated(

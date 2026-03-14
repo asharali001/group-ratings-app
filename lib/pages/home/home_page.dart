@@ -24,33 +24,37 @@ class HomePage extends GetView<HomeController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Welcome header
-              Obx(() => Row(
-                children: [
-                  AppAvatar(
-                    initials: _getInitials(authService.effectiveUserDisplayName),
-                    url: authService.effectiveUserPhotoURL,
-                    size: 48,
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Welcome back,',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+              Obx(
+                () => Row(
+                  children: [
+                    AppAvatar(
+                      initials: _getInitials(
+                        authService.effectiveUserDisplayName,
                       ),
-                      Text(
-                        _getFirstName(authService.effectiveUserDisplayName),
-                        style: AppTypography.headlineSmall.copyWith(
-                          color: colorScheme.onSurface,
+                      url: authService.effectiveUserPhotoURL,
+                      size: 48,
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome back,',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              )),
+                        Text(
+                          _getFirstName(authService.effectiveUserDisplayName),
+                          style: AppTypography.headlineSmall.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: AppSpacing.xl),
               const StatsSection(),
               const SizedBox(height: AppSpacing.xl),

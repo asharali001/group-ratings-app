@@ -155,24 +155,25 @@ class AppButton extends StatelessWidget {
         return theme.outlinedButtonTheme.style!.copyWith(
           side: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) {
-              return BorderSide(color: AppColors.textSecondary.withValues(alpha: 0.12));
+              return BorderSide(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.12));
             }
-            return const BorderSide(color: AppColors.border); // Default outline color
+            return BorderSide(color: theme.colorScheme.outline);
           }),
           foregroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) {
-              return AppColors.textSecondary.withValues(alpha: 0.38);
+              return theme.colorScheme.onSurface.withValues(alpha: 0.38);
             }
-            return AppColors.textPrimary;
+            return theme.colorScheme.onSurface;
           }),
         );
       case AppButtonVariant.ghost:
-         return theme.textButtonTheme.style!.copyWith(
+        return theme.textButtonTheme.style!.copyWith(
           foregroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) {
-              return AppColors.textSecondary.withValues(alpha: 0.38);
+              return theme.colorScheme.onSurface.withValues(alpha: 0.38);
             }
-            return AppColors.textPrimary;
+            return theme.colorScheme.onSurface;
           }),
         );
     }
